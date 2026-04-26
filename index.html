@@ -208,6 +208,8 @@
   </div>
 
   <script>
+    // Твой URL Apps Script API
+    var API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
     var currentLogin = '';
     var currentPoints = 0;
 
@@ -226,24 +228,27 @@
         document.getElementById('error').innerText = 'Введите логин';
         return;
       }
-      google.script.run
-        .withSuccessHandler(function(user) {
-          if (user) {
+      fetch(API_URL + '?action=getUser&login=' + encodeURIComponent(login))
+        .then(response => response.json())
+        .then(user => {
+          if (user && user.name) {
             currentLogin = login;
-            currentPoints = user.points;
+            currentPoints = user.points || 0;
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'flex';
             document.getElementById('userName').innerText = user.name;
             document.getElementById('userDept').innerText = user.department;
-            document.getElementById('userPoints').innerText = user.points;
-            updateProgressBar(user.points);
-            if (user.points >= 100) spawnConfetti();
+            document.getElementById('userPoints').innerText = currentPoints;
+            updateProgressBar(currentPoints);
+            if (currentPoints >= 100) spawnConfetti();
             switchTab('profile');
           } else {
             document.getElementById('error').innerText = 'Пользователь не найден';
           }
         })
-        .getUserByLogin(login);
+        .catch(err => {
+          document.getElementById('error').innerText = 'Ошибка соединения';
+        });
     }
 
     function updateProgressBar(points) {
@@ -273,14 +278,15 @@
       else if (tab === 'tasks') navItems[1].classList.add('active');
       else if (tab === 'rewards') navItems[2].classList.add('active');
 
-      if (tab === 'tasks') loadTasks(currentLogin);
+      if (tab === 'tasks') loadTasks();
       else if (tab === 'rewards') loadRewards();
     }
 
     // Загрузка заданий с кнопками
-    function loadTasks(login) {
-      google.script.run
-        .withSuccessHandler(function(tasks) {
+    function loadTasks() {
+      fetch(API_URL + '?action=getTasks&login=' + encodeURIComponent(currentLogin))
+        .then(response => response.json())
+        .then(tasks => {
           var html = '<h4>📋 Ваши задания:</h4>';
           tasks.forEach(function(t) {
             var statusEmoji = '⏳';
@@ -290,7 +296,6 @@
             html += '<div class="task">';
             html += '<div class="task-info"><span>' + statusEmoji + ' ' + t.task + '</span><span>' + t.points + ' карм.</span></div>';
             
-            // Кнопки действий
             if (t.status === 'Назначено') {
               html += '<button class="task-btn start-btn" onclick="takeTask(\'' + t.task + '\')">Взять в работу</button>';
             } else if (t.status === 'В работе') {
@@ -302,53 +307,51 @@
           });
           document.getElementById('taskList').innerHTML = html;
         })
-        .getTasksForUser(login);
+        .catch(err => showMessage('Ошибка загрузки заданий', true));
     }
 
-    // Взять задание
     function takeTask(taskName) {
-      google.script.run
-        .withSuccessHandler(function(result) {
+      fetch(API_URL + '?action=takeTask&task=' + encodeURIComponent(taskName) + '&login=' + encodeURIComponent(currentLogin))
+        .then(response => response.json())
+        .then(result => {
           showMessage(result.message, !result.success);
-          if (result.success) {
-            loadTasks(currentLogin); // обновить список заданий
-          }
-        })
-        .takeTask(taskName, currentLogin);
+          if (result.success) loadTasks();
+        });
     }
 
-    // Выполнить задание
     function completeTask(taskName) {
-      google.script.run
-        .withSuccessHandler(function(result) {
+      fetch(API_URL + '?action=completeTask&task=' + encodeURIComponent(taskName) + '&login=' + encodeURIComponent(currentLogin))
+        .then(response => response.json())
+        .then(result => {
           showMessage(result.message, !result.success);
           if (result.success) {
-            // Пересчитать кармики и обновить профиль
-            google.script.run
-              .withSuccessHandler(function(user) {
-                currentPoints = user.points;
-                document.getElementById('userPoints').innerText = user.points;
-                updateProgressBar(user.points);
-                if (user.points >= 100) spawnConfetti();
-              })
-              .getUserByLogin(currentLogin);
-            loadTasks(currentLogin); // обновить список заданий
+            // обновляем профиль
+            fetch(API_URL + '?action=getUser&login=' + encodeURIComponent(currentLogin))
+              .then(res => res.json())
+              .then(user => {
+                if (user && user.points !== undefined) {
+                  currentPoints = user.points;
+                  document.getElementById('userPoints').innerText = currentPoints;
+                  updateProgressBar(currentPoints);
+                  if (currentPoints >= 100) spawnConfetti();
+                }
+              });
+            loadTasks();
           }
-        })
-        .completeTask(taskName, currentLogin);
+        });
     }
 
-    // Загрузка наград (без изменений)
     function loadRewards() {
-      google.script.run
-        .withSuccessHandler(function(rewards) {
+      fetch(API_URL + '?action=getRewards')
+        .then(response => response.json())
+        .then(rewards => {
           var html = '';
           rewards.forEach(function(r) {
             html += '<div class="reward-card"><span class="icon">🎁</span><strong>' + r.name + '</strong><br>💎 ' + r.cost + ' карм.</div>';
           });
           document.getElementById('rewardGrid').innerHTML = html;
         })
-        .getRewards();
+        .catch(err => showMessage('Ошибка загрузки наград', true));
     }
   </script>
 </body>
