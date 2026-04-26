@@ -1,358 +1,319 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <base target="_top">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Кармический банк</title>
   <style>
+    :root {
+      --bg-primary: #0a0f1e;
+      --bg-secondary: #151b2e;
+      --bg-card: #1e2640;
+      --text-primary: #f0f2f5;
+      --text-secondary: #8b95a6;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #2a344a;
+      --shadow: 0 20px 40px rgba(0,0,0,0.6);
+      --glow: 0 0 30px rgba(249, 115, 22, 0.3);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: 'Segoe UI', 'Nunito', Tahoma, Geneva, Verdana, sans-serif; 
-      background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-      height: 100vh; display: flex; flex-direction: column;
-      animation: fadeIn 0.5s ease-in;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: radial-gradient(circle at 20% 20%, #1a2340, var(--bg-primary) 80%);
+      color: var(--text-primary);
+      min-height: 100vh; 
+      display: flex; flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    @keyframes bounceIn {
-      0% { transform: scale(0.3); opacity: 0; }
-      50% { transform: scale(1.1); }
-      70% { transform: scale(0.9); }
-      100% { transform: scale(1); opacity: 1; }
+    /* ----- МАСКОТ ----- */
+    .mascot-container {
+      position: fixed; bottom: 20px; right: 20px; z-index: 999;
+      display: flex; align-items: center; gap: 12px;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .mascot-bubble {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 10px 18px; 
+      box-shadow: var(--shadow); color: var(--text-primary);
+      font-weight: 600; font-size: 0.9rem;
+      opacity: 0; transform: translateX(20px); transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    .mascot-bubble.visible { opacity: 1; transform: translateX(0); }
+    .mascot-avatar {
+      width: 70px; height: 70px; background: var(--accent);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 40px; box-shadow: 0 0 25px rgba(249,115,22,0.5);
+      animation: mascot-wave 1.5s infinite ease-in-out;
+      transition: transform 0.2s;
+    }
+    @keyframes mascot-wave {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(15deg); }
+      75% { transform: rotate(-15deg); }
     }
 
-    @keyframes confetti-fall {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(300px) rotate(720deg); opacity: 0; }
+    /* ----- ГОЛОГРАММА НАЧИСЛЕНИЯ ----- */
+    .hologram-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75); z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .hologram-overlay.active { opacity: 1; pointer-events: all; }
+    .hologram-box {
+      background: var(--bg-card); border: 1px solid var(--accent);
+      border-radius: 30px; padding: 40px; text-align: center;
+      box-shadow: 0 0 60px rgba(249,115,22,0.5);
+      transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 360px; width: 90%;
+    }
+    .hologram-overlay.active .hologram-box { transform: scale(1); }
+    .hologram-mascot { font-size: 80px; animation: mascot-wave 1s infinite; }
+    .hologram-points {
+      font-size: 56px; font-weight: 800; color: var(--success);
+      text-shadow: 0 0 30px rgba(16,185,129,0.8);
     }
 
-    .confetti-piece {
-      position: fixed;
-      width: 10px;
-      height: 20px;
-      background: #FF6F61;
-      top: 20%;
-      left: 50%;
-      z-index: 999;
-      animation: confetti-fall 2s ease-in forwards;
+    /* ----- ОСТАЛЬНЫЕ СТИЛИ ----- */
+    .header {
+      background: rgba(21, 27, 46, 0.8); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-
-    /* Экран входа */
-    #loginScreen { 
-      max-width: 400px; margin: 0 auto; padding: 30px; text-align: center; 
-      margin-top: 20vh; background: white; border-radius: 24px; 
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-      animation: bounceIn 0.8s;
+    .header h1 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .header h1 span { font-size: 2rem; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px; width: 100%; display: grid; gap: 24px; }
+    .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 28px; transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; overflow: hidden;
     }
-    
-    #loginScreen .mascot { font-size: 60px; display: block; margin-bottom: 10px; }
-    #loginScreen input[type="text"] { 
-      width: 100%; padding: 14px; margin: 15px 0; border: 2px solid #e0e0e0; 
-      border-radius: 12px; font-size: 16px; transition: border-color 0.3s; 
+    .card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: var(--glow); }
+    .card h3 { font-size: 1.2rem; margin-bottom: 12px; color: var(--text-secondary); }
+    .card .value { font-size: 3rem; font-weight: 800; }
+    .value.accent { color: var(--accent); }
+    .value.success { color: var(--success); }
+    .progress-bar {
+      height: 6px; background: var(--border); border-radius: 6px;
+      margin-top: 16px; overflow: hidden;
     }
-    #loginScreen input[type="text"]:focus { 
-      border-color: #FF6F61; outline: none; box-shadow: 0 0 0 3px rgba(255,111,97,0.2); 
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent), var(--warning));
+      border-radius: 6px; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    #loginScreen button { 
-      background: #FF6F61; color: white; border: none; padding: 14px 30px; 
-      border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; 
-      width: 100%; transition: transform 0.2s, background 0.3s; 
+    .task-list { display: flex; flex-direction: column; gap: 16px; }
+    .task-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 20px; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    #loginScreen button:hover { background: #e55a4e; transform: scale(1.02); }
-    #loginScreen button:active { transform: scale(0.98); }
-    .error { color: #e74c3c; margin-top: 12px; font-weight: bold; }
-
-    /* Основной интерфейс */
-    #mainScreen { display: none; flex: 1; flex-direction: column; }
-    
-    .content { flex: 1; overflow-y: auto; padding: 20px; max-width: 600px; margin: 0 auto; width: 100%; }
-
-    /* Нижнее меню */
-    .bottom-nav { 
-      display: flex; background: white; border-top: 1px solid #e0e0e0; 
-      padding: 8px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); 
+    .task-item:hover { border-color: var(--accent); }
+    .task-status {
+      padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
     }
-    .nav-item { 
-      flex: 1; text-align: center; color: #888; text-decoration: none; 
-      font-size: 14px; padding: 8px; cursor: pointer; transition: color 0.3s, transform 0.2s; 
+    .status-pending { background: rgba(245,158,11,0.2); color: var(--warning); }
+    .status-active { background: rgba(249,115,22,0.2); color: var(--accent); }
+    .status-done { background: rgba(16,185,129,0.2); color: var(--success); }
+    .btn {
+      background: var(--accent); color: white; border: none;
+      padding: 10px 20px; border-radius: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
     }
-    .nav-item.active { color: #FF6F61; font-weight: bold; }
-    .nav-item:active { transform: scale(0.9); }
-    .nav-icon { font-size: 26px; display: block; margin-bottom: 2px; }
-
-    /* Карточки */
-    .profile { 
-      background: white; padding: 30px; border-radius: 24px; 
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; 
-      margin-bottom: 20px; transition: transform 0.3s; 
+    .btn:hover { background: var(--accent-hover); transform: scale(1.02); }
+    .btn:active { transform: scale(0.98); }
+    .reward-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    .reward-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 20px; text-align: center;
     }
-    .profile:hover { transform: translateY(-5px); }
-    .points { 
-      font-size: 48px; font-weight: 800; color: #2ecc71; 
-      text-shadow: 0 2px 4px rgba(46,204,113,0.2); 
+    .bottom-nav {
+      display: flex; background: rgba(21, 27, 46, 0.9); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border); padding: 10px 0;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.4);
     }
-    
-    .progress-container { 
-      background: #eee; border-radius: 20px; height: 12px; margin-top: 15px; 
-      overflow: hidden; 
+    .nav-item {
+      flex: 1; text-align: center; color: var(--text-secondary);
+      text-decoration: none; font-size: 0.85rem; padding: 10px;
+      cursor: pointer; transition: all 0.2s;
     }
-    .progress-bar { 
-      height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); 
-      border-radius: 20px; width: 0%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+    .nav-item.active { color: var(--accent); font-weight: 700; }
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .header { padding: 12px 16px; }
     }
-
-    .task-list { 
-      background: white; border-radius: 24px; padding: 20px; 
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
-    }
-    .task { 
-      padding: 15px; border-bottom: 1px solid #f0f0f0; 
-      display: flex; justify-content: space-between; align-items: center;
-      transition: background 0.2s; flex-wrap: wrap;
-    }
-    .task:hover { background: #fafafa; }
-    .task:last-child { border-bottom: none; }
-    .task-info { display: flex; align-items: center; gap: 10px; }
-    .task-btn { 
-      padding: 6px 14px; border: none; border-radius: 20px; 
-      font-size: 13px; cursor: pointer; margin-left: 10px; 
-      transition: transform 0.2s, opacity 0.2s; 
-    }
-    .start-btn { background: #3498db; color: white; }
-    .start-btn:hover { background: #2980b9; }
-    .complete-btn { background: #2ecc71; color: white; }
-    .complete-btn:hover { background: #27ae60; }
-    .task-btn:active { transform: scale(0.95); }
-
-    .reward-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .reward-card { 
-      background: white; border-radius: 20px; padding: 20px; text-align: center; 
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; 
-    }
-    .reward-card:hover { 
-      transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); 
-    }
-    .reward-card .icon { font-size: 40px; display: block; margin-bottom: 10px; }
-
-    .header { 
-      padding: 15px; background: white; text-align: center; 
-      border-bottom: 1px solid #e0e0e0; font-size: 20px; font-weight: bold; 
-      color: #FF6F61; display: flex; align-items: center; justify-content: center; gap: 8px; 
-    }
-    .message { 
-      background: #2ecc71; color: white; padding: 10px 20px; border-radius: 20px; 
-      margin-bottom: 15px; text-align: center; animation: bounceIn 0.5s; 
-      display: none; 
-    }
-    .message.error { background: #e74c3c; }
   </style>
 </head>
 <body>
-  <!-- ЭКРАН ВХОДА -->
-  <div id="loginScreen">
-    <span class="mascot">🐿️</span>
-    <h2>⚡ Кармический банк</h2>
-    <input type="text" id="loginInput" placeholder="Введите ваш логин" />
-    <button onclick="login()">Войти</button>
-    <div id="error" class="error"></div>
+  <!-- ГОЛОГРАММА -->
+  <div class="hologram-overlay" id="hologram">
+    <div class="hologram-box">
+      <div class="hologram-mascot">🐿️</div>
+      <h2 id="hologramMsg">+50 кармиков</h2>
+      <div class="hologram-points" id="hologramPoints">0</div>
+      <button class="btn" onclick="closeHologram()" style="margin-top:20px;">Отлично!</button>
+    </div>
+  </div>
+
+  <!-- МАСКОТ -->
+  <div class="mascot-container">
+    <div class="mascot-bubble" id="mascotBubble">А ты молодец!</div>
+    <div class="mascot-avatar" id="mascotAvatar">🐿️</div>
   </div>
 
   <!-- ОСНОВНОЙ ЭКРАН -->
   <div id="mainScreen">
     <div class="header">
-      <span>🐿️</span> Кармический банк
-    </div>
-    
-    <div class="content" id="content">
-      <div id="messageBox" class="message">Сообщение</div>
-      
-      <!-- Вкладка Профиль -->
-      <div id="tab-profile" class="tab" style="display:none;">
-        <div class="profile">
-          <h3 id="userName"></h3>
-          <p id="userDept"></p>
-          <div class="points" id="userPoints">0</div>
-          <p>кармиков</p>
-          <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-          </div>
-          <p style="margin-top: 8px; color: #888; font-size: 14px;" id="progressText"></p>
-        </div>
-      </div>
-      
-      <!-- Вкладка Задания -->
-      <div id="tab-tasks" class="tab" style="display:none;">
-        <div class="task-list" id="taskList"></div>
-      </div>
-      
-      <!-- Вкладка Награды -->
-      <div id="tab-rewards" class="tab" style="display:none;">
-        <div class="reward-grid" id="rewardGrid"></div>
+      <h1><span>🐿️</span> Кармический банк</h1>
+      <div class="user-info">
+        <span id="userNameDisplay"></span>
+        <div class="role" id="userDept"></div>
       </div>
     </div>
 
+    <div class="container">
+      <div class="section-title">Мой профиль</div>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>Баланс</h3>
+          <div class="value success" id="userPoints">0</div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:20px;">Доступные задания</div>
+      <div class="task-list" id="taskList"></div>
+
+      <div class="section-title" style="margin-top:20px;">Витрина наград</div>
+      <div class="reward-grid" id="rewardGrid"></div>
+    </div>
+
     <div class="bottom-nav">
-      <div class="nav-item active" onclick="switchTab('profile')">
-        <span class="nav-icon">🐿️</span> Профиль
-      </div>
-      <div class="nav-item" onclick="switchTab('tasks')">
-        <span class="nav-icon">✅</span> Задания
-      </div>
-      <div class="nav-item" onclick="switchTab('rewards')">
-        <span class="nav-icon">🎁</span> Награды
-      </div>
+      <div class="nav-item active" onclick="switchTab('tasks')">✅ Задания</div>
+      <div class="nav-item" onclick="switchTab('rewards')">🎁 Награды</div>
+      <div class="nav-item" onclick="location.reload()">🔄 Обновить</div>
     </div>
   </div>
 
   <script>
-    // Твой URL Apps Script API
-    var API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
-    var currentLogin = '';
-    var currentPoints = 0;
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
+    let currentLogin = localStorage.getItem('karmabank_login') || '';
+    let currentPoints = 0;
 
-    // Показать всплывающее сообщение
-    function showMessage(text, isError = false) {
-      var box = document.getElementById('messageBox');
-      box.innerText = text;
-      box.className = 'message' + (isError ? ' error' : '');
-      box.style.display = 'block';
-      setTimeout(function() { box.style.display = 'none'; }, 3000);
-    }
-
-    function login() {
-      var login = document.getElementById('loginInput').value.trim();
-      if (!login) {
-        document.getElementById('error').innerText = 'Введите логин';
-        return;
+    async function login() {
+      if (!currentLogin) {
+        currentLogin = prompt('Введите ваш логин (например, arthur, lilia, nastya):');
+        if (!currentLogin) return;
+        localStorage.setItem('karmabank_login', currentLogin);
       }
-      fetch(API_URL + '?action=getUser&login=' + encodeURIComponent(login))
-        .then(response => response.json())
-        .then(user => {
-          if (user && user.name) {
-            currentLogin = login;
-            currentPoints = user.points || 0;
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainScreen').style.display = 'flex';
-            document.getElementById('userName').innerText = user.name;
-            document.getElementById('userDept').innerText = user.department;
-            document.getElementById('userPoints').innerText = currentPoints;
-            updateProgressBar(currentPoints);
-            if (currentPoints >= 100) spawnConfetti();
-            switchTab('profile');
-          } else {
-            document.getElementById('error').innerText = 'Пользователь не найден';
-          }
-        })
-        .catch(err => {
-          document.getElementById('error').innerText = 'Ошибка соединения';
-        });
+      await refreshUI();
     }
 
-    function updateProgressBar(points) {
-      var nextMilestone = 500;
-      var percent = Math.min((points / nextMilestone) * 100, 100);
-      document.getElementById('progressBar').style.width = percent + '%';
-      document.getElementById('progressText').innerText = `${points} из ${nextMilestone} до следующей награды`;
+    async function refreshUI() {
+      try {
+        const userRes = await fetch(`${API_URL}?action=getUser&login=${currentLogin}`);
+        const user = await userRes.json();
+        if (user && user.name) {
+          document.getElementById('userNameDisplay').textContent = user.name;
+          document.getElementById('userDept').textContent = user.department || '';
+          currentPoints = user.points || 0;
+          document.getElementById('userPoints').textContent = currentPoints;
+          const progressPercent = Math.min((currentPoints / 500) * 100, 100);
+          document.getElementById('progressFill').style.width = progressPercent + '%';
+          document.getElementById('mainScreen').style.display = 'flex';
+          await loadTasks();
+          await loadRewards();
+          showMascotMessage(`Привет, ${user.name}!`);
+        } else {
+          localStorage.removeItem('karmabank_login');
+          currentLogin = '';
+          alert('Пользователь не найден');
+        }
+      } catch (e) {
+        alert('Ошибка соединения');
+      }
     }
 
-    function spawnConfetti() {
-      for (var i = 0; i < 20; i++) {
-        var confetti = document.createElement('div');
-        confetti.className = 'confetti-piece';
-        confetti.style.left = Math.random() * 100 + '%';
-        confetti.style.background = 'hsl(' + Math.random() * 360 + ', 80%, 60%)';
-        document.body.appendChild(confetti);
-        setTimeout(function() { confetti.remove(); }, 2000);
+    async function loadTasks() {
+      const res = await fetch(`${API_URL}?action=getTasks&login=${currentLogin}`);
+      const tasks = await res.json();
+      const list = document.getElementById('taskList');
+      list.innerHTML = tasks.map(t => {
+        let statusClass = 'status-pending';
+        if (t.status === 'В работе') statusClass = 'status-active';
+        else if (t.status === 'Выполнено') statusClass = 'status-done';
+        return `<div class="task-item">
+          <span>${t.task} <span style="color:#8b95a6;">(${t.points} карм.)</span></span>
+          <span class="task-status ${statusClass}">${t.status || 'Назначено'}</span>
+          ${t.status === 'Назначено' ? `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>` : ''}
+          ${t.status === 'В работе' ? `<button class="btn" onclick="completeTask('${t.task}')">Выполнить</button>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    async function loadRewards() {
+      const res = await fetch(`${API_URL}?action=getRewards`);
+      const rewards = await res.json();
+      document.getElementById('rewardGrid').innerHTML = rewards.map(r => `
+        <div class="reward-item">
+          <span>🎁</span>
+          <h4>${r.name}</h4>
+          <span>${r.cost} карм.</span>
+        </div>
+      `).join('');
+    }
+
+    function showMascotMessage(msg) {
+      const bubble = document.getElementById('mascotBubble');
+      bubble.textContent = msg;
+      bubble.classList.add('visible');
+      setTimeout(() => bubble.classList.remove('visible'), 4000);
+    }
+
+    function showHologram(points) {
+      document.getElementById('hologramMsg').textContent = `+${points} кармиков`;
+      document.getElementById('hologramPoints').textContent = currentPoints;
+      document.getElementById('hologram').classList.add('active');
+    }
+
+    window.closeHologram = function() {
+      document.getElementById('hologram').classList.remove('active');
+    };
+
+    async function takeTask(taskName) {
+      await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${currentLogin}`);
+      showMascotMessage('За дело!');
+      await refreshUI();
+    }
+
+    async function completeTask(taskName) {
+      const res = await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${currentLogin}`);
+      const result = await res.json();
+      if (result.success) {
+        await refreshUI();
+        showHologram(result.message.match(/\d+/)[0]);
+        showMascotMessage('Великолепно!');
+      } else {
+        alert(result.message);
       }
     }
 
     function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      document.getElementById('tab-' + tab).style.display = 'block';
-      var navItems = document.querySelectorAll('.nav-item');
-      if (tab === 'profile') navItems[0].classList.add('active');
-      else if (tab === 'tasks') navItems[1].classList.add('active');
-      else if (tab === 'rewards') navItems[2].classList.add('active');
-
-      if (tab === 'tasks') loadTasks();
-      else if (tab === 'rewards') loadRewards();
+      // Этот функционал уже есть в нижнем меню, оставим для совместимости
     }
 
-    // Загрузка заданий с кнопками
-    function loadTasks() {
-      fetch(API_URL + '?action=getTasks&login=' + encodeURIComponent(currentLogin))
-        .then(response => response.json())
-        .then(tasks => {
-          var html = '<h4>📋 Ваши задания:</h4>';
-          tasks.forEach(function(t) {
-            var statusEmoji = '⏳';
-            if (t.status === 'В работе') statusEmoji = '🔄';
-            else if (t.status === 'Выполнено') statusEmoji = '✅';
-            
-            html += '<div class="task">';
-            html += '<div class="task-info"><span>' + statusEmoji + ' ' + t.task + '</span><span>' + t.points + ' карм.</span></div>';
-            
-            if (t.status === 'Назначено') {
-              html += '<button class="task-btn start-btn" onclick="takeTask(\'' + t.task + '\')">Взять в работу</button>';
-            } else if (t.status === 'В работе') {
-              html += '<button class="task-btn complete-btn" onclick="completeTask(\'' + t.task + '\')">Выполнить</button>';
-            } else {
-              html += '<span style="color: green; font-size: 0.9em;">Завершено</span>';
-            }
-            html += '</div>';
-          });
-          document.getElementById('taskList').innerHTML = html;
-        })
-        .catch(err => showMessage('Ошибка загрузки заданий', true));
-    }
-
-    function takeTask(taskName) {
-      fetch(API_URL + '?action=takeTask&task=' + encodeURIComponent(taskName) + '&login=' + encodeURIComponent(currentLogin))
-        .then(response => response.json())
-        .then(result => {
-          showMessage(result.message, !result.success);
-          if (result.success) loadTasks();
-        });
-    }
-
-    function completeTask(taskName) {
-      fetch(API_URL + '?action=completeTask&task=' + encodeURIComponent(taskName) + '&login=' + encodeURIComponent(currentLogin))
-        .then(response => response.json())
-        .then(result => {
-          showMessage(result.message, !result.success);
-          if (result.success) {
-            // обновляем профиль
-            fetch(API_URL + '?action=getUser&login=' + encodeURIComponent(currentLogin))
-              .then(res => res.json())
-              .then(user => {
-                if (user && user.points !== undefined) {
-                  currentPoints = user.points;
-                  document.getElementById('userPoints').innerText = currentPoints;
-                  updateProgressBar(currentPoints);
-                  if (currentPoints >= 100) spawnConfetti();
-                }
-              });
-            loadTasks();
-          }
-        });
-    }
-
-    function loadRewards() {
-      fetch(API_URL + '?action=getRewards')
-        .then(response => response.json())
-        .then(rewards => {
-          var html = '';
-          rewards.forEach(function(r) {
-            html += '<div class="reward-card"><span class="icon">🎁</span><strong>' + r.name + '</strong><br>💎 ' + r.cost + ' карм.</div>';
-          });
-          document.getElementById('rewardGrid').innerHTML = html;
-        })
-        .catch(err => showMessage('Ошибка загрузки наград', true));
-    }
+    login();
   </script>
 </body>
 </html>
