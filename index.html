@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec" />
+  <script>
+    // Проверяем, с какого домена пришёл пользователь
+    if (window.location.hostname === 'karmabank.ru' || window.location.hostname === 'www.karmabank.ru') {
+      // Если он с karmabank.ru, перекидываем его на karmabank.online
+      window.location.href = 'https://karmabank.online';
+    } else {
+      // Иначе сразу показываем приложение
+      window.location.href = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
+    }
+  </script>
 </head>
 <body>
   <p>Перенаправляем в Кармический банк...</p>
