@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Кармический банк — Командный центр</title>
+  <link rel="icon" type="image/png" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628;
+      --bg-secondary: #0f1f35;
+      --bg-card: #152238;
+      --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #1f3350;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow-x: hidden;
+    }
+    .header {
+      background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .header h1 img { height: 1.8rem; }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+    }
+    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; width: 100%; display: grid; gap: 24px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+    .metric-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; transition: all 0.2s;
+    }
+    .metric-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .metric-card .label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; }
+    .metric-card .value { font-size: 2.2rem; font-weight: 800; }
+    .value.accent { color: var(--accent); }
+    .value.success { color: var(--success); }
+    .value.warning { color: var(--warning); }
+    .panel {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+    }
+    .panel h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .rating-table { width: 100%; border-collapse: collapse; }
+    .rating-table th { text-align: left; color: var(--text-secondary); font-weight: 500; font-size: 0.8rem; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .rating-table td { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .rating-table .position { font-weight: 700; font-size: 1.1rem; }
+    .rating-table .points { font-weight: 700; color: var(--success); }
+    .task-item, .reward-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .task-item:last-child, .reward-item:last-child { border-bottom: none; }
+    .status {
+      padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+    }
+    .status.pending { background: rgba(245,158,11,0.2); color: var(--warning); }
+    .status.in-progress { background: rgba(249,115,22,0.2); color: var(--accent); }
+    .status.done { background: rgba(16,185,129,0.2); color: var(--success); }
+    .login-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .login-form {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 40px 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5); width: 100%; max-width: 400px;
+      text-align: center;
+    }
+    .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
+    .login-form input[type="text"] {
+      width: 100%; padding: 14px 16px; border: 1px solid var(--border);
+      border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary);
+      font-size: 1rem; margin-bottom: 16px; outline: none;
+    }
+    .login-form input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+    .login-btn {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00);
+      color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); }
+    .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <!-- ЭКРАН ВХОДА -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-form">
+      <h2><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Командный центр</h2>
+      <p>Введите логин администратора</p>
+      <input type="text" id="loginInput" placeholder="Логин" />
+      <button class="login-btn" onclick="login()">Войти</button>
+      <div id="loginError" class="login-error"></div>
+    </div>
+  </div>
+
+  <!-- КОМАНДНЫЙ ЦЕНТР -->
+  <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
+    <div class="header">
+      <h1><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"> Кармический банк — Командный центр</h1>
+      <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+    </div>
+    <div class="container">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="label">Сотрудников</div>
+          <div class="value accent" id="totalEmployees">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Всего кармиков</div>
+          <div class="value success" id="totalPoints">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Выполнено заданий</div>
+          <div class="value success" id="completedTasks">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Активных заданий</div>
+          <div class="value warning" id="activeTasks">0</div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>🏆 Рейтинг</h2>
+        <table class="rating-table">
+          <thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th></tr></thead>
+          <tbody id="ratingBody"><tr><td colspan="4">Загрузка...</td></tr></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h2>📋 Последние задания</h2>
+        <div id="taskList"></div>
+      </div>
+      <div class="panel">
+        <h2>🎁 Витрина наград</h2>
+        <div id="rewardList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
+    const ADMIN_LOGIN = 'adminboss'; // ← Здесь укажи желаемый логин администратора
+
+    function login() {
+      const login = document.getElementById('loginInput').value.trim();
+      if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
+      if (login !== ADMIN_LOGIN) {
+        document.getElementById('loginError').textContent = 'Доступ запрещён';
+        return;
+      }
+      // Сохраняем админский логин и показываем дашборд
+      localStorage.setItem('karmabank_admin_login', login);
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainScreen').style.display = 'flex';
+      fetchData();
+      setInterval(fetchData, 30000);
+    }
+
+    function logout() {
+      localStorage.removeItem('karmabank_admin_login');
+      document.getElementById('mainScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('loginInput').value = '';
+      document.getElementById('loginError').textContent = '';
+    }
+
+    async function fetchData() {
+      try {
+        const [employees, tasks, rewards] = await Promise.all([
+          fetch(`${API_URL}?action=getAllEmployees`).then(r => r.json()),
+          fetch(`${API_URL}?action=getAllTasks`).then(r => r.json()),
+          fetch(`${API_URL}?action=getRewards`).then(r => r.json())
+        ]);
+        updateMetrics(employees, tasks);
+        updateRating(employees);
+        updateTaskList(tasks);
+        updateRewardList(rewards);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function updateMetrics(employees, tasks) {
+      const totalEmployees = employees ? employees.length : 0;
+      const totalPoints = employees ? employees.reduce((sum, e) => sum + (e.points || 0), 0) : 0;
+      const completed = tasks ? tasks.filter(t => t.status === 'Выполнено').length : 0;
+      const active = tasks ? tasks.filter(t => t.status !== 'Выполнено').length : 0;
+      document.getElementById('totalEmployees').textContent = totalEmployees;
+      document.getElementById('totalPoints').textContent = totalPoints;
+      document.getElementById('completedTasks').textContent = completed;
+      document.getElementById('activeTasks').textContent = active;
+    }
+
+    function updateRating(employees) {
+      const tbody = document.getElementById('ratingBody');
+      if (!employees || employees.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Нет данных</td></tr>'; return; }
+      const sorted = [...employees].sort((a, b) => (b.points || 0) - (a.points || 0));
+      tbody.innerHTML = sorted.map((e, i) => `
+        <tr>
+          <td class="position">${i + 1}</td>
+          <td>${e.name || '—'}</td>
+          <td>${e.department || '—'}</td>
+          <td class="points">${e.points || 0}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateTaskList(tasks) {
+      const container = document.getElementById('taskList');
+      if (!tasks || tasks.length === 0) { container.innerHTML = '<div>Нет заданий</div>'; return; }
+      container.innerHTML = tasks.slice(0, 10).map(t => {
+        let statusClass = 'pending';
+        if (t.status === 'В работе') statusClass = 'in-progress';
+        else if (t.status === 'Выполнено') statusClass = 'done';
+        return `<div class="task-item">
+          <span>${t.task || 'Задача'} (${t.employee || '—'})</span>
+          <span class="status ${statusClass}">${t.status || 'Назначено'}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function updateRewardList(rewards) {
+      const container = document.getElementById('rewardList');
+      if (!rewards || rewards.length === 0) { container.innerHTML = '<div>Нет наград</div>'; return; }
+      container.innerHTML = rewards.map(r => `
+        <div class="reward-item">
+          <span>${r.name || 'Награда'}</span>
+          <span>${r.cost || 0} карм.</span>
+        </div>
+      `).join('');
+    }
+
+    // При загрузке проверяем, был ли админ уже авторизован
+    if (localStorage.getItem('karmabank_admin_login') === ADMIN_LOGIN) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainScreen').style.display = 'flex';
+      fetchData();
+      setInterval(fetchData, 30000);
+    }
+  </script>
+</body>
+</html>
