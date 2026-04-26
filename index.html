@@ -52,10 +52,11 @@
     .mascot-avatar {
       width: 70px; height: 70px; background: var(--accent);
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 40px; box-shadow: 0 0 25px rgba(249,115,22,0.5);
+      box-shadow: 0 0 25px rgba(249,115,22,0.5);
       animation: mascot-wave 1.5s infinite ease-in-out;
-      transition: transform 0.2s;
+      transition: transform 0.2s; overflow: hidden;
     }
+    .mascot-avatar img { width: 100%; height: 100%; object-fit: cover; }
     @keyframes mascot-wave {
       0%, 100% { transform: rotate(0deg); }
       25% { transform: rotate(15deg); }
@@ -79,6 +80,7 @@
     }
     .hologram-overlay.active .hologram-box { transform: scale(1); }
     .hologram-mascot { font-size: 80px; animation: mascot-wave 1s infinite; }
+    .hologram-mascot img { height: 80px; }
     .hologram-points {
       font-size: 56px; font-weight: 800; color: var(--success);
       text-shadow: 0 0 30px rgba(16,185,129,0.8);
@@ -198,7 +200,7 @@
   <!-- ГОЛОГРАММА -->
   <div class="hologram-overlay" id="hologram">
     <div class="hologram-box">
-      <div class="hologram-mascot"><img src="belchonok.png" style="height: 80px;" alt="Бельчонок"></div>
+      <div class="hologram-mascot"><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"></div>
       <h2 id="hologramMsg">+50 кармиков</h2>
       <div class="hologram-points" id="hologramPoints">0</div>
       <button class="btn" onclick="closeHologram()" style="margin-top:20px;">Отлично!</button>
@@ -208,13 +210,13 @@
   <!-- МАСКОТ -->
   <div class="mascot-container">
     <div class="mascot-bubble" id="mascotBubble">А ты молодец!</div>
-    <div class="mascot-avatar"><img src="belchonok.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Бельчонок"></div>
+    <div class="mascot-avatar"><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"></div>
   </div>
 
   <!-- СТРАНИЦА ВХОДА -->
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
-      <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h2>
+      <h2><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h2>
       <p>Введите ваш логин, чтобы продолжить</p>
       <input type="text" id="loginInput" placeholder="Логин (например, arthur)" />
       <button class="login-btn" onclick="login()">Войти</button>
@@ -225,7 +227,7 @@
   <!-- ОСНОВНОЙ ЭКРАН -->
   <div id="mainScreen" class="main-screen">
     <div class="header">
-      <h1><img src="belchonok.png" style="height: 1.8rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h1>
+      <h1><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" style="height: 1.8rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h1>
       <div class="user-info">
         <span id="userNameDisplay"></span>
         <span class="role" id="userDept"></span>
