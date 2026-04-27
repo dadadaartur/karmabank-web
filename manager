@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Панель руководителя — Кармический банк</title>
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <link rel="apple-touch-icon" href="belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --success: #10b981; --border: #1f3350;
+    }
+    body {
+      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628, #0f1f35);
+      color: var(--text-primary); display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; text-align: center; flex-direction: column; gap: 16px;
+    }
+    h1 { font-size: 2rem; font-weight: 800; }
+    p { color: var(--text-secondary); }
+    img { width: 80px; }
+  </style>
+</head>
+<body>
+  <img src="belchonok.png" alt="Бельчонок">
+  <h1>Панель руководителя</h1>
+  <p>Скоро здесь будет дашборд с карточками сотрудников и AI-рекомендациями.</p>
+</body>
+</html>
