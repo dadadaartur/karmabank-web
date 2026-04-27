@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Кармический путь — Кармический банк</title>
+  <link rel="icon" type="image/png" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
+  <link rel="apple-touch-icon" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --accent-hover: #ea580c; --success: #10b981; --warning: #f59e0b;
+      --danger: #ef4444; --border: #1f3350;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary); min-height: 100vh;
+      display: flex; flex-direction: column; overflow-x: hidden;
+    }
+    .header {
+      background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .header h1 img { height: 1.8rem; vertical-align: middle; }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+    }
+    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+    .container { max-width: 600px; margin: 0 auto; padding: 24px 20px; width: 100%; display: flex; flex-direction: column; gap: 24px; }
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    .level-icon { font-size: 4rem; }
+    .level-name { font-size: 2rem; font-weight: 800; color: var(--accent); margin-top: 8px; }
+    .energy-value { font-size: 3rem; font-weight: 800; color: var(--success); }
+    .progress-container { background: var(--border); border-radius: 12px; height: 10px; margin-top: 16px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--warning)); border-radius: 12px; transition: width 0.8s; }
+    .progress-text { color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px; }
+    .icons-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .icon-badge { font-size: 2.5rem; opacity: 0.3; transition: opacity 0.5s; }
+    .icon-badge.earned { opacity: 1; }
+    .back-link { color: var(--text-secondary); text-align: center; margin-top: 8px; display: block; }
+  </style>
+</head>
+<body>
+  <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
+    <div class="header">
+      <h1><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"> Кармический путь</h1>
+      <button class="logout-btn" onclick="goBack()">↩ Назад</button>
+    </div>
+    <div class="container">
+      <div class="card">
+        <div class="level-icon" id="levelIcon">🐟</div>
+        <div class="level-name" id="levelName">Малёк</div>
+        <div class="energy-value" id="energyValue">0</div>
+        <div style="color: var(--text-secondary);">кармической энергии</div>
+        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="progress-text" id="progressText"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom: 16px; color: var(--text-secondary);">🏅 Полученные значки</h3>
+        <div class="icons-grid" id="iconsGrid"></div>
+      </div>
+      <a href="/" class="back-link">← Вернуться в Кармический банк</a>
+    </div>
+  </div>
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
+    let currentLogin = localStorage.getItem('karmabank_login') || '';
+    if (!currentLogin) {
+      alert('Сначала войдите в Кармический банк');
+      window.location.href = '/';
+    } else {
+      document.getElementById('mainScreen').style.display = 'flex';
+      loadReputation();
+    }
+    async function loadReputation() {
+      try {
+        const res = await fetch(`${API_URL}?action=getReputation&login=${encodeURIComponent(currentLogin)}`);
+        const data = await res.json();
+        if (data) {
+          document.getElementById('levelIcon').textContent = data.level.icon;
+          document.getElementById('levelName').textContent = data.level.name;
+          document.getElementById('energyValue').textContent = data.energy;
+          document.getElementById('progressBar').style.width = data.progress + '%';
+          if (data.nextLevel) {
+            document.getElementById('progressText').textContent = `${data.energy} / ${data.nextLevel.energy} до ${data.nextLevel.name}`;
+          } else {
+            document.getElementById('progressText').textContent = 'Максимальный уровень достигнут!';
+          }
+          const iconsGrid = document.getElementById('iconsGrid');
+          const allIcons = ['🐟', '🐙', '🐬', '🦈', '🐋'];
+          iconsGrid.innerHTML = allIcons.map(icon => {
+            const earned = data.icons.includes(icon);
+            return `<span class="icon-badge ${earned ? 'earned' : ''}">${icon}</span>`;
+          }).join('');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    function goBack() { window.location.href = '/'; }
+  </script>
+</body>
+</html>
