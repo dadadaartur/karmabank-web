@@ -63,22 +63,6 @@
     }
     .mascot-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .hologram-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.75); z-index: 1000;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
-    }
-    .hologram-overlay.active { opacity: 1; pointer-events: all; }
-    .hologram-box {
-      background: var(--bg-card); border: 1px solid var(--accent);
-      border-radius: 30px; padding: 40px; text-align: center;
-      box-shadow: 0 0 60px rgba(249,115,22,0.5);
-      transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      max-width: 360px; width: 90%;
-    }
-    .hologram-overlay.active .hologram-box { transform: scale(1); }
-
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
@@ -157,27 +141,20 @@
     .task-item {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 18px; padding: 16px; display: flex; align-items: center; justify-content: space-between;
-      transition: all 0.2s; flex-wrap: wrap;
+      transition: all 0.2s; flex-wrap: wrap; gap: 10px;
     }
     .task-item:hover { border-color: var(--accent); }
-    .task-info { display: flex; align-items: center; gap: 10px; }
+    .task-info { display: flex; align-items: center; gap: 10px; flex: 1; }
     .task-status {
       padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
-      white-space: nowrap;
+      white-space: nowrap; text-align: center; min-width: 90px;
     }
     .status-pending { background: rgba(245,158,11,0.2); color: var(--warning); }
     .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
     .status-done { background: rgba(16,185,129,0.15); color: var(--success); }
-    .btn {
-      background: var(--accent); color: white; border: none;
-      padding: 10px 20px; border-radius: 14px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; margin-left: 12px;
-    }
-    .btn:hover { background: var(--accent-hover); transform: scale(1.02); }
-    .btn:active { transform: scale(0.98); }
     .task-btn {
       padding: 8px 18px; border-radius: 14px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; margin-left: 12px;
+      cursor: pointer; transition: all 0.2s; margin-left: 0; min-width: 100px;
       border: none; background: var(--accent); color: white;
     }
     .task-btn:hover {
@@ -185,7 +162,7 @@
       animation: glowPulse 1.5s infinite;
     }
     .task-btn:disabled {
-      background: var(--border); color: var(--text-secondary); cursor: default;
+      background: #1f3350; color: #9aa9c1; cursor: default;
       transform: none; animation: none;
     }
     .reward-item {
@@ -231,16 +208,6 @@
   </style>
 </head>
 <body>
-  <!-- Голограмма -->
-  <div class="hologram-overlay" id="hologram">
-    <div class="hologram-box">
-      <div class="hologram-mascot"><img src="belchonok.png" alt="Бельчонок" style="height:80px;"></div>
-      <h2 id="hologramMsg">+50 кармиков</h2>
-      <div class="hologram-points" id="hologramPoints">0</div>
-      <button class="btn" onclick="closeHologram()" style="margin-top:20px;">Отлично!</button>
-    </div>
-  </div>
-
   <!-- Маскот -->
   <div class="mascot-container">
     <div class="mascot-bubble" id="mascotBubble">А ты молодец!</div>
@@ -348,18 +315,8 @@
       setTimeout(() => bubble.classList.remove('visible'), 4000);
     }
 
-    function showHologram(points) {
-      document.getElementById('hologramMsg').textContent = `+${points} кармиков`;
-      document.getElementById('hologramPoints').textContent = currentPoints;
-      document.getElementById('hologram').classList.add('active');
-    }
-
-    window.closeHologram = function() {
-      document.getElementById('hologram').classList.remove('active');
-    };
-
     function showModal(text) {
-      document.getElementById('genericModalText').textContent = text;
+      document.getElementById('genericModalText').innerHTML = `<img src="belchonok.png" style="height:50px; display:block; margin:0 auto 10px;">${text}`;
       document.getElementById('genericModal').classList.add('active');
     }
 
@@ -496,8 +453,6 @@
           const badge = document.getElementById('levelBadge');
           badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
           badge.style.display = 'inline-block';
-          showHologram(result.message.match(/\d+/)[0]);
-          showMascotMessage('Великолепно!');
           showModal('🎉 Задание выполнено! ' + result.message);
         }
         await loadTasks();
