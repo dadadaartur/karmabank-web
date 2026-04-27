@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <!-- Иконка для вкладки браузера -->
-  <link rel="icon" type="image/png" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
-  <!-- Иконка для iOS (при добавлении на главный экран) -->
-  <link rel="apple-touch-icon" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <link rel="apple-touch-icon" href="belchonok.png">
   <title>Кармический банк</title>
   <style>
     :root {
@@ -36,8 +34,6 @@
       user-select: none;
     }
     input[type="text"] { user-select: text; }
-
-    /* ----- МАСКОТ ----- */
     .mascot-container {
       position: fixed; bottom: 20px; right: 20px; z-index: 999;
       display: flex; align-items: center; gap: 12px;
@@ -66,8 +62,6 @@
       25% { transform: rotate(15deg); }
       75% { transform: rotate(-15deg); }
     }
-
-    /* ----- ГОЛОГРАММА НАЧИСЛЕНИЯ ----- */
     .hologram-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.75); z-index: 1000;
@@ -89,8 +83,6 @@
       font-size: 56px; font-weight: 800; color: var(--success);
       text-shadow: 0 0 30px rgba(16,185,129,0.8);
     }
-
-    /* ----- СТРАНИЦА ВХОДА ----- */
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
@@ -127,8 +119,6 @@
     .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); transform: scale(1.02); }
     .login-btn:active { transform: scale(0.98); }
     .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
-
-    /* ----- ОСНОВНОЙ ЭКРАН ----- */
     .main-screen { display: none; flex-direction: column; flex: 1; }
     .header {
       background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
@@ -145,7 +135,6 @@
       font-size: 0.85rem;
     }
     .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
-
     .container { max-width: 800px; margin: 0 auto; padding: 24px 20px; width: 100%; display: flex; flex-direction: column; gap: 24px; }
     .balance-card {
       background: var(--bg-card); border: 1px solid var(--border);
@@ -155,7 +144,6 @@
     .balance-card h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 8px; }
     .balance-value { font-size: 4rem; font-weight: 800; color: var(--success); line-height: 1.2; }
     .balance-subtext { color: var(--text-secondary); margin-top: 8px; }
-
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .menu-card {
       background: var(--bg-card); border: 1px solid var(--border);
@@ -165,7 +153,6 @@
     .menu-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--glow); }
     .menu-card .icon { font-size: 2rem; margin-bottom: 8px; }
     .menu-card h4 { font-size: 1rem; font-weight: 600; }
-
     .section { display: none; flex-direction: column; gap: 16px; }
     .section.active { display: flex; }
     .task-list, .reward-grid { display: flex; flex-direction: column; gap: 12px; }
@@ -201,44 +188,36 @@
   </style>
 </head>
 <body>
-  <!-- ГОЛОГРАММА -->
   <div class="hologram-overlay" id="hologram">
     <div class="hologram-box">
-      <div class="hologram-mascot"><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"></div>
+      <div class="hologram-mascot"><img src="belchonok.png" alt="Бельчонок"></div>
       <h2 id="hologramMsg">+50 кармиков</h2>
       <div class="hologram-points" id="hologramPoints">0</div>
       <button class="btn" onclick="closeHologram()" style="margin-top:20px;">Отлично!</button>
     </div>
   </div>
-
-  <!-- МАСКОТ -->
   <div class="mascot-container">
     <div class="mascot-bubble" id="mascotBubble">А ты молодец!</div>
-    <div class="mascot-avatar"><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"></div>
+    <div class="mascot-avatar"><img src="belchonok.png" alt="Бельчонок"></div>
   </div>
-
-  <!-- СТРАНИЦА ВХОДА -->
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
-      <h2><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h2>
+      <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h2>
       <p>Введите ваш логин, чтобы продолжить</p>
       <input type="text" id="loginInput" placeholder="Логин (например, arthur)" />
       <button class="login-btn" onclick="login()">Войти</button>
       <div id="loginError" class="login-error"></div>
     </div>
   </div>
-
-  <!-- ОСНОВНОЙ ЭКРАН -->
   <div id="mainScreen" class="main-screen">
     <div class="header">
-      <h1><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" style="height: 1.8rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h1>
+      <h1><img src="belchonok.png" style="height: 1.8rem; vertical-align: middle;" alt="Бельчонок"> Кармический банк</h1>
       <div class="user-info">
         <span id="userNameDisplay"></span>
         <span class="role" id="userDept"></span>
         <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
       </div>
     </div>
-
     <div class="container">
       <div id="dashboard">
         <div class="balance-card">
@@ -257,41 +236,34 @@
           </div>
         </div>
       </div>
-
       <div id="tasksSection" class="section">
         <button class="back-btn" onclick="showDashboard()">← Назад</button>
         <div class="task-list" id="taskList"></div>
       </div>
-
       <div id="rewardsSection" class="section">
         <button class="back-btn" onclick="showDashboard()">← Назад</button>
         <div class="reward-grid" id="rewardGrid"></div>
       </div>
     </div>
   </div>
-
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
     let currentLogin = localStorage.getItem('karmabank_login') || '';
     let currentPoints = 0;
-
     function showMascotMessage(msg) {
       const bubble = document.getElementById('mascotBubble');
       bubble.textContent = msg;
       bubble.classList.add('visible');
       setTimeout(() => bubble.classList.remove('visible'), 4000);
     }
-
     function showHologram(points) {
       document.getElementById('hologramMsg').textContent = `+${points} кармиков`;
       document.getElementById('hologramPoints').textContent = currentPoints;
       document.getElementById('hologram').classList.add('active');
     }
-
     window.closeHologram = function() {
       document.getElementById('hologram').classList.remove('active');
     };
-
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
@@ -315,7 +287,6 @@
         })
         .catch(() => { document.getElementById('loginError').textContent = 'Ошибка соединения'; });
     }
-
     function logout() {
       localStorage.removeItem('karmabank_login');
       currentLogin = '';
@@ -324,7 +295,6 @@
       document.getElementById('loginInput').value = '';
       document.getElementById('loginError').textContent = '';
     }
-
     function showDashboard() {
       document.getElementById('dashboard').style.display = 'block';
       document.getElementById('tasksSection').style.display = 'none';
@@ -338,7 +308,6 @@
           }
         });
     }
-
     function showSection(section) {
       document.getElementById('dashboard').style.display = 'none';
       if (section === 'tasks') {
@@ -349,7 +318,6 @@
         loadRewards();
       }
     }
-
     async function loadTasks() {
       const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
       const tasks = await res.json();
@@ -366,7 +334,6 @@
         </div>`;
       }).join('');
     }
-
     async function loadRewards() {
       const res = await fetch(`${API_URL}?action=getRewards`);
       const rewards = await res.json();
@@ -378,13 +345,11 @@
         </div>
       `).join('');
     }
-
     async function takeTask(taskName) {
       await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
       showMascotMessage('За дело!');
       await loadTasks();
     }
-
     async function completeTask(taskName) {
       const res = await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
       const result = await res.json();
@@ -402,7 +367,6 @@
         alert(result.message);
       }
     }
-
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
