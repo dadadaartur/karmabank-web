@@ -115,8 +115,14 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
-    
+    let aiTipsCache = {}; // Кэш для AI-советов, чтобы не запрашивать их повторно без нужды
+
     async function fetchAITip(employee) {
+      // Если совет уже есть в кэше, просто возвращаем его
+      if (aiTipsCache[employee.login]) {
+        return aiTipsCache[employee.login];
+      }
+
       try {
         const metrics = {
           points: employee.points,
@@ -127,6 +133,8 @@
         };
         const res = await fetch(`${API_URL}?action=getAITip&name=${encodeURIComponent(employee.name)}&metrics=${encodeURIComponent(JSON.stringify(metrics))}`);
         const data = await res.json();
+        // Сохраняем в кэш
+        aiTipsCache[employee.login] = data;
         return data;
       } catch (e) {
         return { icon: '✨', text: 'Стабильная работа. Рекомендую индивидуальную беседу.' };
@@ -140,8 +148,10 @@
       currentLogin = login;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
+      aiTipsCache = {}; // Сбрасываем кэш при новом входе
       loadTeam();
-      setInterval(loadTeam, 20000);
+      // Обновляем метрики каждые 60 секунд, но AI-советы не трогаем
+      setInterval(refreshMetrics, 60000);
     }
 
     function logout() {
@@ -172,7 +182,7 @@
                   <div class="employee-dept">${emp.department || '—'}</div>
                 </div>
               </div>
-              <div class="metrics-row">
+              <div class="metrics-row" id="metrics-${emp.login}">
                 <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
                 <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
                 <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
@@ -185,6 +195,7 @@
           `;
         }).join('');
 
+        // Загружаем AI-советы один раз при первом входе
         team.forEach(emp => {
           fetchAITip(emp).then(tip => {
             const tipElem = document.getElementById(`tip-${emp.login}`);
@@ -199,11 +210,33 @@
       }
     }
 
+    // Только обновляем метрики (без AI-запросов)
+    async function refreshMetrics() {
+      try {
+        const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
+        const team = await res.json();
+        if (!team || team.length === 0) return;
+
+        team.forEach(emp => {
+          const metricsElem = document.getElementById(`metrics-${emp.login}`);
+          if (metricsElem) {
+            metricsElem.innerHTML = `
+              <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
+              <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
+              <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
+            `;
+          }
+        });
+      } catch (e) {
+        console.error('Ошибка обновления метрик', e);
+      }
+    }
+
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
       loadTeam();
-      setInterval(loadTeam, 20000);
+      setInterval(refreshMetrics, 60000);
     }
   </script>
 </body>
