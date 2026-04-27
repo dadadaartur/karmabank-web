@@ -17,9 +17,13 @@
     body {
       font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
       background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); min-height: 100vh;
-      display: flex; flex-direction: column; overflow-x: hidden;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow-x: hidden;
+      user-select: none;
     }
+    input[type="text"] { user-select: text; }
     .header {
       background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border); padding: 16px 24px;
@@ -54,6 +58,7 @@
     .rating-table td { padding: 10px 0; border-bottom: 1px solid var(--border); }
     .rating-table .position { font-weight: 700; font-size: 1.1rem; }
     .rating-table .points { font-weight: 700; color: var(--success); }
+    .rating-table .energy { color: var(--accent); font-weight: 600; }
     .task-item, .reward-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 10px 0; border-bottom: 1px solid var(--border);
@@ -102,6 +107,7 @@
       <div id="loginError" class="login-error"></div>
     </div>
   </div>
+
   <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
     <div class="header">
       <h1><img src="belchonok.png" alt="Бельчонок"> Кармический банк — Командный центр</h1>
@@ -118,6 +124,10 @@
           <div class="value success" id="totalPoints">0</div>
         </div>
         <div class="metric-card">
+          <div class="label">Всего энергии</div>
+          <div class="value accent" id="totalEnergy">0</div>
+        </div>
+        <div class="metric-card">
           <div class="label">Выполнено заданий</div>
           <div class="value success" id="completedTasks">0</div>
         </div>
@@ -129,8 +139,8 @@
       <div class="panel">
         <h2>🏆 Рейтинг</h2>
         <table class="rating-table">
-          <thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th></tr></thead>
-          <tbody id="ratingBody"><tr><td colspan="4">Загрузка...</td></tr></tbody>
+          <thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th><th>Энергия</th></tr></thead>
+          <tbody id="ratingBody"><tr><td colspan="5">Загрузка...</td></tr></tbody>
         </table>
       </div>
       <div class="panel">
@@ -143,9 +153,32 @@
       </div>
     </div>
   </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
     const ADMIN_LOGIN = 'adminboss';
+    
+    // Получение справочника уровней для иконок
+    let levelsCache = [];
+    async function loadLevels() {
+      try {
+        const res = await fetch(`${API_URL}?action=getLevels`);
+        levelsCache = await res.json();
+      } catch(e) { console.warn('Не удалось загрузить уровни'); }
+    }
+
+    function getLevelIcon(energy) {
+      if (!levelsCache.length) return '';
+      let icon = levelsCache[0].icon;
+      for (let i = levelsCache.length-1; i >= 0; i--) {
+        if (energy >= levelsCache[i].energy) {
+          icon = levelsCache[i].icon;
+          break;
+        }
+      }
+      return icon;
+    }
+
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
@@ -156,9 +189,12 @@
       localStorage.setItem('karmabank_admin_login', login);
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
-      fetchData();
-      setInterval(fetchData, 30000);
+      loadLevels().then(() => {
+        fetchData();
+        setInterval(fetchData, 30000);
+      });
     }
+
     function logout() {
       localStorage.removeItem('karmabank_admin_login');
       document.getElementById('mainScreen').style.display = 'none';
@@ -166,6 +202,7 @@
       document.getElementById('loginInput').value = '';
       document.getElementById('loginError').textContent = '';
     }
+
     async function fetchData() {
       try {
         const [employees, tasks, rewards] = await Promise.all([
@@ -179,29 +216,38 @@
         updateRewardList(rewards);
       } catch (err) { console.error(err); }
     }
+
     function updateMetrics(employees, tasks) {
       const totalEmployees = employees ? employees.length : 0;
       const totalPoints = employees ? employees.reduce((sum, e) => sum + (e.points || 0), 0) : 0;
+      const totalEnergy = employees ? employees.reduce((sum, e) => sum + (e.energy || 0), 0) : 0;
       const completed = tasks ? tasks.filter(t => t.status === 'Выполнено').length : 0;
       const active = tasks ? tasks.filter(t => t.status !== 'Выполнено').length : 0;
       document.getElementById('totalEmployees').textContent = totalEmployees;
       document.getElementById('totalPoints').textContent = totalPoints;
+      document.getElementById('totalEnergy').textContent = totalEnergy;
       document.getElementById('completedTasks').textContent = completed;
       document.getElementById('activeTasks').textContent = active;
     }
+
     function updateRating(employees) {
       const tbody = document.getElementById('ratingBody');
-      if (!employees || employees.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Нет данных</td></tr>'; return; }
+      if (!employees || employees.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Нет данных</td></tr>'; return; }
       const sorted = [...employees].sort((a, b) => (b.points || 0) - (a.points || 0));
-      tbody.innerHTML = sorted.map((e, i) => `
+      tbody.innerHTML = sorted.map((e, i) => {
+        const icon = getLevelIcon(e.energy || 0);
+        return `
         <tr>
           <td class="position">${i + 1}</td>
-          <td>${e.name || '—'}</td>
+          <td>${icon} ${e.name || '—'}</td>
           <td>${e.department || '—'}</td>
           <td class="points">${e.points || 0}</td>
+          <td class="energy">${e.energy || 0}</td>
         </tr>
-      `).join('');
+        `;
+      }).join('');
     }
+
     function updateTaskList(tasks) {
       const container = document.getElementById('taskList');
       if (!tasks || tasks.length === 0) { container.innerHTML = '<div>Нет заданий</div>'; return; }
@@ -215,6 +261,7 @@
         </div>`;
       }).join('');
     }
+
     function updateRewardList(rewards) {
       const container = document.getElementById('rewardList');
       if (!rewards || rewards.length === 0) { container.innerHTML = '<div>Нет наград</div>'; return; }
@@ -225,11 +272,14 @@
         </div>
       `).join('');
     }
+
     if (localStorage.getItem('karmabank_admin_login') === ADMIN_LOGIN) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
-      fetchData();
-      setInterval(fetchData, 30000);
+      loadLevels().then(() => {
+        fetchData();
+        setInterval(fetchData, 30000);
+      });
     }
   </script>
 </body>
