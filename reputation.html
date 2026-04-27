@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Кармический путь — Кармический банк</title>
-  <link rel="icon" type="image/png" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
-  <link rel="apple-touch-icon" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <link rel="apple-touch-icon" href="belchonok.png">
   <style>
     :root {
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
@@ -52,7 +52,7 @@
 <body>
   <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
     <div class="header">
-      <h1><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"> Кармический путь</h1>
+      <h1><img src="belchonok.png" alt="Бельчонок"> Кармический путь</h1>
       <button class="logout-btn" onclick="goBack()">↩ Назад</button>
     </div>
     <div class="container">
@@ -102,9 +102,7 @@
             return `<span class="icon-badge ${earned ? 'earned' : ''}">${icon}</span>`;
           }).join('');
         }
-      } catch (e) {
-        console.error(e);
-      }
+      } catch (e) { console.error(e); }
     }
     function goBack() { window.location.href = '/'; }
   </script>
