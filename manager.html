@@ -21,6 +21,7 @@
       display: flex; flex-direction: column; overflow-x: hidden;
       user-select: none;
     }
+    input[type="text"] { user-select: text; }
     .header {
       background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border); padding: 16px 24px;
@@ -112,7 +113,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxL3R6HvzYVt0yzuxZmx26E88tAV2rYNcrA1K3-k1tvW26fzQT-eLeKHVaep2yf_pL0Uw/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
     
     async function fetchAITip(employee) {
@@ -125,7 +126,8 @@
           inProgressTasks: employee.inProgressTasks
         };
         const res = await fetch(`${API_URL}?action=getAITip&name=${encodeURIComponent(employee.name)}&metrics=${encodeURIComponent(JSON.stringify(metrics))}`);
-        return await res.json();
+        const data = await res.json();
+        return data;
       } catch (e) {
         return { icon: '✨', text: 'Стабильная работа. Рекомендую индивидуальную беседу.' };
       }
@@ -160,40 +162,6 @@
           return;
         }
 
-        grid.innerHTML = team.map(emp => {
-          const card = document.createElement('div');
-          card.className = 'employee-card';
-          card.innerHTML = `
-            <div class="employee-header">
-              <div class="employee-avatar">${emp.name.charAt(0)}</div>
-              <div>
-                <div class="employee-name">${emp.name}</div>
-                <div class="employee-dept">${emp.department || '—'}</div>
-              </div>
-            </div>
-            <div class="metrics-row">
-              <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
-              <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
-              <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
-            </div>
-            <div class="ai-tip" id="tip-${emp.login}">
-              <span class="icon">🤖</span>
-              <span>ИИ анализирует данные...</span>
-            </div>
-          `;
-
-          // Запрашиваем AI-совет асинхронно
-          fetchAITip(emp).then(tip => {
-            const tipElem = card.querySelector(`#tip-${emp.login}`);
-            if (tipElem) {
-              tipElem.innerHTML = `<span class="icon">${tip.icon}</span><span>${tip.text}</span>`;
-            }
-          });
-
-          return card.outerHTML;
-        }).join('');
-
-        // Перестраиваем grid с карточками
         grid.innerHTML = team.map(emp => {
           return `
             <div class="employee-card" id="card-${emp.login}">
