@@ -115,12 +115,20 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
     
-    function generateAITip(employee) {
-      if (employee.pendingTasks > 2) return { icon: '⚠️', text: 'Сотрудник перегружен неназначенными задачами. Проведите приоритизацию.' };
-      if (employee.energy === 0 && employee.completedTasks > 0) return { icon: '💡', text: 'Отличный старт! Важно отметить первый прогресс.' };
-      if (employee.completedTasks > 3) return { icon: '🏆', text: 'Высокая продуктивность! Рассмотрите для наставничества.' };
-      if (employee.inProgressTasks > 2) return { icon: '🚀', text: 'Хороший темп работы. Поддержите мотивацию.' };
-      return { icon: '✨', text: 'Стабильная работа. Рекомендую индивидуальную беседу.' };
+    async function fetchAITip(employee) {
+      try {
+        const metrics = {
+          points: employee.points,
+          energy: employee.energy,
+          completedTasks: employee.completedTasks,
+          pendingTasks: employee.pendingTasks,
+          inProgressTasks: employee.inProgressTasks
+        };
+        const res = await fetch(`${API_URL}?action=getAITip&name=${encodeURIComponent(employee.name)}&metrics=${encodeURIComponent(JSON.stringify(metrics))}`);
+        return await res.json();
+      } catch (e) {
+        return { icon: '✨', text: 'Стабильная работа. Рекомендую индивидуальную беседу.' };
+      }
     }
 
     function login() {
@@ -151,10 +159,44 @@
           grid.innerHTML = '<div class="loading">Нет подчинённых. Убедитесь, что в таблице заполнен столбец "Руководитель".</div>';
           return;
         }
+
         grid.innerHTML = team.map(emp => {
-          const tip = generateAITip(emp);
+          const card = document.createElement('div');
+          card.className = 'employee-card';
+          card.innerHTML = `
+            <div class="employee-header">
+              <div class="employee-avatar">${emp.name.charAt(0)}</div>
+              <div>
+                <div class="employee-name">${emp.name}</div>
+                <div class="employee-dept">${emp.department || '—'}</div>
+              </div>
+            </div>
+            <div class="metrics-row">
+              <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
+              <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
+              <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
+            </div>
+            <div class="ai-tip" id="tip-${emp.login}">
+              <span class="icon">🤖</span>
+              <span>ИИ анализирует данные...</span>
+            </div>
+          `;
+
+          // Запрашиваем AI-совет асинхронно
+          fetchAITip(emp).then(tip => {
+            const tipElem = card.querySelector(`#tip-${emp.login}`);
+            if (tipElem) {
+              tipElem.innerHTML = `<span class="icon">${tip.icon}</span><span>${tip.text}</span>`;
+            }
+          });
+
+          return card.outerHTML;
+        }).join('');
+
+        // Перестраиваем grid с карточками
+        grid.innerHTML = team.map(emp => {
           return `
-            <div class="employee-card">
+            <div class="employee-card" id="card-${emp.login}">
               <div class="employee-header">
                 <div class="employee-avatar">${emp.name.charAt(0)}</div>
                 <div>
@@ -167,13 +209,24 @@
                 <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
                 <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
               </div>
-              <div class="ai-tip">
-                <span class="icon">${tip.icon}</span>
-                <span>${tip.text}</span>
+              <div class="ai-tip" id="tip-${emp.login}">
+                <span class="icon">🤖</span>
+                <span>ИИ анализирует данные...</span>
               </div>
             </div>
           `;
         }).join('');
+
+        // Грузим AI-советы асинхронно
+        team.forEach(emp => {
+          fetchAITip(emp).then(tip => {
+            const tipElem = document.getElementById(`tip-${emp.login}`);
+            if (tipElem) {
+              tipElem.innerHTML = `<span class="icon">${tip.icon}</span><span>${tip.text}</span>`;
+            }
+          });
+        });
+
       } catch (e) {
         document.getElementById('teamGrid').innerHTML = '<div class="loading">Ошибка загрузки. Проверьте, что в таблице есть столбец "Руководитель" и обновлена версия скрипта.</div>';
       }
