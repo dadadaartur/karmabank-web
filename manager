@@ -10,21 +10,180 @@
     :root {
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
       --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --success: #10b981; --border: #1f3350;
+      --accent-hover: #ea580c; --success: #10b981; --warning: #f59e0b;
+      --danger: #ef4444; --border: #1f3350; --shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628, #0f1f35);
-      color: var(--text-primary); display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; text-align: center; flex-direction: column; gap: 16px;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary); min-height: 100vh;
+      display: flex; flex-direction: column; overflow-x: hidden;
     }
-    h1 { font-size: 2rem; font-weight: 800; }
-    p { color: var(--text-secondary); }
-    img { width: 80px; }
+    .header {
+      background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .header h1 img { height: 1.8rem; vertical-align: middle; }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+    }
+    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; width: 100%; display: flex; flex-direction: column; gap: 24px; }
+    .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
+    .employee-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 28px; transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+    }
+    .employee-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+    .employee-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .employee-avatar {
+      width: 50px; height: 50px; border-radius: 50%; background: var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800;
+    }
+    .employee-name { font-size: 1.2rem; font-weight: 700; }
+    .employee-dept { font-size: 0.85rem; color: var(--text-secondary); }
+    .metrics-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .metric { text-align: center; }
+    .metric .value { font-size: 1.5rem; font-weight: 800; }
+    .metric .label { font-size: 0.75rem; color: var(--text-secondary); }
+    .value.success { color: var(--success); } .value.warning { color: var(--warning); } .value.accent { color: var(--accent); }
+    .ai-tip {
+      background: rgba(249, 115, 22, 0.1); border: 1px solid var(--accent);
+      border-radius: 16px; padding: 14px; margin-top: 16px;
+      font-size: 0.9rem; color: var(--text-secondary);
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .ai-tip .icon { font-size: 1.2rem; }
+    .loading { text-align: center; color: var(--text-secondary); padding: 40px; }
+    .login-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .login-form {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 40px 30px;
+      box-shadow: var(--shadow); width: 100%; max-width: 400px; text-align: center;
+    }
+    .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
+    .login-form input[type="text"] {
+      width: 100%; padding: 14px 16px; border: 1px solid var(--border);
+      border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary);
+      font-size: 1rem; margin-bottom: 16px; outline: none;
+    }
+    .login-form input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+    .login-btn {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00);
+      color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); }
+    .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
   </style>
 </head>
 <body>
-  <img src="belchonok.png" alt="Бельчонок">
-  <h1>Панель руководителя</h1>
-  <p>Скоро здесь будет дашборд с карточками сотрудников и AI-рекомендациями.</p>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-form">
+      <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Панель руководителя</h2>
+      <p>Войдите, чтобы увидеть свою команду</p>
+      <input type="text" id="loginInput" placeholder="Ваш логин (например, arthur)" />
+      <button class="login-btn" onclick="login()">Смотреть команду</button>
+      <div id="loginError" class="login-error"></div>
+    </div>
+  </div>
+
+  <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
+    <div class="header">
+      <h1><img src="belchonok.png" alt="Бельчонок"> Моя команда</h1>
+      <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+    </div>
+    <div class="container">
+      <div class="section-title">👥 Мои сотрудники</div>
+      <div class="team-grid" id="teamGrid"><div class="loading">Загрузка...</div></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
+    let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
+    
+    // Генератор ИИ-совета на основе показателей (заглушка, потом подключим YandexGPT)
+    function generateAITip(employee) {
+      if (employee.pendingTasks > 2) return { icon: '⚠️', text: 'Сотрудник перегружен неназначенными задачами. Проведите приоритизацию.' };
+      if (employee.energy === 0 && employee.completedTasks > 0) return { icon: '💡', text: 'Отличный старт! Важно отметить первый прогресс.' };
+      if (employee.completedTasks > 3) return { icon: '🏆', text: 'Высокая продуктивность! Рассмотрите для наставничества.' };
+      if (employee.inProgressTasks > 2) return { icon: '🚀', text: 'Хороший темп работы. Поддержите мотивацию.' };
+      return { icon: '✨', text: 'Стабильная работа. Рекомендую индивидуальную беседу.' };
+    }
+
+    function login() {
+      const login = document.getElementById('loginInput').value.trim();
+      if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
+      localStorage.setItem('karmabank_manager_login', login);
+      currentLogin = login;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainScreen').style.display = 'flex';
+      loadTeam();
+      setInterval(loadTeam, 20000);
+    }
+
+    function logout() {
+      localStorage.removeItem('karmabank_manager_login');
+      document.getElementById('mainScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('loginInput').value = '';
+      document.getElementById('loginError').textContent = '';
+    }
+
+    async function loadTeam() {
+      try {
+        const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
+        const team = await res.json();
+        const grid = document.getElementById('teamGrid');
+        if (!team || team.length === 0) {
+          grid.innerHTML = '<div class="loading">Нет подчинённых. Убедитесь, что в таблице заполнен столбец "Руководитель".</div>';
+          return;
+        }
+        grid.innerHTML = team.map(emp => {
+          const tip = generateAITip(emp);
+          return `
+            <div class="employee-card">
+              <div class="employee-header">
+                <div class="employee-avatar">${emp.name.charAt(0)}</div>
+                <div>
+                  <div class="employee-name">${emp.name}</div>
+                  <div class="employee-dept">${emp.department || '—'}</div>
+                </div>
+              </div>
+              <div class="metrics-row">
+                <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
+                <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
+                <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
+              </div>
+              <div class="ai-tip">
+                <span class="icon">${tip.icon}</span>
+                <span>${tip.text}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        document.getElementById('teamGrid').innerHTML = '<div class="loading">Ошибка загрузки. Проверьте, что в таблице есть столбец "Руководитель" и обновлена версия скрипта.</div>';
+      }
+    }
+
+    if (currentLogin) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainScreen').style.display = 'flex';
+      loadTeam();
+      setInterval(loadTeam, 20000);
+    }
+  </script>
 </body>
 </html>
