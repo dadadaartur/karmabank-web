@@ -3,30 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Кармический банк — Командный центр</title>
-  <link rel="icon" type="image/png" href="https://storage.yandexcloud.net/karmabank.online/belchonok.png">
+  <title>Командный центр — Кармический банк</title>
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <link rel="apple-touch-icon" href="belchonok.png">
   <style>
     :root {
-      --bg-primary: #0a1628;
-      --bg-secondary: #0f1f35;
-      --bg-card: #152238;
-      --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1;
-      --accent: #f97316;
-      --accent-hover: #ea580c;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --border: #1f3350;
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --accent-hover: #ea580c; --success: #10b981; --warning: #f59e0b;
+      --danger: #ef4444; --border: #1f3350;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
       background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary);
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      overflow-x: hidden;
+      color: var(--text-primary); min-height: 100vh;
+      display: flex; flex-direction: column; overflow-x: hidden;
     }
     .header {
       background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
@@ -34,7 +26,7 @@
       display: flex; align-items: center; justify-content: space-between;
     }
     .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-    .header h1 img { height: 1.8rem; }
+    .header h1 img { height: 1.8rem; vertical-align: middle; }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
@@ -101,21 +93,18 @@
   </style>
 </head>
 <body>
-  <!-- ЭКРАН ВХОДА -->
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
-      <h2><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Командный центр</h2>
+      <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Командный центр</h2>
       <p>Введите логин администратора</p>
       <input type="text" id="loginInput" placeholder="Логин" />
       <button class="login-btn" onclick="login()">Войти</button>
       <div id="loginError" class="login-error"></div>
     </div>
   </div>
-
-  <!-- КОМАНДНЫЙ ЦЕНТР -->
   <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
     <div class="header">
-      <h1><img src="https://storage.yandexcloud.net/karmabank.online/belchonok.png" alt="Бельчонок"> Кармический банк — Командный центр</h1>
+      <h1><img src="belchonok.png" alt="Бельчонок"> Кармический банк — Командный центр</h1>
       <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
     </div>
     <div class="container">
@@ -154,11 +143,9 @@
       </div>
     </div>
   </div>
-
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwnQn6v4GsehwvkHCkuj61XTIc89Cs-NOslLXBNUofX6E3xNaOv3nEcuRQJKagTcgTZ9Q/exec';
-    const ADMIN_LOGIN = 'adminboss'; // ← Здесь укажи желаемый логин администратора
-
+    const ADMIN_LOGIN = 'adminboss';
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
@@ -166,14 +153,12 @@
         document.getElementById('loginError').textContent = 'Доступ запрещён';
         return;
       }
-      // Сохраняем админский логин и показываем дашборд
       localStorage.setItem('karmabank_admin_login', login);
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
       fetchData();
       setInterval(fetchData, 30000);
     }
-
     function logout() {
       localStorage.removeItem('karmabank_admin_login');
       document.getElementById('mainScreen').style.display = 'none';
@@ -181,7 +166,6 @@
       document.getElementById('loginInput').value = '';
       document.getElementById('loginError').textContent = '';
     }
-
     async function fetchData() {
       try {
         const [employees, tasks, rewards] = await Promise.all([
@@ -193,11 +177,8 @@
         updateRating(employees);
         updateTaskList(tasks);
         updateRewardList(rewards);
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     }
-
     function updateMetrics(employees, tasks) {
       const totalEmployees = employees ? employees.length : 0;
       const totalPoints = employees ? employees.reduce((sum, e) => sum + (e.points || 0), 0) : 0;
@@ -208,7 +189,6 @@
       document.getElementById('completedTasks').textContent = completed;
       document.getElementById('activeTasks').textContent = active;
     }
-
     function updateRating(employees) {
       const tbody = document.getElementById('ratingBody');
       if (!employees || employees.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Нет данных</td></tr>'; return; }
@@ -222,7 +202,6 @@
         </tr>
       `).join('');
     }
-
     function updateTaskList(tasks) {
       const container = document.getElementById('taskList');
       if (!tasks || tasks.length === 0) { container.innerHTML = '<div>Нет заданий</div>'; return; }
@@ -236,7 +215,6 @@
         </div>`;
       }).join('');
     }
-
     function updateRewardList(rewards) {
       const container = document.getElementById('rewardList');
       if (!rewards || rewards.length === 0) { container.innerHTML = '<div>Нет наград</div>'; return; }
@@ -247,8 +225,6 @@
         </div>
       `).join('');
     }
-
-    // При загрузке проверяем, был ли админ уже авторизован
     if (localStorage.getItem('karmabank_admin_login') === ADMIN_LOGIN) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
