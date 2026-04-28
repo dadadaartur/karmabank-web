@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Задания — Кармический банк</title>
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --success: #10b981; --warning: #f59e0b; --border: #1f3350;
+    }
+    body {
+      font-family: 'Inter', sans-serif; background: var(--bg-primary);
+      color: var(--text-primary); padding: 20px; user-select: none;
+    }
+    .back-btn { color: var(--text-secondary); cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .task-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .btn {
+      background: var(--accent); color: white; border: none;
+      padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600;
+    }
+    .btn:hover { background: #ea580c; }
+    .status { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+    .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="back-btn" onclick="window.location.href='/'">← Назад</div>
+  <h2>✅ Мои задания</h2>
+  <div id="tasksList">Загрузка...</div>
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    async function loadTasks() {
+      const login = localStorage.getItem('karmabank_login');
+      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(login)}`);
+      const tasks = await res.json();
+      const container = document.getElementById('tasksList');
+      container.innerHTML = tasks.map(t => `
+        <div class="task-card">
+          <span>${t.task} (${t.points} карм.)</span>
+          <span class="status status-active">${t.status || 'Назначено'}</span>
+          ${t.status === 'Назначено' ? `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>` : ''}
+          ${t.status === 'В работе' ? `<button class="btn" onclick="completeTask('${t.task}')">Выполнить</button>` : ''}
+        </div>
+      `).join('');
+    }
+    async function takeTask(taskName) {
+      await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(localStorage.getItem('karmabank_login'))}`);
+      loadTasks();
+    }
+    async function completeTask(taskName) {
+      const comment = prompt('Введите комментарий для руководителя');
+      if (!comment) return;
+      await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(localStorage.getItem('karmabank_login'))}&comment=${encodeURIComponent(comment)}`);
+      loadTasks();
+    }
+    loadTasks();
+  </script>
+</body>
+</html>
