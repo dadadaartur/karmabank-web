@@ -21,9 +21,12 @@
       border-radius: 16px; padding: 16px; margin-bottom: 12px;
       display: flex; justify-content: space-between; align-items: center;
     }
+    .reward-info { display: flex; flex-direction: column; }
+    .reward-cost { font-weight: bold; color: var(--accent); }
     .btn {
       background: var(--accent); color: white; border: none;
       padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600;
+      min-width: 80px; text-align: center;
     }
     .btn:hover { background: #ea580c; }
     .modal {
@@ -56,8 +59,10 @@
       const container = document.getElementById('rewardsList');
       container.innerHTML = rewards.map(r => `
         <div class="reward-card">
-          <span>${r.name}</span>
-          <span>${r.cost} карм.</span>
+          <div class="reward-info">
+            <span>${r.name}</span>
+            <span class="reward-cost">${r.cost} карм.</span>
+          </div>
           <button class="btn" onclick="confirmBuy('${r.name}', ${r.cost})">Купить</button>
         </div>
       `).join('');
@@ -76,13 +81,32 @@
         const res = await fetch(`${API_URL}?action=buyReward&reward=${encodeURIComponent(rewardName)}&login=${encodeURIComponent(localStorage.getItem('karmabank_login'))}`);
         const result = await res.json();
         if (result.success) {
-          alert('Поздравляем с покупкой!');
+          showCertificate(result.certificate);
           loadRewards();
         } else {
-          alert(result.message);
+          showMessage(result.message);
         }
       };
       document.getElementById('noBtn').onclick = () => modal.remove();
+    }
+    function showCertificate(cert) {
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `<div class="modal-content">
+        <h2>🎉 Сертификат</h2>
+        <p><b>${cert.userName}</b> приобрёл(а) право на <b>${cert.rewardName}</b></p>
+        <p>Стоимость: ${cert.cost} кармиков</p>
+        <p>Дата: ${cert.date}</p>
+        <p>Действителен до: ${cert.validUntil}</p>
+        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+    function showMessage(msg) {
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `<div class="modal-content"><p>${msg}</p><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+      document.body.appendChild(modal);
     }
     loadRewards();
   </script>
