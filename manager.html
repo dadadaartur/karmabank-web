@@ -129,7 +129,7 @@
 <body>
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
-      <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Панель руководителя</h2>
+      <h2>Панель руководителя</h2>
       <p>Войдите, чтобы увидеть свою команду</p>
       <input type="text" id="loginInput" placeholder="Ваш логин (например, arthur)" />
       <button class="login-btn" onclick="login()">Смотреть команду</button>
@@ -139,7 +139,7 @@
 
   <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
     <div class="header">
-      <h1 onclick="window.location.reload()"><img src="belchonok.png" alt="Бельчонок"> Моя команда</h1>
+      <h1>Моя команда</h1>
       <div class="header-actions">
         <a href="/" class="back-btn">← На главную</a>
         <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
@@ -151,7 +151,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно подтверждения проверки -->
+  <!-- Модальные окна без бельчонка -->
   <div id="verifyModal" class="modal">
     <div class="modal-content">
       <p id="verifyModalText"></p>
@@ -160,7 +160,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно для результата проверки -->
   <div id="resultModal" class="modal">
     <div class="modal-content">
       <p id="resultModalText"></p>
@@ -234,29 +233,27 @@
           return;
         }
 
-        grid.innerHTML = team.map(emp => {
-          return `
-            <div class="employee-card" id="card-${emp.login}">
-              <div class="employee-header">
-                <div class="employee-avatar">${emp.name.charAt(0)}</div>
-                <div>
-                  <div class="employee-name">${emp.name}</div>
-                  <div class="employee-dept">${emp.department || '—'}</div>
-                </div>
+        grid.innerHTML = team.map(emp => `
+          <div class="employee-card" id="card-${emp.login}">
+            <div class="employee-header">
+              <div class="employee-avatar">${emp.name.charAt(0)}</div>
+              <div>
+                <div class="employee-name">${emp.name}</div>
+                <div class="employee-dept">${emp.department || '—'}</div>
               </div>
-              <div class="metrics-row">
-                <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
-                <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
-                <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
-              </div>
-              <div class="ai-tip" id="tip-${emp.login}">
-                <span class="icon">🤖</span>
-                <span>ИИ анализирует данные...</span>
-              </div>
-              <div class="task-review-section" id="review-${emp.login}">Загрузка...</div>
             </div>
-          `;
-        }).join('');
+            <div class="metrics-row">
+              <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
+              <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
+              <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
+            </div>
+            <div class="ai-tip" id="tip-${emp.login}">
+              <span class="icon">🤖</span>
+              <span>ИИ анализирует данные...</span>
+            </div>
+            <div class="task-review-section" id="review-${emp.login}">Загрузка...</div>
+          </div>
+        `).join('');
 
         team.forEach(emp => {
           fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
