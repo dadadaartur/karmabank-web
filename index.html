@@ -223,7 +223,8 @@
           <div class="menu-card" onclick="showSection('tasks')"><div class="icon">✅</div><h4>Доступные задания</h4></div>
           <div class="menu-card" onclick="showSection('rewards')"><div class="icon">🎁</div><h4>Витрина наград</h4></div>
           <div class="menu-card" onclick="window.location.href='/reputation.html'"><div class="icon">⭐</div><h4>Кармический путь</h4></div>
-          <div class="menu-card" id="teamCard" onclick="window.location.href='/manager.html'"><div class="icon">👥</div><h4>Моя команда</h4></div>
+          <!-- Раздел Моя команда изначально скрыт -->
+          <div class="menu-card" id="teamCard" style="display:none;" onclick="window.location.href='/manager.html'"><div class="icon">👥</div><h4>Моя команда</h4></div>
           <div class="menu-card" onclick="openTransferModal()"><div class="icon">💸</div><h4>Перевести кармики</h4></div>
         </div>
       </div>
@@ -350,9 +351,12 @@
             const badge = document.getElementById('levelBadge');
             badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
             badge.style.display = 'inline-block';
+            // Проверка прав руководителя – показываем раздел только если isManager
             fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
               .then(r => r.json())
-              .then(isManager => document.getElementById('teamCard').style.display = isManager ? 'block' : 'none');
+              .then(isManager => {
+                document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
+              });
             showDashboard();
           } else {
             document.getElementById('loginError').textContent = 'Пользователь не найден';
