@@ -5,20 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Панель руководителя — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
-  <link rel="apple-touch-icon" href="belchonok.png">
   <style>
     :root {
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
       --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --accent-hover: #ea580c; --success: #10b981; --warning: #f59e0b;
-      --danger: #ef4444; --border: #1f3350; --shadow: 0 20px 40px rgba(0,0,0,0.5);
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); min-height: 100vh;
-      display: flex; flex-direction: column; overflow-x: hidden;
+      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
       user-select: none;
     }
     input[type="text"] { user-select: text; }
@@ -27,8 +23,12 @@
       border-bottom: 1px solid var(--border); padding: 16px 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .header h1 img { height: 1.8rem; vertical-align: middle; }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .back-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none;
+    }
+    .back-btn:hover { background: var(--border); }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
@@ -81,7 +81,7 @@
     .login-form {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 24px; padding: 40px 30px;
-      box-shadow: var(--shadow); width: 100%; max-width: 400px; text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center;
     }
     .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
@@ -96,7 +96,7 @@
       color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
       cursor: pointer;
     }
-    .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); }
+    .login-btn:hover { background: linear-gradient(135deg, #ea580c, #cc5200); }
     .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -140,7 +140,10 @@
   <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
     <div class="header">
       <h1 onclick="window.location.reload()"><img src="belchonok.png" alt="Бельчонок"> Моя команда</h1>
-      <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+      <div class="header-actions">
+        <a href="/" class="back-btn">← На главную</a>
+        <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+      </div>
     </div>
     <div class="container">
       <div class="section-title">👥 Мои сотрудники</div>
@@ -148,6 +151,7 @@
     </div>
   </div>
 
+  <!-- Модальное окно подтверждения проверки -->
   <div id="verifyModal" class="modal">
     <div class="modal-content">
       <p id="verifyModalText"></p>
@@ -156,9 +160,22 @@
     </div>
   </div>
 
+  <!-- Модальное окно для результата проверки -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <p id="resultModalText"></p>
+      <button class="modal-close-btn" onclick="document.getElementById('resultModal').classList.remove('active')">Закрыть</button>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
+
+    function showResultModal(message) {
+      document.getElementById('resultModalText').textContent = message;
+      document.getElementById('resultModal').classList.add('active');
+    }
 
     async function fetchAITip(employee) {
       try {
@@ -183,7 +200,7 @@
         closeVerifyModal();
         const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
         const result = await res.json();
-        alert(result.message);
+        showResultModal(result.message);
         loadTeam();
       };
     }
