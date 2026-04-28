@@ -6,6 +6,7 @@
   <title>Чат команды — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
+    /* стили без изменений */
     :root {
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
       --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
@@ -78,7 +79,6 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const currentUser = localStorage.getItem('karmabank_login') || 'anonymous';
-    let allMessages = [];
 
     async function loadMembers() {
       const res = await fetch(`${API_URL}?action=getAllEmployees`);
@@ -101,50 +101,39 @@
       document.getElementById('memberCardModal').classList.add('active');
     }
 
-    function addMessage(sender, text, cls) {
-      allMessages.push({ sender, text });
-      const div = document.createElement('div');
-      div.className = 'message ' + cls;
-      div.innerHTML = `<b>${sender}:</b> ${text}`;
-      document.getElementById('chatBox').appendChild(div);
-      document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+    async function loadMessages() {
+      const res = await fetch(`${API_URL}?action=getMessages`);
+      const messages = await res.json();
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML = '';
+      messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'message ' + (msg.sender === currentUser ? 'user' : 'colleague');
+        div.innerHTML = `<b>${msg.sender}:</b> ${msg.text}`;
+        chatBox.appendChild(div);
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     async function sendMessage() {
       const input = document.getElementById('userInput');
       const text = input.value.trim();
       if (!text) return;
-      addMessage(currentUser, text, 'user');
       input.value = '';
-      try {
-        await fetch(`${API_URL}?action=sendMessage&sender=${encodeURIComponent(currentUser)}&text=${encodeURIComponent(text)}`);
-      } catch(e) {}
-      // Для демонстрации "общих" сообщений — через 2 секунды добавляем ответ от другого участника (заглушка)
-      setTimeout(() => {
-        if (allMessages.length % 2 === 0) {
-          addMessage('Лилия', 'Привет! 👋', 'colleague');
-        }
-      }, 2000);
+      await fetch(`${API_URL}?action=sendMessage&sender=${encodeURIComponent(currentUser)}&text=${encodeURIComponent(text)}`);
+      loadMessages();
     }
 
     async function callAI() {
       const question = prompt('Введите вопрос для ИИ:');
       if (!question) return;
-      addMessage('ИИ', 'Думаю...', 'colleague');
-      try {
-        const res = await fetch(`${API_URL}?action=chat&prompt=${encodeURIComponent(question)}`);
-        const data = await res.json();
-        document.querySelectorAll('.colleague').forEach(b => {
-          if (b.textContent.startsWith('ИИ: Думаю')) b.remove();
-        });
-        addMessage('ИИ', data.reply || 'Нет ответа', 'colleague');
-      } catch(e) {
-        addMessage('ИИ', 'Ошибка соединения', 'colleague');
-      }
+      await sendMessage(`🤖 ${question}`);
+      loadMessages();
     }
 
     loadMembers();
-    setInterval(loadMembers, 30000);
+    loadMessages();
+    setInterval(loadMessages, 3000); // автообновление каждые 3 секунды
   </script>
 </body>
 </html>
