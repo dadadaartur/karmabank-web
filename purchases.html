@@ -148,7 +148,7 @@
       if (res) {
         const result = await res.json();
         if (result.success) {
-          loadPurchases();
+          loadPurchases(); // Перерисовываем список
         } else {
           alert(result.message);
         }
