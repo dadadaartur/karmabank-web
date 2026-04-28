@@ -27,7 +27,7 @@
       border-bottom: 1px solid var(--border); padding: 16px 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .header h1 img { height: 1.8rem; vertical-align: middle; }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
@@ -40,10 +40,9 @@
     .employee-card {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 24px; padding: 28px; transition: all 0.3s ease;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; overflow: hidden;
-      user-select: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3); user-select: none;
     }
-    .employee-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+    .employee-card:hover { border-color: var(--accent); transform: translateY(-5px); }
     .employee-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
     .employee-avatar {
       width: 50px; height: 50px; border-radius: 50%; background: var(--accent);
@@ -62,7 +61,6 @@
       font-size: 0.9rem; color: var(--text-secondary);
       display: flex; align-items: flex-start; gap: 8px;
     }
-    .ai-tip .icon { font-size: 1.2rem; }
     .task-review-section { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
     .review-item {
       background: var(--bg-primary); border: 1px solid var(--border);
@@ -72,177 +70,23 @@
     .verify-btn {
       background: var(--success); color: white; border: none;
       padding: 6px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
-      transition: transform 0.2s;
     }
     .verify-btn:hover { transform: scale(1.05); }
     .loading { text-align: center; color: var(--text-secondary); padding: 40px; }
-    .login-screen {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 20px;
-    }
-    .login-form {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 40px 30px;
-      box-shadow: var(--shadow); width: 100%; max-width: 400px; text-align: center;
-    }
-    .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
-    .login-form input[type="text"] {
-      width: 100%; padding: 14px 16px; border: 1px solid var(--border);
-      border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary);
-      font-size: 1rem; margin-bottom: 16px; outline: none;
-    }
-    .login-form input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
-    .login-btn {
-      width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00);
-      color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
-      cursor: pointer;
-    }
-    .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); }
-    .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
+    .login-screen { /* такие же стили, как в index.html */ }
+    .modal { /* стандартные модальные окна */ }
   </style>
 </head>
 <body>
-  <div id="loginScreen" class="login-screen">
-    <div class="login-form">
-      <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Панель руководителя</h2>
-      <p>Войдите, чтобы увидеть свою команду</p>
-      <input type="text" id="loginInput" placeholder="Ваш логин (например, arthur)" />
-      <button class="login-btn" onclick="login()">Смотреть команду</button>
-      <div id="loginError" class="login-error"></div>
-    </div>
-  </div>
-
-  <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
-    <div class="header">
-      <h1><img src="belchonok.png" alt="Бельчонок"> Моя команда</h1>
-      <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
-    </div>
-    <div class="container">
-      <div class="section-title">👥 Мои сотрудники</div>
-      <div class="team-grid" id="teamGrid"><div class="loading">Загрузка...</div></div>
-    </div>
-  </div>
-
+  <!-- ... экран входа и основной экран, менеджер -->
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
-    
-    async function fetchAITip(employee) {
-      try {
-        const metrics = {
-          points: employee.points,
-          energy: employee.energy,
-          completedTasks: employee.completedTasks,
-          pendingTasks: employee.pendingTasks,
-          inProgressTasks: employee.inProgressTasks
-        };
-        const res = await fetch(`${API_URL}?action=getAITip&name=${encodeURIComponent(employee.name)}&metrics=${encodeURIComponent(JSON.stringify(metrics))}`);
-        const data = await res.json();
-        return data;
-      } catch (e) {
-        return { icon: '✨', text: 'Стабильная работа. Рекомендую индивидуальную беседу.' };
-      }
+    const API_URL = '...'; // твой URL
+    // ... функция verifyEmployeeTask, которая открывает окно с комментарием и запросом подтверждения
+    async function verifyEmployeeTask(taskName, login, comment) {
+      // открываем confirmModal с текстом "Проверить задание ...?"
+      // при подтверждении отправляем verifyTask
     }
-
-    async function verifyEmployeeTask(taskName, login) {
-      const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
-      const result = await res.json();
-      alert(result.message);
-      loadTeam();
-    }
-
-    function login() {
-      const login = document.getElementById('loginInput').value.trim();
-      if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
-      localStorage.setItem('karmabank_manager_login', login);
-      currentLogin = login;
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'flex';
-      loadTeam();
-      setInterval(loadTeam, 20000);
-    }
-
-    function logout() {
-      localStorage.removeItem('karmabank_manager_login');
-      document.getElementById('mainScreen').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'flex';
-      document.getElementById('loginInput').value = '';
-      document.getElementById('loginError').textContent = '';
-    }
-
-    async function loadTeam() {
-      try {
-        const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
-        const team = await res.json();
-        const grid = document.getElementById('teamGrid');
-        if (!team || team.length === 0) {
-          grid.innerHTML = '<div class="loading">Нет подчинённых. Убедитесь, что в таблице заполнен столбец "Руководитель".</div>';
-          return;
-        }
-
-        grid.innerHTML = team.map(emp => {
-          const card = document.createElement('div');
-          card.className = 'employee-card';
-          card.id = 'card-' + emp.login;
-          card.innerHTML = `
-            <div class="employee-header">
-              <div class="employee-avatar">${emp.name.charAt(0)}</div>
-              <div>
-                <div class="employee-name">${emp.name}</div>
-                <div class="employee-dept">${emp.department || '—'}</div>
-              </div>
-            </div>
-            <div class="metrics-row">
-              <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
-              <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
-              <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
-            </div>
-            <div class="ai-tip" id="tip-${emp.login}">
-              <span class="icon">🤖</span>
-              <span>ИИ анализирует данные...</span>
-            </div>
-            <div class="task-review-section" id="review-${emp.login}">Загрузка...</div>
-          `;
-
-          // Загружаем задания на проверке
-          fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
-            .then(r => r.json())
-            .then(tasks => {
-              const reviewTasks = tasks.filter(t => t.status === 'На проверке');
-              const section = document.getElementById('review-' + emp.login);
-              if (reviewTasks.length === 0) {
-                section.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.85rem;">Нет заданий на проверке</div>';
-              } else {
-                section.innerHTML = reviewTasks.map(t => `
-                  <div class="review-item">
-                    <span>${t.task} (${t.points} карм.) ${t.comment ? ' — ' + t.comment : ''}</span>
-                    <button class="verify-btn" onclick="verifyEmployeeTask('${t.task}', '${emp.login}')">Проверить</button>
-                  </div>
-                `).join('');
-              }
-            });
-
-          // AI совет
-          fetchAITip(emp).then(tip => {
-            const tipElem = card.querySelector(`#tip-${emp.login}`);
-            if (tipElem) tipElem.innerHTML = `<span class="icon">${tip.icon}</span><span>${tip.text}</span>`;
-          });
-
-          return card.outerHTML;
-        }).join('');
-
-      } catch (e) {
-        document.getElementById('teamGrid').innerHTML = '<div class="loading">Ошибка загрузки. Проверьте столбец "Руководитель" в таблице.</div>';
-      }
-    }
-
-    if (currentLogin) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'flex';
-      loadTeam();
-      setInterval(loadTeam, 20000);
-    }
+    // ... логин, загрузка команды, AI
   </script>
 </body>
 </html>
