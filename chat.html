@@ -9,7 +9,7 @@
     :root {
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
       --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --border: #1f3350;
+      --border: #1f3350; --success: #10b981;
     }
     body {
       font-family: 'Inter', sans-serif; background: var(--bg-primary);
@@ -17,12 +17,16 @@
       user-select: none;
     }
     .sidebar {
-      width: 200px; background: var(--bg-card); border-right: 1px solid var(--border);
+      width: 220px; background: var(--bg-card); border-right: 1px solid var(--border);
       padding: 16px; overflow-y: auto;
     }
     .sidebar h3 { margin-bottom: 12px; }
-    .member { padding: 6px 0; display: flex; align-items: center; gap: 6px; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .member {
+      padding: 8px 0; display: flex; align-items: center; gap: 8px; cursor: pointer;
+      border-radius: 8px; padding: 6px;
+    }
+    .member:hover { background: var(--bg-secondary); }
+    .member .status-dot { width: 8px; height: 8px; border-radius: 50%; }
     .online { background: var(--success); }
     .offline { background: var(--text-secondary); }
     .main-chat { flex: 1; display: flex; flex-direction: column; }
@@ -35,6 +39,19 @@
     .input-area input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); }
     .input-area button { margin-left: 8px; padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; }
     .back-btn { padding: 8px 16px; background: transparent; color: var(--text-secondary); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; }
+    .member-card-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+    }
+    .member-card-modal.active { display: flex; }
+    .member-card-content {
+      background: var(--bg-card); border: 1px solid var(--accent);
+      border-radius: 24px; padding: 30px; max-width: 320px; width: 90%; text-align: center;
+    }
+    .close-card-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-top: 16px;
+    }
   </style>
 </head>
 <body>
@@ -53,27 +70,46 @@
       <button onclick="sendMessage()">➤</button>
     </div>
   </div>
+
+  <div class="member-card-modal" id="memberCardModal">
+    <div class="member-card-content" id="memberCardContent"></div>
+  </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const currentUser = localStorage.getItem('karmabank_login') || 'anonymous';
-    
+    let allMessages = [];
+
     async function loadMembers() {
       const res = await fetch(`${API_URL}?action=getAllEmployees`);
       const employees = await res.json();
       document.getElementById('membersList').innerHTML = employees.map(e => `
-        <div class="member">
+        <div class="member" onclick="showMemberCard('${e.name}', '${e.department || ''}', '${e.energy || 0}')">
           <span class="status-dot online"></span>
-          ${e.name} ${e.status === 'больничный' ? '🤒' : e.status === 'выходной' ? '🏖️' : ''}
+          ${e.name}
         </div>
       `).join('');
     }
+
+    function showMemberCard(name, dept, energy) {
+      document.getElementById('memberCardContent').innerHTML = `
+        <h3>${name}</h3>
+        <p>Отдел: ${dept || '—'}</p>
+        <p>Энергия: ${energy}</p>
+        <button class="close-card-btn" onclick="document.getElementById('memberCardModal').classList.remove('active')">Закрыть</button>
+      `;
+      document.getElementById('memberCardModal').classList.add('active');
+    }
+
     function addMessage(sender, text, cls) {
+      allMessages.push({ sender, text });
       const div = document.createElement('div');
       div.className = 'message ' + cls;
       div.innerHTML = `<b>${sender}:</b> ${text}`;
       document.getElementById('chatBox').appendChild(div);
       document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
     }
+
     async function sendMessage() {
       const input = document.getElementById('userInput');
       const text = input.value.trim();
@@ -83,7 +119,14 @@
       try {
         await fetch(`${API_URL}?action=sendMessage&sender=${encodeURIComponent(currentUser)}&text=${encodeURIComponent(text)}`);
       } catch(e) {}
+      // Для демонстрации "общих" сообщений — через 2 секунды добавляем ответ от другого участника (заглушка)
+      setTimeout(() => {
+        if (allMessages.length % 2 === 0) {
+          addMessage('Лилия', 'Привет! 👋', 'colleague');
+        }
+      }, 2000);
     }
+
     async function callAI() {
       const question = prompt('Введите вопрос для ИИ:');
       if (!question) return;
@@ -91,14 +134,17 @@
       try {
         const res = await fetch(`${API_URL}?action=chat&prompt=${encodeURIComponent(question)}`);
         const data = await res.json();
-        document.querySelectorAll('.colleague').forEach(b => b.textContent === 'Думаю...' && b.remove());
+        document.querySelectorAll('.colleague').forEach(b => {
+          if (b.textContent.startsWith('ИИ: Думаю')) b.remove();
+        });
         addMessage('ИИ', data.reply || 'Нет ответа', 'colleague');
       } catch(e) {
         addMessage('ИИ', 'Ошибка соединения', 'colleague');
       }
     }
+
     loadMembers();
-    setInterval(loadMembers, 30000); // обновлять список каждые 30 секунд
+    setInterval(loadMembers, 30000);
   </script>
 </body>
 </html>
