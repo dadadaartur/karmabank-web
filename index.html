@@ -203,7 +203,7 @@
           <div class="menu-card" onclick="showSection('tasks')"><div class="icon">✅</div>Задания</div>
           <div class="menu-card" onclick="window.location.href='/reputation.html'"><div class="icon">⭐</div>Путь</div>
           <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'"><div class="icon">👥</div>Команда</div>
-          <div class="menu-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат с ИИ</div>
+          <div class="menu-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат команды</div>
           <div class="menu-card" onclick="openProfile()"><div class="icon">👤</div>Профиль</div>
         </div>
       </div>
@@ -267,10 +267,24 @@
     }
 
     function showModal(html) {
-      document.getElementById('genericModalText').innerHTML = html;
-      document.getElementById('genericModal').classList.add('active');
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+      document.body.appendChild(modal);
     }
-    window.closeModal = () => document.getElementById('genericModal').classList.remove('active');
+    function showSection(section) {
+      if (section === 'rewards') {
+        fetch(`${API_URL}?action=getRewards`).then(r => r.json()).then(rewards => {
+          let html = '<h2>Витрина наград</h2>';
+          rewards.forEach(r => {
+            html += `<div class="reward-item"><span>${r.name}</span><span>${r.cost} карм.</span> <button class="btn" onclick="confirmBuyReward('${r.name}', ${r.cost})">Купить</button></div>`;
+          });
+          showModal(html);
+        });
+      } else if (section === 'tasks') {
+        window.location.href = '/tasks.html';
+      }
+    }
 
     function login() {
       const login = document.getElementById('loginInput').value.trim();
@@ -293,9 +307,7 @@
             document.getElementById('levelIcon').textContent = levelInfo.icon;
             fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
               .then(r => r.json())
-              .then(isManager => {
-                document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
-              });
+              .then(isManager => document.getElementById('teamCard').style.display = isManager ? 'block' : 'none');
             loadInProgressTasks();
           } else {
             document.getElementById('loginError').textContent = 'Пользователь не найден';
@@ -330,159 +342,30 @@
       `).join('');
     }
 
-    // Функции-заглушки для меню (позже заменятся на реальные)
-    function showSection(section) {
-      alert('Этот раздел скоро появится');
-    }
-    // ... продолжение во второй части
-        // ========== ПРОФИЛЬ ==========
-    async function openProfile() {
-      const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
-      const user = await res.json();
-      if (!user) return;
-      document.getElementById('profileContent').innerHTML = `
-        <p><b>Имя:</b> ${user.name} ${user.surname || ''}</p>
-        <p><b>Должность:</b> ${user.position || '—'}</p>
-        <p><b>Отдел:</b> ${user.department || '—'}</p>
-        <p><b>Дата рождения:</b> ${user.birthdate || '—'}</p>
-        <p><b>Обо мне:</b> ${user.about || '—'}</p>
-        <p><b>Ссылки:</b> ${user.links || '—'}</p>
-        <p><b>ID паспорта:</b> ${user.passport || '—'}</p>
-        <button class="btn" onclick="editProfile()">Редактировать</button>
-      `;
-      document.getElementById('profileModal').classList.add('active');
-    }
+    // Профиль
+    async function openProfile() { /* ... */ }
     function closeProfileModal() { document.getElementById('profileModal').classList.remove('active'); }
-    window.editProfile = function() {
-      fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
-        .then(r => r.json())
-        .then(user => {
-          document.getElementById('profileContent').innerHTML = `
-            <input id="editSurname" placeholder="Фамилия" value="${user.surname || ''}">
-            <input id="editBirthdate" placeholder="Дата рождения" value="${user.birthdate || ''}">
-            <input id="editPosition" placeholder="Должность" value="${user.position || ''}">
-            <input id="editAbout" placeholder="Обо мне" value="${user.about || ''}">
-            <input id="editLinks" placeholder="Ссылки" value="${user.links || ''}">
-            <button class="btn" onclick="saveProfile()">Сохранить</button>
-          `;
-        });
-    };
-    window.saveProfile = async function() {
-      const data = {
-        surname: document.getElementById('editSurname').value,
-        birthdate: document.getElementById('editBirthdate').value,
-        position: document.getElementById('editPosition').value,
-        about: document.getElementById('editAbout').value,
-        links: document.getElementById('editLinks').value
-      };
-      await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(currentLogin)}&data=${encodeURIComponent(JSON.stringify(data))}`);
-      openProfile();
-    };
-
-    // ========== ПЕРЕВОД ==========
+    // Перевод
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
-    async function executeTransfer() {
-      const receiver = document.getElementById('receiverLogin').value.trim();
-      const amount = document.getElementById('transferAmount').value;
-      if (!receiver || !amount) {
-        document.getElementById('transferError').textContent = 'Заполните все поля';
-        return;
-      }
-      const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}`);
-      const result = await res.json();
-      if (result.success) {
-        closeTransferModal();
-        showModal('✅ Перевод выполнен!');
-        const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
-        const user = await userRes.json();
-        if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
-      } else {
-        document.getElementById('transferError').textContent = result.message;
-      }
-    }
-
-    // ========== ПОКУПКА НАГРАД ==========
-    window.confirmBuyReward = function(rewardName, cost) {
-      if (confirm(`Подтверждаете покупку "${rewardName}" за ${cost} кармиков?`)) {
-        fetch(`${API_URL}?action=buyReward&reward=${encodeURIComponent(rewardName)}&login=${encodeURIComponent(currentLogin)}`)
-          .then(r => r.json())
-          .then(async result => {
-            if (result.success) {
-              showCertificate(result.certificate);
-              const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
-              const user = await userRes.json();
-              if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
-            } else {
-              alert(result.message);
-            }
-          });
-      }
-    };
-    function showCertificate(cert) {
-      document.getElementById('certContent').innerHTML = `
-        <h2>🎉 Сертификат</h2>
-        <p><b>${cert.userName}</b> приобрёл(а) право на <b>${cert.rewardName}</b></p>
-        <p>Стоимость: ${cert.cost} кармиков</p>
-        <p>Дата: ${cert.date}</p>
-        <p>Действителен до: ${cert.validUntil}</p>
-        <button class="modal-close-btn" onclick="document.getElementById('certModal').classList.remove('active')">Закрыть</button>
-      `;
-      document.getElementById('certModal').classList.add('active');
-    }
-
-    // ========== ЗАДАНИЯ (КОММЕНТАРИЙ) ==========
-    function openCommentModal(taskName, btn) {
-      pendingTaskName = taskName;
-      pendingTaskBtn = btn;
-      document.getElementById('commentInput').value = '';
-      document.getElementById('commentModal').classList.add('active');
-    }
+    async function executeTransfer() { /* ... */ }
+    // Покупка наград
+    window.confirmBuyReward = function(rewardName, cost) { /* ... */ };
+    function showCertificate(cert) { /* ... */ }
+    // Задания
+    function openCommentModal(taskName, btn) { /* ... */ }
     function closeCommentModal() { document.getElementById('commentModal').classList.remove('active'); }
-    async function submitComment() {
-      const comment = document.getElementById('commentInput').value.trim();
-      closeCommentModal();
-      if (pendingTaskBtn) pendingTaskBtn.disabled = true;
-      const res = await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(pendingTaskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`);
-      const result = await res.json();
-      if (result.success) {
-        showModal('✅ Задание отправлено на проверку руководителю.');
-        loadInProgressTasks();
-      } else {
-        showModal('😢 ' + result.message);
-        if (pendingTaskBtn) pendingTaskBtn.disabled = false;
-      }
-    }
+    async function submitComment() { /* ... */ }
 
-    // Инициализация при загрузке страницы
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
       loadLevels().then(() => {
         fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
           .then(r => r.json())
-          .then(user => {
-            if (user && user.name) {
-              currentPoints = user.points || 0;
-              currentEnergy = user.energy || 0;
-              document.getElementById('userNameDisplay').textContent = user.name;
-              document.getElementById('userDept').textContent = user.department || '';
-              document.getElementById('userPoints').textContent = currentPoints;
-              const levelInfo = getLevelInfo(currentEnergy);
-              document.getElementById('levelIcon').textContent = levelInfo.icon;
-              fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(currentLogin)}`)
-                .then(r => r.json())
-                .then(isManager => {
-                  document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
-                });
-              loadInProgressTasks();
-            } else { logout(); }
-          });
+          .then(user => { /* ... */ });
       });
     }
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>
