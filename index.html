@@ -203,7 +203,7 @@
           <div class="menu-card" onclick="showSection('tasks')"><div class="icon">✅</div>Задания</div>
           <div class="menu-card" onclick="window.location.href='/reputation.html'"><div class="icon">⭐</div>Путь</div>
           <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'"><div class="icon">👥</div>Команда</div>
-          <div class="menu-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат команды</div>
+          <div class="menu-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат</div>
           <div class="menu-card" onclick="openProfile()"><div class="icon">👤</div>Профиль</div>
         </div>
       </div>
@@ -245,7 +245,9 @@
       <button class="btn" onclick="submitComment()">Отправить</button>
       <button class="modal-close-btn" onclick="closeCommentModal()">Отмена</button>
     </div>
-  </div>  <script>
+  </div>
+
+  <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_login') || '';
     let currentPoints = 0, currentEnergy = 0;
@@ -329,7 +331,6 @@
       `).join('');
     }
 
-    // Витрина наград
     function showSection(section) {
       if (section === 'rewards') {
         fetch(`${API_URL}?action=getRewards`).then(r => r.json()).then(rewards => {
@@ -340,7 +341,6 @@
           showModal(html);
         });
       } else if (section === 'tasks') {
-        // Задания пока что в модальном окне
         fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`).then(r => r.json()).then(tasks => {
           let html = '<h2>✅ Все задания</h2>';
           tasks.forEach(t => {
@@ -362,11 +362,10 @@
 
     window.takeTask = async function(taskName) {
       await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
-      showSection('tasks'); // обновить список заданий
+      showSection('tasks');
       loadInProgressTasks();
     };
 
-    // Профиль
     async function openProfile() {
       const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
       const user = await res.json();
@@ -410,7 +409,6 @@
       openProfile();
     };
 
-    // Перевод
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
     async function executeTransfer() {
@@ -433,7 +431,6 @@
       }
     }
 
-    // Покупка наград
     window.confirmBuyReward = function(rewardName, cost) {
       if (confirm(`Подтверждаете покупку "${rewardName}" за ${cost} кармиков?`)) {
         fetch(`${API_URL}?action=buyReward&reward=${encodeURIComponent(rewardName)}&login=${encodeURIComponent(currentLogin)}`)
@@ -462,7 +459,6 @@
       document.getElementById('certModal').classList.add('active');
     }
 
-    // Задания (комментарий)
     function openCommentModal(taskName, btn) {
       pendingTaskName = taskName;
       pendingTaskBtn = btn;
@@ -485,7 +481,6 @@
       }
     }
 
-    // Автовход
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
