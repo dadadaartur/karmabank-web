@@ -27,6 +27,7 @@
       border-bottom: 1px solid var(--border); padding: 16px 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
+    /* Исправлено: клик по заголовку обновляет страницу руководителя, а не уходит в index.html */
     .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .header h1 img { height: 1.8rem; vertical-align: middle; }
     .logout-btn {
@@ -98,6 +99,7 @@
     }
     .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); }
     .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
+    /* Модальные окна */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -139,7 +141,8 @@
 
   <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
     <div class="header">
-      <h1 onclick="window.location.href='/'"><img src="belchonok.png" alt="Бельчонок"> Моя команда</h1>
+      <!-- Исправлено: клик по заголовку обновляет страницу руководителя, а не уходит в index -->
+      <h1 onclick="window.location.reload()"><img src="belchonok.png" alt="Бельчонок"> Моя команда</h1>
       <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
     </div>
     <div class="container">
@@ -157,10 +160,23 @@
     </div>
   </div>
 
+  <!-- Модальное окно для результата проверки (успех/ошибка) -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <p id="resultModalText"></p>
+      <button class="modal-close-btn" onclick="document.getElementById('resultModal').classList.remove('active')">Закрыть</button>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
-    
+
+    function showResultModal(message) {
+      document.getElementById('resultModalText').textContent = message;
+      document.getElementById('resultModal').classList.add('active');
+    }
+
     async function fetchAITip(employee) {
       try {
         const metrics = {
@@ -178,13 +194,13 @@
     }
 
     function openVerifyModal(taskName, login, comment) {
-      document.getElementById('verifyModalText').textContent = `Проверить задание "${taskName}"?\nКомментарий: ${comment}`;
+      document.getElementById('verifyModalText').innerHTML = `Проверить задание <b>${taskName}</b>?<br><br>Комментарий сотрудника: <i>${comment || 'нет'}</i>`;
       document.getElementById('verifyModal').classList.add('active');
       document.getElementById('verifyYesBtn').onclick = async () => {
         closeVerifyModal();
         const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
         const result = await res.json();
-        alert(result.message);
+        showResultModal(result.message);
         loadTeam();
       };
     }
