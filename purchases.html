@@ -28,14 +28,53 @@
     .btn:hover { background: #ea580c; }
     .btn.refund { background: var(--danger); }
     .btn.refund:hover { background: #dc2626; }
+
+    /* Наши модальные окна */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: linear-gradient(135deg, #1a2940, #152238);
+      border: 1px solid var(--accent);
+      border-radius: 24px; padding: 30px; max-width: 400px; width: 90%;
+      text-align: center; box-shadow: 0 0 50px rgba(249,115,22,0.6);
+      animation: modalPop 0.3s ease;
+    }
+    @keyframes modalPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .modal-close-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
+    }
+    .confirm-btn {
+      background: var(--accent); color: white; border: none;
+      padding: 10px 20px; border-radius: 14px; font-weight: 600;
+      cursor: pointer; margin: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="back-btn" onclick="window.location.href='/'">← Назад</div>
   <h2>🛍 Мои покупки</h2>
   <div id="purchasesList">Загрузка...</div>
+
+  <!-- Модальное окно подтверждения возврата -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <p id="confirmText"></p>
+      <button class="confirm-btn" id="confirmYesBtn">Да, вернуть</button>
+      <button class="modal-close-btn" onclick="closeConfirmModal()">Отмена</button>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    let pendingCertId = null;
+
     async function loadPurchases() {
       const login = localStorage.getItem('karmabank_login');
       const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(login)}`);
@@ -51,16 +90,36 @@
             <strong>${p.rewardName}</strong>
             <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
           </div>
-          ${p.canRefund ? `<button class="btn refund" onclick="refund('${p.id}')">Вернуть</button>` : ''}
+          ${p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : ''}
         </div>
       `).join('');
     }
-    async function refund(certId) {
-      if (!confirm('Вернуть этот сертификат и получить кармики обратно?')) return;
-      const login = localStorage.getItem('karmabank_login');
-      await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(certId)}`);
-      loadPurchases();
+
+    function openRefundModal(certId, rewardName, cost) {
+      pendingCertId = certId;
+      document.getElementById('confirmText').textContent = `Вернуть сертификат "${rewardName}" и получить обратно ${cost} кармиков?`;
+      document.getElementById('confirmModal').classList.add('active');
     }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+      pendingCertId = null;
+    }
+
+    async function executeRefund() {
+      if (!pendingCertId) return;
+      const login = localStorage.getItem('karmabank_login');
+      const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`);
+      const result = await res.json();
+      closeConfirmModal();
+      if (result.success) {
+        loadPurchases(); // обновить список
+      } else {
+        alert(result.message);
+      }
+    }
+
+    document.getElementById('confirmYesBtn').onclick = executeRefund;
     loadPurchases();
   </script>
 </body>
