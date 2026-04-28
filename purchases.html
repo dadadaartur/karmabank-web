@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Мои покупки — Кармический банк</title>
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981;
+      --danger: #ef4444; --border: #1f3350;
+    }
+    body {
+      font-family: 'Inter', sans-serif; background: var(--bg-primary);
+      color: var(--text-primary); padding: 20px; user-select: none;
+    }
+    .back-btn { color: var(--text-secondary); cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .purchase-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .btn {
+      background: var(--accent); color: white; border: none;
+      padding: 6px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
+    }
+    .btn:hover { background: #ea580c; }
+    .btn.refund { background: var(--danger); }
+    .btn.refund:hover { background: #dc2626; }
+  </style>
+</head>
+<body>
+  <div class="back-btn" onclick="window.location.href='/'">← Назад</div>
+  <h2>🛍 Мои покупки</h2>
+  <div id="purchasesList">Загрузка...</div>
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    async function loadPurchases() {
+      const login = localStorage.getItem('karmabank_login');
+      const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(login)}`);
+      const purchases = await res.json();
+      const container = document.getElementById('purchasesList');
+      if (!purchases || purchases.length === 0) {
+        container.innerHTML = '<p>У вас пока нет покупок.</p>';
+        return;
+      }
+      container.innerHTML = purchases.map(p => `
+        <div class="purchase-card">
+          <div>
+            <strong>${p.rewardName}</strong>
+            <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
+          </div>
+          ${p.canRefund ? `<button class="btn refund" onclick="refund('${p.id}')">Вернуть</button>` : ''}
+        </div>
+      `).join('');
+    }
+    async function refund(certId) {
+      if (!confirm('Вернуть этот сертификат и получить кармики обратно?')) return;
+      const login = localStorage.getItem('karmabank_login');
+      await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(certId)}`);
+      loadPurchases();
+    }
+    loadPurchases();
+  </script>
+</body>
+</html>
