@@ -148,7 +148,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно подтверждения проверки -->
   <div id="verifyModal" class="modal">
     <div class="modal-content">
       <p id="verifyModalText"></p>
@@ -157,22 +156,9 @@
     </div>
   </div>
 
-  <!-- Модальное окно для результата проверки -->
-  <div id="resultModal" class="modal">
-    <div class="modal-content">
-      <p id="resultModalText"></p>
-      <button class="modal-close-btn" onclick="document.getElementById('resultModal').classList.remove('active')">Закрыть</button>
-    </div>
-  </div>
-
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
-
-    function showResultModal(message) {
-      document.getElementById('resultModalText').textContent = message;
-      document.getElementById('resultModal').classList.add('active');
-    }
 
     async function fetchAITip(employee) {
       try {
@@ -197,7 +183,7 @@
         closeVerifyModal();
         const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
         const result = await res.json();
-        showResultModal(result.message);
+        alert(result.message);
         loadTeam();
       };
     }
@@ -211,7 +197,6 @@
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
       loadTeam();
-      // ИИ загружается только при входе, без интервала
     }
 
     function logout() {
