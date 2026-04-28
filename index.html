@@ -33,7 +33,17 @@
       position: relative;
       user-select: none;
     }
-    input[type="text"], input[type="number"], textarea { user-select: text; }
+    input[type="text"], input[type="number"] { user-select: text; }
+
+    /* Анимации */
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 5px var(--accent); }
+      50% { box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -44,10 +54,6 @@
       border-radius: 24px; padding: 40px 30px;
       box-shadow: var(--shadow); width: 100%; max-width: 400px;
       text-align: center; animation: fadeInUp 0.6s ease;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
     }
     .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
@@ -84,61 +90,38 @@
     }
     .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
 
-    .container { max-width: 900px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
+    .container { max-width: 500px; margin: 0 auto; padding: 40px 20px; width: 100%; }
 
     .balance-card {
-      background: var(--bg-card); border-radius: 20px; padding: 20px; text-align: center;
-      border: 1px solid var(--border); position: relative;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 40px 30px; text-align: center;
+      box-shadow: var(--shadow); transition: all 0.3s ease;
+      margin-bottom: 30px;
     }
-    .balance-value { font-size: 3rem; font-weight: 800; color: var(--success); }
-    .balance-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: center; }
+    .balance-value { font-size: 4rem; font-weight: 800; color: var(--success); line-height: 1.2; }
+    .balance-subtext { color: var(--text-secondary); margin-top: 8px; }
+    .energy-badge {
+      display: inline-block; background: rgba(249,115,22,0.15); border: 1px solid var(--accent);
+      border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;
+      margin-top: 16px;
+    }
+    .balance-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
     .balance-actions button {
       background: var(--border); color: var(--text-primary); border: none;
-      padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;
-      transition: background 0.2s;
+      padding: 10px 20px; border-radius: 14px; cursor: pointer; font-size: 0.9rem;
+      transition: all 0.2s; font-weight: 600;
     }
-    .balance-actions button:hover { background: var(--accent); }
+    .balance-actions button:hover { background: var(--accent); transform: scale(1.05); }
 
-    .level-icon { position: absolute; top: 10px; right: 10px; font-size: 2rem; }
-
-    .tasks-panel { grid-column: 2; }
-    .task-card {
-      background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 10px;
-      border: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .task-card .status {
-      padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
-    }
-    .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
-
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-    .menu-card {
-      background: var(--bg-card); border-radius: 16px; padding: 16px; text-align: center;
-      cursor: pointer; border: 1px solid var(--border); transition: all 0.2s;
-    }
-    .menu-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .menu-card .icon { font-size: 1.5rem; margin-bottom: 4px; }
-
-    .section { display: none; flex-direction: column; gap: 12px; }
-    .section.active { display: flex; }
-    .task-item, .reward-item {
+    .nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .nav-card {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 18px; padding: 16px; display: flex; align-items: center; justify-content: space-between;
+      border-radius: 20px; padding: 20px; text-align: center;
+      cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text-primary);
     }
-    .task-status {
-      padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
-      white-space: nowrap; text-align: center; min-width: 90px;
-    }
-    .status-pending { background: rgba(245,158,11,0.2); color: var(--warning); }
-    .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
-    .status-review { background: rgba(59,130,246,0.3); color: #3b82f6; }
-    .status-done { background: rgba(16,185,129,0.15); color: var(--success); }
-    .btn {
-      background: var(--accent); color: white; border: none;
-      padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer;
-    }
-    .btn:hover { background: var(--accent-hover); }
+    .nav-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--glow); }
+    .nav-card .icon { font-size: 2rem; margin-bottom: 8px; }
+    .nav-card h4 { font-size: 0.9rem; font-weight: 600; }
 
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -160,7 +143,13 @@
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
     }
-    .modal input, .modal textarea {
+    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+    .confirm-btn {
+      background: var(--accent); color: white; border: none;
+      padding: 10px 20px; border-radius: 14px; font-weight: 600;
+      cursor: pointer; margin: 10px;
+    }
+    .modal input {
       width: 100%; padding: 10px; margin: 8px 0;
       border-radius: 10px; border: 1px solid var(--border);
       background: var(--bg-secondary); color: var(--text-primary);
@@ -168,6 +157,7 @@
   </style>
 </head>
 <body>
+  <!-- Экран входа -->
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
       <h2><img src="belchonok.png" style="height:2.5rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h2>
@@ -178,6 +168,7 @@
     </div>
   </div>
 
+  <!-- Основной дашборд -->
   <div id="mainScreen" class="main-screen">
     <div class="header">
       <h1 onclick="location.reload()"><img src="belchonok.png" style="height:1.8rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h1>
@@ -188,33 +179,38 @@
       </div>
     </div>
     <div class="container">
-      <div class="balance-panel">
-        <div class="balance-card">
-          <div class="level-icon" id="levelIcon"></div>
-          <div style="font-size:0.9rem; color:var(--text-secondary)">Баланс</div>
-          <div class="balance-value" id="userPoints">0</div>
-          <div>кармиков</div>
-          <div class="balance-actions">
-            <button onclick="openTransferModal()">💰 Перевести</button>
-            <button onclick="showSection('rewards')">🎁 Потратить</button>
-          </div>
-        </div>
-        <div class="menu-grid">
-          <div class="menu-card" onclick="showSection('tasks')"><div class="icon">✅</div>Задания</div>
-          <div class="menu-card" onclick="window.location.href='/reputation.html'"><div class="icon">⭐</div>Путь</div>
-          <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'"><div class="icon">👥</div>Команда</div>
-          <div class="menu-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат</div>
-          <div class="menu-card" onclick="openProfile()"><div class="icon">👤</div>Профиль</div>
+      <div class="balance-card">
+        <div style="font-size:0.9rem; color:var(--text-secondary)">Ваш баланс</div>
+        <div class="balance-value" id="userPoints">0</div>
+        <div class="balance-subtext">кармиков</div>
+        <div class="energy-badge" id="energyDisplay">⚡ 0 энергии</div>
+        <div class="balance-actions">
+          <button onclick="openTransferModal()">💰 Перевести</button>
+          <button onclick="window.location.href='/spend.html'">🎁 Потратить</button>
         </div>
       </div>
-      <div class="tasks-panel">
-        <h3>📋 В работе</h3>
-        <div id="inProgressTasks">Нет активных заданий</div>
+      <div class="nav-grid">
+        <div class="nav-card" onclick="window.location.href='/tasks.html'">
+          <div class="icon">✅</div>
+          <h4>Задания</h4>
+        </div>
+        <div class="nav-card" onclick="window.location.href='/spend.html'">
+          <div class="icon">🎁</div>
+          <h4>Магазин</h4>
+        </div>
+        <div class="nav-card" onclick="window.location.href='/chat.html'">
+          <div class="icon">💬</div>
+          <h4>Чат</h4>
+        </div>
+        <div class="nav-card" onclick="window.location.href='/profile.html'">
+          <div class="icon">👤</div>
+          <h4>Профиль</h4>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Модальные окна -->
+  <!-- Модальное окно перевода -->
   <div id="transferModal" class="modal">
     <div class="modal-content">
       <h2>Перевод кармиков</h2>
@@ -226,78 +222,28 @@
     </div>
   </div>
 
-  <div id="profileModal" class="modal">
-    <div class="modal-content">
-      <h2>Мой профиль</h2>
-      <div id="profileContent">Загрузка...</div>
-      <button class="modal-close-btn" onclick="closeProfileModal()">Закрыть</button>
-    </div>
-  </div>
-
-  <div id="certModal" class="modal">
-    <div class="modal-content" id="certContent"></div>
-  </div>
-
-  <div id="commentModal" class="modal">
-    <div class="modal-content">
-      <h3>Введите комментарий</h3>
-      <input type="text" id="commentInput" placeholder="Например, номер договора...">
-      <button class="btn" onclick="submitComment()">Отправить</button>
-      <button class="modal-close-btn" onclick="closeCommentModal()">Отмена</button>
-    </div>
-  </div>
-
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_login') || '';
     let currentPoints = 0, currentEnergy = 0;
-    let levelsCache = [];
-    let pendingTaskName = null, pendingTaskBtn = null;
-
-    async function loadLevels() {
-      try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {}
-    }
-    function getLevelInfo(energy) {
-      if (!levelsCache.length) return { icon: '🐟', name: 'Малёк' };
-      let level = levelsCache[0];
-      for (let i = levelsCache.length-1; i >= 0; i--) {
-        if (energy >= levelsCache[i].energy) { level = levelsCache[i]; break; }
-      }
-      return { icon: level.icon, name: level.name };
-    }
-
-    function showModal(html) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
-      document.body.appendChild(modal);
-    }
 
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
       fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`)
         .then(r => r.json())
-        .then(async user => {
+        .then(user => {
           if (user && user.name) {
             localStorage.setItem('karmabank_login', login);
             currentLogin = login;
             currentPoints = user.points || 0;
             currentEnergy = user.energy || 0;
-            await loadLevels();
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'flex';
             document.getElementById('userNameDisplay').textContent = user.name;
             document.getElementById('userDept').textContent = user.department || '';
             document.getElementById('userPoints').textContent = currentPoints;
-            const levelInfo = getLevelInfo(currentEnergy);
-            document.getElementById('levelIcon').textContent = levelInfo.icon;
-            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
-              .then(r => r.json())
-              .then(isManager => {
-                document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
-              });
-            loadInProgressTasks();
+            document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
           } else {
             document.getElementById('loginError').textContent = 'Пользователь не найден';
           }
@@ -314,103 +260,9 @@
       document.getElementById('loginError').textContent = '';
     }
 
-    async function loadInProgressTasks() {
-      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
-      const tasks = await res.json();
-      const inProgress = tasks.filter(t => t.status === 'В работе').slice(0, 3);
-      const container = document.getElementById('inProgressTasks');
-      if (inProgress.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет активных заданий</div>';
-        return;
-      }
-      container.innerHTML = inProgress.map(t => `
-        <div class="task-card">
-          <span>${t.task} (${t.points} карм.)</span>
-          <span class="status status-active">В работе</span>
-        </div>
-      `).join('');
-    }
-
-    function showSection(section) {
-      if (section === 'rewards') {
-        fetch(`${API_URL}?action=getRewards`).then(r => r.json()).then(rewards => {
-          let html = '<h2>🎁 Витрина наград</h2>';
-          rewards.forEach(r => {
-            html += `<div class="reward-item"><span>${r.name}</span><span>${r.cost} карм.</span> <button class="btn" onclick="confirmBuyReward('${r.name}', ${r.cost})">Купить</button></div>`;
-          });
-          showModal(html);
-        });
-      } else if (section === 'tasks') {
-        fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`).then(r => r.json()).then(tasks => {
-          let html = '<h2>✅ Все задания</h2>';
-          tasks.forEach(t => {
-            let statusClass = 'status-pending';
-            if (t.status === 'В работе') statusClass = 'status-active';
-            else if (t.status === 'На проверке') statusClass = 'status-review';
-            else if (t.status === 'Выполнено') statusClass = 'status-done';
-            html += `<div class="task-item">
-              <span>${t.task} (${t.points} карм.)</span>
-              <span class="task-status ${statusClass}">${t.status || 'Назначено'}</span>
-              ${t.status === 'Назначено' ? `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>` : ''}
-              ${t.status === 'В работе' ? `<button class="btn" onclick="openCommentModal('${t.task}')">Выполнить</button>` : ''}
-            </div>`;
-          });
-          showModal(html);
-        });
-      }
-    }
-
-    window.takeTask = async function(taskName) {
-      await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
-      showSection('tasks');
-      loadInProgressTasks();
-    };
-
-    async function openProfile() {
-      const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
-      const user = await res.json();
-      if (!user) return;
-      document.getElementById('profileContent').innerHTML = `
-        <p><b>Имя:</b> ${user.name} ${user.surname || ''}</p>
-        <p><b>Должность:</b> ${user.position || '—'}</p>
-        <p><b>Отдел:</b> ${user.department || '—'}</p>
-        <p><b>Дата рождения:</b> ${user.birthdate || '—'}</p>
-        <p><b>Обо мне:</b> ${user.about || '—'}</p>
-        <p><b>Ссылки:</b> ${user.links || '—'}</p>
-        <p><b>ID паспорта:</b> ${user.passport || '—'}</p>
-        <button class="btn" onclick="editProfile()">Редактировать</button>
-      `;
-      document.getElementById('profileModal').classList.add('active');
-    }
-    function closeProfileModal() { document.getElementById('profileModal').classList.remove('active'); }
-    window.editProfile = function() {
-      fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
-        .then(r => r.json())
-        .then(user => {
-          document.getElementById('profileContent').innerHTML = `
-            <input id="editSurname" placeholder="Фамилия" value="${user.surname || ''}">
-            <input id="editBirthdate" placeholder="Дата рождения" value="${user.birthdate || ''}">
-            <input id="editPosition" placeholder="Должность" value="${user.position || ''}">
-            <input id="editAbout" placeholder="Обо мне" value="${user.about || ''}">
-            <input id="editLinks" placeholder="Ссылки" value="${user.links || ''}">
-            <button class="btn" onclick="saveProfile()">Сохранить</button>
-          `;
-        });
-    };
-    window.saveProfile = async function() {
-      const data = {
-        surname: document.getElementById('editSurname').value,
-        birthdate: document.getElementById('editBirthdate').value,
-        position: document.getElementById('editPosition').value,
-        about: document.getElementById('editAbout').value,
-        links: document.getElementById('editLinks').value
-      };
-      await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(currentLogin)}&data=${encodeURIComponent(JSON.stringify(data))}`);
-      openProfile();
-    };
-
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
+
     async function executeTransfer() {
       const receiver = document.getElementById('receiverLogin').value.trim();
       const amount = document.getElementById('transferAmount').value;
@@ -422,7 +274,7 @@
       const result = await res.json();
       if (result.success) {
         closeTransferModal();
-        showModal('✅ Перевод выполнен!');
+        alert('✅ Перевод выполнен!');
         const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
         const user = await userRes.json();
         if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
@@ -431,80 +283,21 @@
       }
     }
 
-    window.confirmBuyReward = function(rewardName, cost) {
-      if (confirm(`Подтверждаете покупку "${rewardName}" за ${cost} кармиков?`)) {
-        fetch(`${API_URL}?action=buyReward&reward=${encodeURIComponent(rewardName)}&login=${encodeURIComponent(currentLogin)}`)
-          .then(r => r.json())
-          .then(async result => {
-            if (result.success) {
-              showCertificate(result.certificate);
-              const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
-              const user = await userRes.json();
-              if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
-            } else {
-              alert(result.message);
-            }
-          });
-      }
-    };
-    function showCertificate(cert) {
-      document.getElementById('certContent').innerHTML = `
-        <h2>🎉 Сертификат</h2>
-        <p><b>${cert.userName}</b> приобрёл(а) право на <b>${cert.rewardName}</b></p>
-        <p>Стоимость: ${cert.cost} кармиков</p>
-        <p>Дата: ${cert.date}</p>
-        <p>Действителен до: ${cert.validUntil}</p>
-        <button class="modal-close-btn" onclick="document.getElementById('certModal').classList.remove('active')">Закрыть</button>
-      `;
-      document.getElementById('certModal').classList.add('active');
-    }
-
-    function openCommentModal(taskName, btn) {
-      pendingTaskName = taskName;
-      pendingTaskBtn = btn;
-      document.getElementById('commentInput').value = '';
-      document.getElementById('commentModal').classList.add('active');
-    }
-    function closeCommentModal() { document.getElementById('commentModal').classList.remove('active'); }
-    async function submitComment() {
-      const comment = document.getElementById('commentInput').value.trim();
-      closeCommentModal();
-      if (pendingTaskBtn) pendingTaskBtn.disabled = true;
-      const res = await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(pendingTaskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`);
-      const result = await res.json();
-      if (result.success) {
-        showModal('✅ Задание отправлено на проверку руководителю.');
-        loadInProgressTasks();
-      } else {
-        showModal('😢 ' + result.message);
-        if (pendingTaskBtn) pendingTaskBtn.disabled = false;
-      }
-    }
-
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
-      loadLevels().then(() => {
-        fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
-          .then(r => r.json())
-          .then(user => {
-            if (user && user.name) {
-              currentPoints = user.points || 0;
-              currentEnergy = user.energy || 0;
-              document.getElementById('userNameDisplay').textContent = user.name;
-              document.getElementById('userDept').textContent = user.department || '';
-              document.getElementById('userPoints').textContent = currentPoints;
-              const levelInfo = getLevelInfo(currentEnergy);
-              document.getElementById('levelIcon').textContent = levelInfo.icon;
-              fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(currentLogin)}`)
-                .then(r => r.json())
-                .then(isManager => {
-                  document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
-                });
-              loadInProgressTasks();
-            } else { logout(); }
-          });
-      });
+      fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
+        .then(r => r.json())
+        .then(user => {
+          if (user) {
+            currentPoints = user.points || 0;
+            currentEnergy = user.energy || 0;
+            document.getElementById('userNameDisplay').textContent = user.name;
+            document.getElementById('userDept').textContent = user.department || '';
+            document.getElementById('userPoints').textContent = currentPoints;
+            document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
+          }
+        });
     }
   </script>
 </body>
