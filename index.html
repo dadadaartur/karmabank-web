@@ -35,9 +35,17 @@
     }
     input[type="text"], input[type="number"], textarea { user-select: text; }
 
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 5px var(--accent); }
+      50% { box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
+    }
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes modalPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
     .login-screen {
@@ -75,9 +83,13 @@
       display: flex; align-items: center; justify-content: space-between;
     }
     .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .header h1 img { height: 1.8rem; vertical-align: middle; }
     .user-info { display: flex; align-items: center; gap: 12px; }
     .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .profile-link {
+      color: var(--text-secondary); cursor: pointer; font-size: 1.2rem;
+      transition: color 0.2s; text-decoration: none;
+    }
+    .profile-link:hover { color: var(--accent); }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s;
@@ -92,13 +104,13 @@
       border: 1px solid var(--border); position: relative;
     }
     .balance-value { font-size: 3rem; font-weight: 800; color: var(--success); }
-    .balance-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .balance-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: center; }
     .balance-actions button {
       background: var(--border); color: var(--text-primary); border: none;
       padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;
-      transition: background 0.2s;
+      transition: all 0.2s; font-weight: 600;
     }
-    .balance-actions button:hover { background: var(--accent); }
+    .balance-actions button:hover { background: var(--accent); transform: scale(1.05); }
 
     .level-icon { position: absolute; top: 10px; right: 10px; font-size: 2rem; }
 
@@ -113,19 +125,25 @@
     }
     .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
 
-    .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-    .nav-card {
+    .empty-tasks {
+      color: var(--text-secondary); padding: 40px 20px; text-align: center;
+      background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
+    }
+
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+    .menu-card {
       background: var(--bg-card); border-radius: 16px; padding: 16px; text-align: center;
       cursor: pointer; border: 1px solid var(--border); transition: all 0.2s;
     }
-    .nav-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .nav-card .icon { font-size: 1.5rem; margin-bottom: 4px; }
+    .menu-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .menu-card .icon { font-size: 1.5rem; margin-bottom: 4px; }
 
     .btn {
       background: var(--accent); color: white; border: none;
       padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s;
     }
-    .btn:hover { background: var(--accent-hover); }
+    .btn:hover { background: var(--accent-hover); animation: glowPulse 1.5s infinite; }
 
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -139,10 +157,6 @@
       text-align: center; box-shadow: 0 0 50px rgba(249,115,22,0.6);
       animation: modalPop 0.3s ease;
     }
-    @keyframes modalPop {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
     .modal-close-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
@@ -152,16 +166,12 @@
       border-radius: 10px; border: 1px solid var(--border);
       background: var(--bg-secondary); color: var(--text-primary);
     }
-    .empty-tasks {
-      color: var(--text-secondary); padding: 40px 20px; text-align: center;
-      background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
-    }
   </style>
 </head>
 <body>
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
-      <h2><img src="belchonok.png" style="height:2.5rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h2>
+      <h2>Кармический банк</h2>
       <p>Введите ваш логин, чтобы продолжить</p>
       <input type="text" id="loginInput" placeholder="Логин (например, arthur)" />
       <button class="login-btn" onclick="login()">Войти</button>
@@ -171,10 +181,11 @@
 
   <div id="mainScreen" class="main-screen">
     <div class="header">
-      <h1 onclick="location.reload()"><img src="belchonok.png" style="height:1.8rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h1>
+      <h1 onclick="location.reload()">Кармический банк</h1>
       <div class="user-info">
         <span id="userNameDisplay"></span>
         <span class="role" id="userDept"></span>
+        <a class="profile-link" href="/profile.html" title="Профиль">▶</a>
         <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
       </div>
     </div>
@@ -192,11 +203,10 @@
             <button onclick="window.location.href='/history.html'">📋 История</button>
           </div>
         </div>
-        <div class="nav-grid">
-          <div class="nav-card" onclick="window.location.href='/tasks.html'"><div class="icon">✅</div>Задания</div>
-          <div class="nav-card" onclick="window.location.href='/spend.html'"><div class="icon">🎁</div>Магазин</div>
-          <div class="nav-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат</div>
-          <div class="nav-card" onclick="window.location.href='/profile.html'"><div class="icon">👤</div>Профиль</div>
+        <div class="menu-grid">
+          <div class="menu-card" onclick="window.location.href='/tasks.html'"><div class="icon">✅</div>Задания</div>
+          <div class="menu-card" onclick="window.location.href='/spend.html'"><div class="icon">🎁</div>Магазин</div>
+          <div class="menu-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат</div>
         </div>
       </div>
       <div class="tasks-panel">
@@ -282,7 +292,7 @@
       if (inProgress.length === 0) {
         container.innerHTML = `<div class="empty-tasks">
           <p>Нет активных заданий</p>
-          <a href="/tasks.html" class="btn" style="display:inline-block; margin-top:12px;">➕ Взять задание</a>
+          <a href="/tasks.html" class="btn" style="display:inline-block; margin-top:12px;">Посмотреть все</a>
         </div>`;
         return;
       }
