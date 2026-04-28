@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Профиль — Кармический банк</title>
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350;
+    }
+    body {
+      font-family: 'Inter', sans-serif; background: var(--bg-primary);
+      color: var(--text-primary); padding: 20px; user-select: none;
+    }
+    .back-btn { color: var(--text-secondary); cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .profile-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 30px; max-width: 400px; margin: 0 auto;
+      text-align: center;
+    }
+    .btn {
+      background: var(--accent); color: white; border: none;
+      padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; margin-top: 10px;
+    }
+    input, textarea {
+      width: 100%; padding: 10px; margin: 8px 0;
+      border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-primary); color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="back-btn" onclick="window.location.href='/'">← Назад</div>
+  <h2>Мой профиль</h2>
+  <div id="profileContent">Загрузка...</div>
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    async function loadProfile() {
+      const login = localStorage.getItem('karmabank_login');
+      const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
+      const user = await res.json();
+      const container = document.getElementById('profileContent');
+      container.innerHTML = `
+        <div class="profile-card">
+          <p><b>Имя:</b> ${user.name} ${user.surname || ''}</p>
+          <p><b>Должность:</b> ${user.position || '—'}</p>
+          <p><b>Отдел:</b> ${user.department || '—'}</p>
+          <p><b>Дата рождения:</b> ${user.birthdate || '—'}</p>
+          <p><b>Обо мне:</b> ${user.about || '—'}</p>
+          <p><b>Ссылки:</b> ${user.links || '—'}</p>
+          <p><b>ID паспорта:</b> ${user.passport || '—'}</p>
+          <button class="btn" onclick="editProfile()">Редактировать</button>
+        </div>
+      `;
+    }
+    function editProfile() {
+      // Заглушка для будущего редактирования
+      alert('Редактирование профиля будет доступно в следующем обновлении.');
+    }
+    loadProfile();
+  </script>
+</body>
+</html>
