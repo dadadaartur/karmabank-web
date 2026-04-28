@@ -5,507 +5,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
-  <link rel="apple-touch-icon" href="belchonok.png">
   <style>
     :root {
-      --bg-primary: #0a1628;
-      --bg-secondary: #0f1f35;
-      --bg-card: #152238;
-      --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1;
-      --accent: #f97316;
-      --accent-hover: #ea580c;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --border: #1f3350;
-      --shadow: 0 20px 40px rgba(0,0,0,0.5);
-      --glow: 0 0 30px rgba(249, 115, 22, 0.3);
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary);
-      min-height: 100vh; 
-      display: flex; flex-direction: column;
-      overflow-x: hidden;
-      position: relative;
-      user-select: none;
-    }
-    input[type="text"], input[type="number"] { user-select: text; }
-
-    @keyframes glowPulse {
-      0%, 100% { box-shadow: 0 0 5px var(--accent); }
-      50% { box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
-    }
-
-    .login-screen {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 20px;
-    }
-    .login-form {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 40px 30px;
-      box-shadow: var(--shadow); width: 100%; max-width: 400px;
-      text-align: center; animation: fadeInUp 0.6s ease;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
-    .login-form input[type="text"] {
-      width: 100%; padding: 14px 16px; border: 1px solid var(--border);
-      border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary);
-      font-size: 1rem; margin-bottom: 16px; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .login-form input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
-    .login-btn {
-      width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00);
-      color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); transform: scale(1.02); }
-    .login-btn:active { transform: scale(0.98); }
-    .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
-
-    .main-screen { display: none; flex-direction: column; flex: 1; }
-    .header {
-      background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border); padding: 16px 24px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .header h1 img { height: 1.8rem; vertical-align: middle; }
-    .user-info { display: flex; align-items: center; gap: 12px; }
-    .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-    .logout-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s;
-      font-size: 0.85rem;
-    }
-    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
-
-    .container { max-width: 800px; margin: 0 auto; padding: 24px 20px; width: 100%; display: flex; flex-direction: column; gap: 24px; }
-    .balance-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 32px 24px; text-align: center;
-      box-shadow: var(--shadow); transition: all 0.3s ease;
-    }
-    .balance-card h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 8px; }
-    .balance-value { font-size: 4rem; font-weight: 800; color: var(--success); line-height: 1.2; }
-    .balance-subtext { color: var(--text-secondary); margin-top: 8px; }
-    .level-badge {
-      display: inline-block; background: rgba(249,115,22,0.15); border: 1px solid var(--accent);
-      border-radius: 20px; padding: 6px 16px; font-weight: 600; font-size: 0.9rem;
-      margin-top: 12px;
-    }
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .menu-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 20px; padding: 20px; text-align: center;
-      cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text-primary);
-    }
-    .menu-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--glow); }
-    .menu-card .icon { font-size: 2rem; margin-bottom: 8px; }
-    .menu-card h4 { font-size: 1rem; font-weight: 600; }
-    .section { display: none; flex-direction: column; gap: 16px; }
-    .section.active { display: flex; }
-    .task-list, .reward-grid { display: flex; flex-direction: column; gap: 12px; }
-    .task-item {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 18px; padding: 16px; display: flex; align-items: center; justify-content: space-between;
-      transition: all 0.2s; flex-wrap: wrap; gap: 10px;
-    }
-    .task-item:hover { border-color: var(--accent); }
-    .task-info { display: flex; align-items: center; gap: 10px; flex: 1; }
-    .task-status {
-      padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
-      white-space: nowrap; text-align: center; min-width: 90px;
-    }
-    .status-pending { background: rgba(245,158,11,0.2); color: var(--warning); }
-    .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
-    .status-review { background: rgba(59,130,246,0.3); color: #3b82f6; }
-    .status-done { background: rgba(16,185,129,0.15); color: var(--success); }
-    .task-btn {
-      padding: 8px 18px; border-radius: 14px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; margin-left: 0; min-width: 100px;
-      border: none; background: var(--accent); color: white;
-    }
-    .task-btn:hover {
-      transform: scale(1.1);
-      animation: glowPulse 1.5s infinite;
-    }
-    .task-btn:disabled {
-      background: #1f3350; color: #9aa9c1; cursor: default;
-      transform: none; animation: none;
-    }
-    .reward-item {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 18px; padding: 16px; text-align: center;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .reward-item:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .back-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; align-self: flex-start;
-      margin-bottom: 8px;
-    }
-    .back-btn:hover { background: var(--border); }
-
-    /* Модальные окна */
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-    }
+    body { font-family: 'Inter', sans-serif; background: #0a1628; color: var(--text-primary); user-select: none; }
+    input, textarea { user-select: text; }
+    .header { background: rgba(21,38,56,0.9); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .header h1 { font-size: 1.4rem; cursor: pointer; }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
+    .balance-panel { grid-column: 1; }
+    .balance-card { background: var(--bg-card); border-radius: 20px; padding: 20px; text-align: center; border: 1px solid var(--border); position: relative; }
+    .balance-value { font-size: 3rem; font-weight: 800; color: var(--success); }
+    .balance-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: center; }
+    .balance-actions button { background: var(--border); color: var(--text-primary); border: none; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 0.8rem; }
+    .level-icon { position: absolute; top: 10px; right: 10px; font-size: 2rem; }
+    .tasks-panel { grid-column: 2; }
+    .task-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 10px; border: 1px solid var(--border); }
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+    .menu-card { background: var(--bg-card); border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; border: 1px solid var(--border); }
+    .menu-card:hover { border-color: var(--accent); }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
     .modal.active { display: flex; }
-    .modal-content {
-      background: linear-gradient(135deg, #1a2940, #152238);
-      border: 1px solid var(--accent);
-      border-radius: 24px; padding: 30px; max-width: 400px; width: 90%;
-      text-align: center; box-shadow: 0 0 50px rgba(249,115,22,0.6);
-      animation: modalPop 0.3s ease;
-    }
-    @keyframes modalPop {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
-    }
-    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
-    .confirm-btn {
-      background: var(--accent); color: white; border: none;
-      padding: 10px 20px; border-radius: 14px; font-weight: 600;
-      cursor: pointer; margin: 10px;
-    }
-    .modal input[type="text"] {
-      width: 100%; padding: 10px; margin: 10px 0;
-      border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg-secondary); color: var(--text-primary);
-    }
+    .modal-content { background: var(--bg-card); padding: 30px; border-radius: 20px; max-width: 400px; width: 90%; text-align: center; border: 1px solid var(--accent); }
+RL
   </style>
 </head>
 <body>
-
-  <div id="loginScreen" class="login-screen">
-    <div class="login-form">
-      <h2><img src="belchonok.png" style="height:2.5rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h2>
-      <p>Введите ваш логин, чтобы продолжить</p>
-      <input type="text" id="loginInput" placeholder="Логин (например, arthur)" />
-      <button class="login-btn" onclick="login()">Войти</button>
-      <div id="loginError" class="login-error"></div>
-    </div>
-  </div>
-
-  <div id="mainScreen" class="main-screen">
-    <div class="header">
-      <h1 onclick="window.location.href='/'"><img src="belchonok.png" style="height:1.8rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h1>
-      <div class="user-info">
-        <span id="userNameDisplay"></span>
-        <span class="role" id="userDept"></span>
-        <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+  <div id="app">
+    <!-- Экран входа -->
+    <div id="loginScreen" class="login-screen">
+      <div class="login-form">
+        <h2>🐿️ Кармический банк</h2>
+        <input type="text" id="loginInput" placeholder="Логин">
+        <button onclick="login()">Войти</button>
+        <div id="loginError"></div>
       </div>
     </div>
-    <div class="container">
-      <div id="dashboard">
-        <div class="balance-card">
-          <h3>Ваш баланс</h3>
-          <div class="balance-value" id="userPoints">0</div>
-          <div class="balance-subtext">кармиков</div>
-          <div class="level-badge" id="levelBadge" style="display:none;"></div>
+    <!-- Основной экран -->
+    <div id="mainScreen" style="display:none">
+      <div class="header">
+        <h1 onclick="location.reload()">🐿️ Кармический банк</h1>
+        <div><span id="userNameDisplay"></span> | <button onclick="logout()">Выйти</button></div>
+      </div>
+      <div class="container">
+        <div class="balance-panel">
+          <div class="balance-card">
+            <div class="level-icon" id="levelIcon"></div>
+            <div style="font-size:0.9rem; color:var(--text-secondary)">Баланс</div>
+            <div class="balance-value" id="userPoints">0</div>
+            <div>кармиков</div>
+            <div class="balance-actions">
+              <button onclick="openTransferModal()">💰 Перевести</button>
+              <button onclick="showSection('rewards')">🎁 Потратить</button>
+            </div>
+          </div>
+          <div class="menu-grid">
+            <div class="menu-card" onclick="showSection('tasks')">✅ Задания</div>
+            <div class="menu-card" onclick="showSection('rewards')">🎁 Награды</div>
+            <div class="menu-card" onclick="window.location.href='/reputation.html'">⭐ Путь</div>
+            <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'">👥 Команда</div>
+            <div class="menu-card" onclick="window.location.href='/chat.html'">💬 Чат с ИИ</div>
+            <div class="menu-card" onclick="openProfile()">👤 Профиль</div>
+          </div>
         </div>
-        <div class="menu-grid" style="margin-top:20px;">
-          <div class="menu-card" onclick="showSection('tasks')"><div class="icon">✅</div><h4>Доступные задания</h4></div>
-          <div class="menu-card" onclick="showSection('rewards')"><div class="icon">🎁</div><h4>Витрина наград</h4></div>
-          <div class="menu-card" onclick="window.location.href='/reputation.html'"><div class="icon">⭐</div><h4>Кармический путь</h4></div>
-          <!-- Раздел Моя команда изначально скрыт -->
-          <div class="menu-card" id="teamCard" style="display:none;" onclick="window.location.href='/manager.html'"><div class="icon">👥</div><h4>Моя команда</h4></div>
-          <div class="menu-card" onclick="openTransferModal()"><div class="icon">💸</div><h4>Перевести кармики</h4></div>
+        <div class="tasks-panel">
+          <h3>📋 В работе</h3>
+          <div id="inProgressTasks"></div>
         </div>
       </div>
-      <div id="tasksSection" class="section">
-        <button class="back-btn" onclick="showDashboard()">← Назад</button>
-        <div class="task-list" id="taskList"></div>
-      </div>
-      <div id="rewardsSection" class="section">
-        <button class="back-btn" onclick="showDashboard()">← Назад</button>
-        <div class="reward-grid" id="rewardGrid"></div>
-      </div>
     </div>
   </div>
-
-  <!-- Модальные окна -->
-  <div id="genericModal" class="modal">
-    <div class="modal-content">
-      <p id="genericModalText"></p>
-      <button class="modal-close-btn" onclick="closeModal()">Закрыть</button>
-    </div>
-  </div>
-
-  <div id="confirmModal" class="modal">
-    <div class="modal-content">
-      <p id="confirmModalText"></p>
-      <button class="confirm-btn" id="confirmYesBtn">Да</button>
-      <button class="modal-close-btn" onclick="closeConfirmModal()">Отмена</button>
-    </div>
-  </div>
-
-  <div id="transferModal" class="modal">
-    <div class="modal-content">
-      <h2>Перевод кармиков</h2>
-      <input type="text" id="receiverLogin" placeholder="Логин получателя" style="width:100%; margin:10px 0; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary);">
-      <input type="number" id="transferAmount" placeholder="Сумма" style="width:100%; margin:10px 0; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary);">
-      <button class="btn" onclick="executeTransfer()">Отправить</button>
-      <button class="modal-close-btn" onclick="closeTransferModal()">Отмена</button>
-      <div id="transferError" class="login-error"></div>
-    </div>
-  </div>
-
-  <div id="commentModal" class="modal">
-    <div class="modal-content">
-      <h3>Введите комментарий</h3>
-      <input type="text" id="commentInput" placeholder="Например, номер договора..." />
-      <button class="confirm-btn" onclick="submitComment()">Отправить</button>
-      <button class="modal-close-btn" onclick="closeCommentModal()">Отмена</button>
-    </div>
-  </div>
-
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    let currentLogin = localStorage.getItem('karmabank_login') || '';
-    let currentPoints = 0, currentEnergy = 0;
-    let levelsCache = [];
-    let pendingTaskName = null;
-    let pendingTaskBtn = null;
-
-    async function loadLevels() {
-      try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {}
-    }
-    function getLevelInfo(energy) {
-      if (!levelsCache.length) return { icon: '🐟', name: 'Малёк' };
-      let level = levelsCache[0];
-      for (let i = levelsCache.length-1; i >= 0; i--) {
-        if (energy >= levelsCache[i].energy) { level = levelsCache[i]; break; }
-      }
-      return { icon: level.icon, name: level.name };
-    }
-
-    function showModal(html) {
-      document.getElementById('genericModalText').innerHTML = html;
-      document.getElementById('genericModal').classList.add('active');
-    }
-    window.closeModal = () => document.getElementById('genericModal').classList.remove('active');
-
-    function openConfirmModal(question, onYes) {
-      document.getElementById('confirmModalText').textContent = question;
-      document.getElementById('confirmModal').classList.add('active');
-      document.getElementById('confirmYesBtn').onclick = () => { closeConfirmModal(); onYes(); };
-    }
-    window.closeConfirmModal = () => document.getElementById('confirmModal').classList.remove('active');
-
-    function openCommentModal(taskName, btn) {
-      pendingTaskName = taskName;
-      pendingTaskBtn = btn;
-      document.getElementById('commentInput').value = '';
-      document.getElementById('commentModal').classList.add('active');
-    }
-    window.closeCommentModal = () => document.getElementById('commentModal').classList.remove('active');
-    window.submitComment = async () => {
-      const comment = document.getElementById('commentInput').value.trim();
-      closeCommentModal();
-      if (pendingTaskBtn) pendingTaskBtn.disabled = true;
-      const res = await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(pendingTaskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`);
-      const result = await res.json();
-      if (result.success) {
-        showModal('✅ Задание отправлено на проверку руководителю.');
-        await loadTasks();
-      } else {
-        showModal('😢 ' + result.message);
-        if (pendingTaskBtn) pendingTaskBtn.disabled = false;
-      }
-    };
-
-    function login() {
-      const login = document.getElementById('loginInput').value.trim();
-      if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
-      fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(login)}`)
-        .then(r => r.json())
-        .then(async user => {
-          if (user && user.name) {
-            localStorage.setItem('karmabank_login', login);
-            currentLogin = login;
-            currentPoints = user.points || 0;
-            currentEnergy = user.energy || 0;
-            await loadLevels();
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainScreen').style.display = 'flex';
-            document.getElementById('userNameDisplay').textContent = user.name;
-            document.getElementById('userDept').textContent = user.department || '';
-            document.getElementById('userPoints').textContent = currentPoints;
-            const levelInfo = getLevelInfo(currentEnergy);
-            const badge = document.getElementById('levelBadge');
-            badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
-            badge.style.display = 'inline-block';
-            // Проверка прав руководителя – показываем раздел только если isManager
-            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
-              .then(r => r.json())
-              .then(isManager => {
-                document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
-              });
-            showDashboard();
-          } else {
-            document.getElementById('loginError').textContent = 'Пользователь не найден';
-          }
-        })
-        .catch(() => { document.getElementById('loginError').textContent = 'Ошибка соединения'; });
-    }
-
-    function logout() {
-      localStorage.removeItem('karmabank_login');
-      currentLogin = '';
-      document.getElementById('mainScreen').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'flex';
-      document.getElementById('loginInput').value = '';
-      document.getElementById('loginError').textContent = '';
-    }
-
-    function showDashboard() {
-      document.getElementById('dashboard').style.display = 'block';
-      document.getElementById('tasksSection').style.display = 'none';
-      document.getElementById('rewardsSection').style.display = 'none';
-      fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`)
-        .then(r => r.json())
-        .then(user => {
-          if (user) {
-            currentPoints = user.points || 0;
-            currentEnergy = user.energy || 0;
-            document.getElementById('userPoints').textContent = currentPoints;
-            const levelInfo = getLevelInfo(currentEnergy);
-            const badge = document.getElementById('levelBadge');
-            badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
-            badge.style.display = 'inline-block';
-          }
-        });
-    }
-
-    function showSection(section) {
-      document.getElementById('dashboard').style.display = 'none';
-      if (section === 'tasks') { document.getElementById('tasksSection').style.display = 'flex'; loadTasks(); }
-      else if (section === 'rewards') { document.getElementById('rewardsSection').style.display = 'flex'; loadRewards(); }
-    }
-
-    async function loadTasks() {
-      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
-      const tasks = await res.json();
-      const list = document.getElementById('taskList');
-      list.innerHTML = tasks.map(t => {
-        let statusClass = 'status-pending';
-        if (t.status === 'В работе') statusClass = 'status-active';
-        else if (t.status === 'На проверке') statusClass = 'status-review';
-        else if (t.status === 'Выполнено') statusClass = 'status-done';
-        return `<div class="task-item">
-          <div class="task-info"><span>${t.task} <span style="color:var(--text-secondary);">(${t.points} карм.)</span></span></div>
-          <span class="task-status ${statusClass}">${t.status || 'Назначено'}</span>
-          ${t.status === 'Назначено' ? `<button class="task-btn" onclick="takeTask('${t.task}', this)">Взять</button>` : ''}
-          ${t.status === 'В работе' ? `<button class="task-btn" onclick="openCommentModal('${t.task}', this)">Выполнить</button>` : ''}
-          ${t.status === 'На проверке' ? `<span class="task-btn" disabled>На проверке</span>` : ''}
-          ${t.status === 'Выполнено' ? `<span class="task-btn" disabled>Задание выполнено</span>` : ''}
-        </div>`;
-      }).join('');
-    }
-
-    window.takeTask = async (taskName, btn) => {
-      btn.disabled = true;
-      await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
-      showModal('✅ Задание "' + taskName + '" теперь в работе.');
-      await loadTasks();
-    };
-
-    async function loadRewards() {
-      const res = await fetch(`${API_URL}?action=getRewards`);
-      const rewards = await res.json();
-      document.getElementById('rewardGrid').innerHTML = rewards.map(r => `
-        <div class="reward-item" onclick="confirmBuyReward('${r.name}', ${r.cost})">
-          <span>🎁</span>
-          <h4>${r.name}</h4>
-          <span>${r.cost} карм.</span>
-        </div>
-      `).join('');
-    }
-
-    window.confirmBuyReward = function(rewardName, cost) {
-      openConfirmModal(`Подтверждаете покупку "${rewardName}" стоимостью ${cost} кармиков?`, async () => {
-        const res = await fetch(`${API_URL}?action=buyReward&reward=${encodeURIComponent(rewardName)}&login=${encodeURIComponent(currentLogin)}`);
-        const result = await res.json();
-        if (result.success) {
-          showCertificate(result.certificate);
-          const userRes = await fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`);
-          const user = await userRes.json();
-          if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
-          showModal('🎉 Поздравляем! Достижение записано в Цифровой паспорт специалиста.');
-        } else {
-          showModal('😢 ' + result.message);
-        }
-      });
-    };
-
-    function showCertificate(cert) {
-      const certModal = document.createElement('div'); certModal.className = 'modal active';
-      certModal.innerHTML = `<div class="modal-content">
-        <h2>🎉 Сертификат</h2>
-        <p style="font-size:1.2rem; margin:10px 0;">Настоящий сертификат подтверждает, что</p>
-        <h3>${cert.userName}</h3><p>приобрёл(а) право на</p><h2>${cert.rewardName}</h2>
-        <p>Стоимость: ${cert.cost} кармиков</p><p>Дата: ${cert.date}</p><p>Действителен до: ${cert.validUntil}</p>
-        <p style="margin-top:20px;">Печать Кармического банка<br>🐿️</p>
-        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
-      </div>`;
-      document.body.appendChild(certModal);
-    }
-
-    function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
-    window.closeTransferModal = () => { document.getElementById('transferModal').classList.remove('active'); document.getElementById('transferError').textContent = ''; };
-    window.executeTransfer = async () => {
-      const receiver = document.getElementById('receiverLogin').value.trim();
-      const amount = document.getElementById('transferAmount').value;
-      if (!receiver || !amount) { document.getElementById('transferError').textContent = 'Заполните все поля'; return; }
-      const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}`);
-      const result = await res.json();
-      if (result.success) {
-        closeTransferModal();
-        showModal('✅ Твой коллега получил кармики!');
-        const userRes = await fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`);
-        const user = await userRes.json();
-        if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
-      } else { showModal('😢 ' + result.message); }
-    };
-
-    if (currentLogin) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'flex';
-      loadLevels().then(() => {
-        fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`).then(r => r.json()).then(user => {
-          if (user && user.name) {
-            currentPoints = user.points || 0; currentEnergy = user.energy || 0;
-            document.getElementById('userNameDisplay').textContent = user.name;
-            document.getElementById('userDept').textContent = user.department || '';
-            document.getElementById('userPoints').textContent = currentPoints;
-            const levelInfo = getLevelInfo(currentEnergy);
-            const badge = document.getElementById('levelBadge');
-            badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
-            badge.style.display = 'inline-block';
-            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(currentLogin)}`).then(r => r.json()).then(isManager => {
-              document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
-            });
-            showDashboard();
-          } else { logout(); }
-        });
-      });
-    }
-  </script>
+  <!-- Модальные окна, скрипты -->
+  <script src="app.js"></script>
 </body>
 </html>
