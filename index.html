@@ -35,33 +35,10 @@
     }
     input[type="text"], input[type="number"] { user-select: text; }
 
-    /* Мерцание для кнопок */
     @keyframes glowPulse {
       0%, 100% { box-shadow: 0 0 5px var(--accent); }
       50% { box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
-
-    .mascot-container {
-      position: fixed; bottom: 20px; right: 20px; z-index: 999;
-      display: flex; align-items: center; gap: 12px;
-      transition: transform 0.3s ease; cursor: pointer;
-    }
-    .mascot-bubble {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 20px; padding: 10px 18px; 
-      box-shadow: var(--shadow); color: var(--text-primary);
-      font-weight: 600; font-size: 0.9rem;
-      opacity: 0; transform: translateX(20px); transition: all 0.3s ease;
-      white-space: nowrap;
-    }
-    .mascot-bubble.visible { opacity: 1; transform: translateX(0); }
-    .mascot-avatar {
-      width: 70px; height: 70px; background: var(--accent);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 25px rgba(249,115,22,0.5);
-      transition: transform 0.2s; overflow: hidden;
-    }
-    .mascot-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -101,7 +78,7 @@
       border-bottom: 1px solid var(--border); padding: 16px 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .header h1 img { height: 1.8rem; vertical-align: middle; }
     .user-info { display: flex; align-items: center; gap: 12px; }
     .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
@@ -151,6 +128,7 @@
     }
     .status-pending { background: rgba(245,158,11,0.2); color: var(--warning); }
     .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
+    .status-review { background: rgba(59,130,246,0.3); color: #3b82f6; }
     .status-done { background: rgba(16,185,129,0.15); color: var(--success); }
     .task-btn {
       padding: 8px 18px; border-radius: 14px; font-weight: 600;
@@ -205,16 +183,15 @@
       padding: 10px 20px; border-radius: 14px; font-weight: 600;
       cursor: pointer; margin: 10px;
     }
+    .modal input[type="text"] {
+      width: 100%; padding: 10px; margin: 10px 0;
+      border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-secondary); color: var(--text-primary);
+    }
   </style>
 </head>
 <body>
-  <!-- Маскот -->
-  <div class="mascot-container">
-    <div class="mascot-bubble" id="mascotBubble">А ты молодец!</div>
-    <div class="mascot-avatar"><img src="belchonok.png" alt="Бельчонок"></div>
-  </div>
 
-  <!-- Экран входа -->
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
       <h2><img src="belchonok.png" style="height:2.5rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h2>
@@ -225,10 +202,9 @@
     </div>
   </div>
 
-  <!-- Основной экран -->
   <div id="mainScreen" class="main-screen">
     <div class="header">
-      <h1><img src="belchonok.png" style="height:1.8rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h1>
+      <h1 onclick="window.location.href='/'"><img src="belchonok.png" style="height:1.8rem; vertical-align:middle;" alt="Бельчонок"> Кармический банк</h1>
       <div class="user-info">
         <span id="userNameDisplay"></span>
         <span class="role" id="userDept"></span>
@@ -264,7 +240,7 @@
 
   <!-- Модальные окна -->
   <div id="genericModal" class="modal">
-    <div class="modal-content" id="genericModalContent">
+    <div class="modal-content">
       <p id="genericModalText"></p>
       <button class="modal-close-btn" onclick="closeModal()">Закрыть</button>
     </div>
@@ -289,16 +265,26 @@
     </div>
   </div>
 
+  <div id="commentModal" class="modal">
+    <div class="modal-content">
+      <h3>Введите комментарий</h3>
+      <input type="text" id="commentInput" placeholder="Например, номер договора..." />
+      <button class="confirm-btn" onclick="submitComment()">Отправить</button>
+      <button class="modal-close-btn" onclick="closeCommentModal()">Отмена</button>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_login') || '';
     let currentPoints = 0, currentEnergy = 0;
     let levelsCache = [];
+    let pendingTaskName = null;
+    let pendingTaskBtn = null;
 
     async function loadLevels() {
       try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {}
     }
-
     function getLevelInfo(energy) {
       if (!levelsCache.length) return { icon: '🐟', name: 'Малёк' };
       let level = levelsCache[0];
@@ -308,34 +294,39 @@
       return { icon: level.icon, name: level.name };
     }
 
-    function showMascotMessage(msg) {
-      const bubble = document.getElementById('mascotBubble');
-      bubble.textContent = msg;
-      bubble.classList.add('visible');
-      setTimeout(() => bubble.classList.remove('visible'), 4000);
-    }
-
-    function showModal(text) {
-      document.getElementById('genericModalText').innerHTML = `<img src="belchonok.png" style="height:50px; display:block; margin:0 auto 10px;">${text}`;
+    function showModal(html) {
+      document.getElementById('genericModalText').innerHTML = html;
       document.getElementById('genericModal').classList.add('active');
     }
-
-    window.closeModal = function() {
-      document.getElementById('genericModal').classList.remove('active');
-    };
+    window.closeModal = () => document.getElementById('genericModal').classList.remove('active');
 
     function openConfirmModal(question, onYes) {
       document.getElementById('confirmModalText').textContent = question;
       document.getElementById('confirmModal').classList.add('active');
-      const yesBtn = document.getElementById('confirmYesBtn');
-      yesBtn.onclick = function() {
-        closeConfirmModal();
-        onYes();
-      };
+      document.getElementById('confirmYesBtn').onclick = () => { closeConfirmModal(); onYes(); };
     }
+    window.closeConfirmModal = () => document.getElementById('confirmModal').classList.remove('active');
 
-    window.closeConfirmModal = function() {
-      document.getElementById('confirmModal').classList.remove('active');
+    function openCommentModal(taskName, btn) {
+      pendingTaskName = taskName;
+      pendingTaskBtn = btn;
+      document.getElementById('commentInput').value = '';
+      document.getElementById('commentModal').classList.add('active');
+    }
+    window.closeCommentModal = () => document.getElementById('commentModal').classList.remove('active');
+    window.submitComment = async () => {
+      const comment = document.getElementById('commentInput').value.trim();
+      closeCommentModal();
+      if (pendingTaskBtn) pendingTaskBtn.disabled = true;
+      const res = await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(pendingTaskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`);
+      const result = await res.json();
+      if (result.success) {
+        showModal('✅ Задание отправлено на проверку руководителю.');
+        await loadTasks();
+      } else {
+        showModal('😢 ' + result.message);
+        if (pendingTaskBtn) pendingTaskBtn.disabled = false;
+      }
     };
 
     function login() {
@@ -359,7 +350,6 @@
             const badge = document.getElementById('levelBadge');
             badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
             badge.style.display = 'inline-block';
-            showMascotMessage(`Привет, ${user.name}!`);
             fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
               .then(r => r.json())
               .then(isManager => document.getElementById('teamCard').style.display = isManager ? 'block' : 'none');
@@ -401,13 +391,8 @@
 
     function showSection(section) {
       document.getElementById('dashboard').style.display = 'none';
-      if (section === 'tasks') {
-        document.getElementById('tasksSection').style.display = 'flex';
-        loadTasks();
-      } else if (section === 'rewards') {
-        document.getElementById('rewardsSection').style.display = 'flex';
-        loadRewards();
-      }
+      if (section === 'tasks') { document.getElementById('tasksSection').style.display = 'flex'; loadTasks(); }
+      else if (section === 'rewards') { document.getElementById('rewardsSection').style.display = 'flex'; loadRewards(); }
     }
 
     async function loadTasks() {
@@ -417,49 +402,24 @@
       list.innerHTML = tasks.map(t => {
         let statusClass = 'status-pending';
         if (t.status === 'В работе') statusClass = 'status-active';
+        else if (t.status === 'На проверке') statusClass = 'status-review';
         else if (t.status === 'Выполнено') statusClass = 'status-done';
         return `<div class="task-item">
-          <div class="task-info">
-            <span>${t.task} <span style="color:var(--text-secondary);">(${t.points} карм.)</span></span>
-          </div>
+          <div class="task-info"><span>${t.task} <span style="color:var(--text-secondary);">(${t.points} карм.)</span></span></div>
           <span class="task-status ${statusClass}">${t.status || 'Назначено'}</span>
           ${t.status === 'Назначено' ? `<button class="task-btn" onclick="takeTask('${t.task}', this)">Взять</button>` : ''}
-          ${t.status === 'В работе' ? `<button class="task-btn" onclick="completeTask('${t.task}', this)">Выполнить</button>` : ''}
-          ${t.status === 'Выполнено' ? `<button class="task-btn" disabled>Задание выполнено</button>` : ''}
+          ${t.status === 'В работе' ? `<button class="task-btn" onclick="openCommentModal('${t.task}', this)">Выполнить</button>` : ''}
+          ${t.status === 'На проверке' ? `<span class="task-btn" disabled>На проверке</span>` : ''}
+          ${t.status === 'Выполнено' ? `<span class="task-btn" disabled>Задание выполнено</span>` : ''}
         </div>`;
       }).join('');
     }
 
-    window.takeTask = async function(taskName, btn) {
+    window.takeTask = async (taskName, btn) => {
       btn.disabled = true;
       await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
-      showMascotMessage('Задание присвоено!');
       showModal('✅ Задание "' + taskName + '" теперь в работе.');
       await loadTasks();
-    };
-
-    window.completeTask = async function(taskName, btn) {
-      btn.disabled = true;
-      const res = await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
-      const result = await res.json();
-      if (result.success) {
-        const userRes = await fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`);
-        const user = await userRes.json();
-        if (user) {
-          currentPoints = user.points || 0;
-          currentEnergy = user.energy || 0;
-          document.getElementById('userPoints').textContent = currentPoints;
-          const levelInfo = getLevelInfo(currentEnergy);
-          const badge = document.getElementById('levelBadge');
-          badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
-          badge.style.display = 'inline-block';
-          showModal('🎉 Задание выполнено! ' + result.message);
-        }
-        await loadTasks();
-      } else {
-        showModal('😢 ' + result.message);
-        btn.disabled = false;
-      }
     };
 
     async function loadRewards() {
@@ -482,10 +442,8 @@
           showCertificate(result.certificate);
           const userRes = await fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`);
           const user = await userRes.json();
-          if (user) {
-            currentPoints = user.points || 0;
-            document.getElementById('userPoints').textContent = currentPoints;
-          }
+          if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
+          showModal('🎉 Поздравляем! Достижение записано в Цифровой паспорт специалиста.');
         } else {
           showModal('😢 ' + result.message);
         }
@@ -493,37 +451,24 @@
     };
 
     function showCertificate(cert) {
-      document.getElementById('certContent').innerHTML = `
+      const certModal = document.createElement('div'); certModal.className = 'modal active';
+      certModal.innerHTML = `<div class="modal-content">
         <h2>🎉 Сертификат</h2>
         <p style="font-size:1.2rem; margin:10px 0;">Настоящий сертификат подтверждает, что</p>
-        <h3>${cert.userName}</h3>
-        <p>приобрёл(а) право на</p>
-        <h2>${cert.rewardName}</h2>
-        <p>Стоимость: ${cert.cost} кармиков</p>
-        <p>Дата: ${cert.date}</p>
-        <p>Действителен до: ${cert.validUntil}</p>
+        <h3>${cert.userName}</h3><p>приобрёл(а) право на</p><h2>${cert.rewardName}</h2>
+        <p>Стоимость: ${cert.cost} кармиков</p><p>Дата: ${cert.date}</p><p>Действителен до: ${cert.validUntil}</p>
         <p style="margin-top:20px;">Печать Кармического банка<br>🐿️</p>
-        <button class="modal-close-btn" onclick="document.getElementById('certModal').classList.remove('active')">Закрыть</button>
-      `;
-      document.getElementById('certModal').classList.add('active');
+        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
+      </div>`;
+      document.body.appendChild(certModal);
     }
 
-    function openTransferModal() {
-      document.getElementById('transferModal').classList.add('active');
-    }
-
-    window.closeTransferModal = function() {
-      document.getElementById('transferModal').classList.remove('active');
-      document.getElementById('transferError').textContent = '';
-    };
-
-    window.executeTransfer = async function() {
+    function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
+    window.closeTransferModal = () => { document.getElementById('transferModal').classList.remove('active'); document.getElementById('transferError').textContent = ''; };
+    window.executeTransfer = async () => {
       const receiver = document.getElementById('receiverLogin').value.trim();
       const amount = document.getElementById('transferAmount').value;
-      if (!receiver || !amount) {
-        document.getElementById('transferError').textContent = 'Заполните все поля';
-        return;
-      }
+      if (!receiver || !amount) { document.getElementById('transferError').textContent = 'Заполните все поля'; return; }
       const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}`);
       const result = await res.json();
       if (result.success) {
@@ -531,40 +476,30 @@
         showModal('✅ Твой коллега получил кармики!');
         const userRes = await fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`);
         const user = await userRes.json();
-        if (user) {
-          currentPoints = user.points || 0;
-          document.getElementById('userPoints').textContent = currentPoints;
-        }
-      } else {
-        showModal('😢 ' + result.message);
-      }
+        if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
+      } else { showModal('😢 ' + result.message); }
     };
 
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
       loadLevels().then(() => {
-        fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`)
-          .then(r => r.json())
-          .then(user => {
-            if (user && user.name) {
-              currentPoints = user.points || 0;
-              currentEnergy = user.energy || 0;
-              document.getElementById('userNameDisplay').textContent = user.name;
-              document.getElementById('userDept').textContent = user.department || '';
-              document.getElementById('userPoints').textContent = currentPoints;
-              const levelInfo = getLevelInfo(currentEnergy);
-              const badge = document.getElementById('levelBadge');
-              badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
-              badge.style.display = 'inline-block';
-              fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(currentLogin)}`)
-                .then(r => r.json())
-                .then(isManager => document.getElementById('teamCard').style.display = isManager ? 'block' : 'none');
-              showDashboard();
-            } else {
-              logout();
-            }
-          });
+        fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentLogin)}`).then(r => r.json()).then(user => {
+          if (user && user.name) {
+            currentPoints = user.points || 0; currentEnergy = user.energy || 0;
+            document.getElementById('userNameDisplay').textContent = user.name;
+            document.getElementById('userDept').textContent = user.department || '';
+            document.getElementById('userPoints').textContent = currentPoints;
+            const levelInfo = getLevelInfo(currentEnergy);
+            const badge = document.getElementById('levelBadge');
+            badge.textContent = `${levelInfo.icon} ${levelInfo.name} · ${currentEnergy} энергии`;
+            badge.style.display = 'inline-block';
+            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(currentLogin)}`).then(r => r.json()).then(isManager => {
+              document.getElementById('teamCard').style.display = isManager ? 'block' : 'none';
+            });
+            showDashboard();
+          } else { logout(); }
+        });
       });
     }
   </script>
