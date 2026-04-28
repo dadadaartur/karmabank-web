@@ -24,12 +24,14 @@
     .btn {
       background: var(--accent); color: white; border: none;
       padding: 6px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
+      margin-left: 6px;
     }
     .btn:hover { background: #ea580c; }
+    .btn.use { background: var(--success); }
+    .btn.use:hover { background: #059669; }
     .btn.refund { background: var(--danger); }
     .btn.refund:hover { background: #dc2626; }
 
-    /* Наши модальные окна */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -55,6 +57,11 @@
       padding: 10px 20px; border-radius: 14px; font-weight: 600;
       cursor: pointer; margin: 10px;
     }
+    .modal input {
+      width: 100%; padding: 10px; margin: 8px 0;
+      border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-primary); color: var(--text-primary);
+    }
   </style>
 </head>
 <body>
@@ -66,14 +73,25 @@
   <div id="confirmModal" class="modal">
     <div class="modal-content">
       <p id="confirmText"></p>
-      <button class="confirm-btn" id="confirmYesBtn">Да, вернуть</button>
+      <button class="confirm-btn" id="confirmYesBtn">Да</button>
       <button class="modal-close-btn" onclick="closeConfirmModal()">Отмена</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно использования сертификата -->
+  <div id="useModal" class="modal">
+    <div class="modal-content">
+      <h3>Использовать сертификат</h3>
+      <p id="useModalReward"></p>
+      <input type="text" id="useComment" placeholder="Комментарий для руководителя">
+      <button class="confirm-btn" id="useYesBtn">Отправить</button>
+      <button class="modal-close-btn" onclick="closeUseModal()">Отмена</button>
     </div>
   </div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    let pendingCertId = null;
+    let pendingCertId = null, pendingAction = null;
 
     async function loadPurchases() {
       const login = localStorage.getItem('karmabank_login');
@@ -90,36 +108,55 @@
             <strong>${p.rewardName}</strong>
             <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
           </div>
-          ${p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : ''}
+          <div>
+            ${p.canUse ? `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>` : ''}
+            ${p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : ''}
+          </div>
         </div>
       `).join('');
     }
 
     function openRefundModal(certId, rewardName, cost) {
       pendingCertId = certId;
-      document.getElementById('confirmText').textContent = `Вернуть сертификат "${rewardName}" и получить обратно ${cost} кармиков?`;
+      pendingAction = 'refund';
+      document.getElementById('confirmText').textContent = `Вернуть "${rewardName}" и получить ${cost} кармиков?`;
       document.getElementById('confirmModal').classList.add('active');
     }
 
-    function closeConfirmModal() {
-      document.getElementById('confirmModal').classList.remove('active');
-      pendingCertId = null;
+    function openUseModal(certId, rewardName) {
+      pendingCertId = certId;
+      pendingAction = 'use';
+      document.getElementById('useModalReward').textContent = rewardName;
+      document.getElementById('useComment').value = '';
+      document.getElementById('useModal').classList.add('active');
     }
 
-    async function executeRefund() {
-      if (!pendingCertId) return;
+    function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('active'); }
+    function closeUseModal() { document.getElementById('useModal').classList.remove('active'); }
+
+    async function executeAction() {
       const login = localStorage.getItem('karmabank_login');
-      const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`);
-      const result = await res.json();
+      let res;
+      if (pendingAction === 'refund') {
+        res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`);
+      } else if (pendingAction === 'use') {
+        const comment = document.getElementById('useComment').value.trim();
+        res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}&comment=${encodeURIComponent(comment)}`);
+      }
       closeConfirmModal();
-      if (result.success) {
-        loadPurchases(); // обновить список
-      } else {
-        alert(result.message);
+      closeUseModal();
+      if (res) {
+        const result = await res.json();
+        if (result.success) {
+          loadPurchases();
+        } else {
+          alert(result.message);
+        }
       }
     }
 
-    document.getElementById('confirmYesBtn').onclick = executeRefund;
+    document.getElementById('confirmYesBtn').onclick = executeAction;
+    document.getElementById('useYesBtn').onclick = executeAction;
     loadPurchases();
   </script>
 </body>
