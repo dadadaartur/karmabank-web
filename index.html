@@ -82,7 +82,7 @@
       border-bottom: 1px solid var(--border); padding: 16px 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
     .user-info { display: flex; align-items: center; gap: 12px; }
     .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
     .profile-link {
@@ -97,11 +97,28 @@
     }
     .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
 
-    .container { max-width: 900px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
     .balance-card {
-      background: var(--bg-card); border-radius: 20px; padding: 20px; text-align: center;
-      border: 1px solid var(--border); position: relative;
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid var(--border);
+      position: relative;
     }
     .balance-value { font-size: 3rem; font-weight: 800; color: var(--success); }
     .balance-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: center; }
@@ -114,7 +131,7 @@
 
     .level-icon { position: absolute; top: 10px; right: 10px; font-size: 2rem; }
 
-    .tasks-panel { grid-column: 2; }
+    .tasks-panel { }
     .task-card {
       background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 10px;
       border: 1px solid var(--border);
@@ -130,7 +147,11 @@
       background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
     }
 
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
     .menu-card {
       background: var(--bg-card); border-radius: 16px; padding: 16px; text-align: center;
       cursor: pointer; border: 1px solid var(--border); transition: all 0.2s;
@@ -190,7 +211,7 @@
       </div>
     </div>
     <div class="container">
-      <div class="balance-panel">
+      <div class="left-column">
         <div class="balance-card">
           <div class="level-icon" id="levelIcon"></div>
           <div style="font-size:0.9rem; color:var(--text-secondary)">Баланс</div>
@@ -207,6 +228,7 @@
           <div class="menu-card" onclick="window.location.href='/tasks.html'"><div class="icon">✅</div>Задания</div>
           <div class="menu-card" onclick="window.location.href='/spend.html'"><div class="icon">🎁</div>Магазин</div>
           <div class="menu-card" onclick="window.location.href='/chat.html'"><div class="icon">💬</div>Чат</div>
+          <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'"><div class="icon">👥</div>Команда</div>
         </div>
       </div>
       <div class="tasks-panel">
@@ -235,18 +257,13 @@
     let currentPoints = 0, currentEnergy = 0;
     let levelsCache = [];
 
-    async function loadLevels() {
-      try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {}
-    }
+    async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
     function getLevelInfo(energy) {
       if (!levelsCache.length) return { icon: '🐟', name: 'Малёк' };
       let level = levelsCache[0];
-      for (let i = levelsCache.length-1; i >= 0; i--) {
-        if (energy >= levelsCache[i].energy) { level = levelsCache[i]; break; }
-      }
+      for (let i = levelsCache.length-1; i >= 0; i--) { if (energy >= levelsCache[i].energy) { level = levelsCache[i]; break; } }
       return { icon: level.icon, name: level.name };
     }
-
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
@@ -265,16 +282,15 @@
             document.getElementById('userDept').textContent = user.department || '';
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
-            const levelInfo = getLevelInfo(currentEnergy);
-            document.getElementById('levelIcon').textContent = levelInfo.icon;
+            document.getElementById('levelIcon').textContent = getLevelInfo(currentEnergy).icon;
+            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
+              .then(r => r.json())
+              .then(isManager => { document.getElementById('teamCard').style.display = isManager ? 'block' : 'none'; });
             loadInProgressTasks();
-          } else {
-            document.getElementById('loginError').textContent = 'Пользователь не найден';
-          }
+          } else { document.getElementById('loginError').textContent = 'Пользователь не найден'; }
         })
         .catch(() => { document.getElementById('loginError').textContent = 'Ошибка соединения'; });
     }
-
     function logout() {
       localStorage.removeItem('karmabank_login');
       currentLogin = '';
@@ -283,37 +299,24 @@
       document.getElementById('loginInput').value = '';
       document.getElementById('loginError').textContent = '';
     }
-
     async function loadInProgressTasks() {
       const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
       const tasks = await res.json();
       const inProgress = tasks.filter(t => t.status === 'В работе').slice(0, 3);
       const container = document.getElementById('inProgressTasks');
       if (inProgress.length === 0) {
-        container.innerHTML = `<div class="empty-tasks">
-          <p>Нет активных заданий</p>
-          <a href="/tasks.html" class="btn" style="display:inline-block; margin-top:12px;">Посмотреть все</a>
-        </div>`;
+        container.innerHTML = `<div class="empty-tasks"><p>Нет активных заданий</p><a href="/tasks.html" class="btn" style="display:inline-block; margin-top:12px;">Посмотреть все</a></div>`;
         return;
       }
-      container.innerHTML = inProgress.map(t => `
-        <div class="task-card">
-          <span>${t.task} (${t.points} карм.)</span>
-          <span class="status status-active">В работе</span>
-        </div>
-      `).join('');
+      container.innerHTML = inProgress.map(t => `<div class="task-card"><span>${t.task} (${t.points} карм.)</span><span class="status status-active">В работе</span></div>`).join('');
     }
-
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
     async function executeTransfer() {
       const receiver = document.getElementById('receiverLogin').value.trim();
       const amount = document.getElementById('transferAmount').value;
       const comment = document.getElementById('transferComment').value.trim();
-      if (!receiver || !amount) {
-        document.getElementById('transferError').textContent = 'Заполните обязательные поля';
-        return;
-      }
+      if (!receiver || !amount) { document.getElementById('transferError').textContent = 'Заполните обязательные поля'; return; }
       const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}&comment=${encodeURIComponent(comment)}`);
       const result = await res.json();
       if (result.success) {
@@ -322,18 +325,14 @@
         const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
         const user = await userRes.json();
         if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
-      } else {
-        document.getElementById('transferError').textContent = result.message;
-      }
+      } else { document.getElementById('transferError').textContent = result.message; }
     }
-
     function showModal(html) {
       const modal = document.createElement('div');
       modal.className = 'modal active';
       modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
       document.body.appendChild(modal);
     }
-
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
@@ -348,8 +347,7 @@
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
             await loadLevels();
-            const levelInfo = getLevelInfo(currentEnergy);
-            document.getElementById('levelIcon').textContent = levelInfo.icon;
+            document.getElementById('levelIcon').textContent = getLevelInfo(currentEnergy).icon;
             loadInProgressTasks();
           }
         });
