@@ -30,6 +30,7 @@
     .btn.complete { background: var(--success); }
     .status { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
     .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
+    .status-global { background: rgba(16,185,129,0.2); color: var(--success); }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -65,12 +66,19 @@
       const container = document.getElementById('tasksList');
       container.innerHTML = tasks.map(t => {
         let btnHtml = '';
-        if (t.status === 'Назначено') btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
-        else if (t.status === 'В работе') btnHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Выполнить</button>`;
-        else if (t.status === 'На проверке') btnHtml = `<span class="status status-active">На проверке</span>`;
-        else if (t.status === 'Выполнено') btnHtml = `<span class="status status-active">Выполнено</span>`;
+        if (t.isGlobal) {
+          btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
+        } else if (t.status === 'Назначено') {
+          btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
+        } else if (t.status === 'В работе') {
+          btnHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Выполнить</button>`;
+        } else if (t.status === 'На проверке') {
+          btnHtml = `<span class="status status-active">На проверке</span>`;
+        } else if (t.status === 'Выполнено') {
+          btnHtml = `<span class="status status-active">Выполнено</span>`;
+        }
         return `<div class="task-card">
-          <span>${t.task} (${t.points} карм.)</span>
+          <span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status status-global">Общее</span>' : ''}</span>
           ${btnHtml}
         </div>`;
       }).join('');
