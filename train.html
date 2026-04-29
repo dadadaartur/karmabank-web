@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Тренировка — Кармический банк</title>
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350;
+    }
+    body {
+      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary); display: flex; align-items: center; justify-content: center;
+      height: 100vh; margin: 0; flex-direction: column; text-align: center;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+      text-decoration: none; position: absolute; top: 20px; left: 20px;
+    }
+    .back-btn:hover { background: var(--border); color: var(--text-primary); }
+    .icon { font-size: 4rem; margin-bottom: 20px; }
+    h1 { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <a class="back-btn" href="/">← Назад</a>
+  <div class="icon">🏋️</div>
+  <h1>Тренировка</h1>
+  <p style="color: var(--text-secondary);">Этот раздел появится в следующем обновлении.</p>
+</body>
+</html>
