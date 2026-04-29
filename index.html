@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
-  <link rel="apple-touch-icon" href="belchonok.png">
   <style>
     :root {
       --bg-primary: #0a1628;
@@ -59,7 +58,7 @@
       box-shadow: var(--shadow); width: 100%; max-width: 400px;
       text-align: center; animation: fadeInUp 0.6s ease;
     }
-    .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .login-form h2 { font-size: 2rem; margin-bottom: 8px; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
     .login-form input[type="text"] {
       width: 100%; padding: 14px 16px; border: 1px solid var(--border);
@@ -86,11 +85,6 @@
     .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
     .user-info { display: flex; align-items: center; gap: 12px; }
     .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-    .profile-link {
-      color: var(--text-secondary); cursor: pointer; font-size: 1.2rem;
-      transition: color 0.2s; text-decoration: none;
-    }
-    .profile-link:hover { color: var(--accent); }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s;
@@ -202,7 +196,6 @@
       <div class="user-info">
         <span id="userNameDisplay"></span>
         <span class="role" id="userDept"></span>
-        <a class="profile-link" href="/profile.html" title="Профиль">▶</a>
         <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
       </div>
     </div>
@@ -299,20 +292,30 @@
     async function loadInProgressTasks() {
       const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
       const tasks = await res.json();
-      const inProgress = tasks.filter(t => t.status === 'В работе').slice(0, 3);
-      const globalTasks = tasks.filter(t => t.isGlobal);
-      const displayTasks = [...globalTasks, ...inProgress].slice(0, 3);
+      const displayTasks = tasks.slice(0, 6);
       const container = document.getElementById('inProgressTasks');
       if (displayTasks.length === 0) {
         container.innerHTML = `<div class="empty-tasks"><p>Нет активных заданий</p></div>`;
         return;
       }
-      container.innerHTML = displayTasks.map(t => `
-        <div class="task-card" onclick="window.location.href='/tasks.html'">
-          <span>${t.task} (${t.points} карм.)</span>
-          <span class="status ${t.isGlobal ? 'status-global' : 'status-active'}">${t.isGlobal ? 'Общее' : 'В работе'}</span>
-        </div>
-      `).join('');
+      container.innerHTML = displayTasks.map(t => {
+        let btnHtml = '';
+        if (t.isGlobal) {
+          btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
+        } else if (t.status === 'Назначено') {
+          btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
+        } else if (t.status === 'В работе') {
+          btnHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Выполнить</button>`;
+        } else if (t.status === 'На проверке') {
+          btnHtml = `<span class="status status-active">На проверке</span>`;
+        } else if (t.status === 'Выполнено') {
+          btnHtml = `<span class="status status-active">Выполнено</span>`;
+        }
+        return `<div class="task-card">
+          <span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status status-global">Общее</span>' : ''}</span>
+          ${btnHtml}
+        </div>`;
+      }).join('');
     }
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
