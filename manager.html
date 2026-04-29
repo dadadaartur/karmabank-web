@@ -127,12 +127,17 @@
     }
     .notifications-panel {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px;
+      border-radius: 16px; padding: 20px; max-height: 250px; overflow: hidden;
     }
     .notif-item {
       padding: 10px 0; border-bottom: 1px solid var(--border);
     }
     .notif-item:last-child { border-bottom: none; }
+    .show-all-btn {
+      display: block; text-align: center; margin-top: 12px; color: var(--accent);
+      cursor: pointer; font-weight: 600;
+    }
+    .show-all-btn:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -158,13 +163,14 @@
       <div class="notifications-panel" id="notificationsPanel">
         <div class="section-title">🔔 Уведомления</div>
         <div id="notificationsList">Загрузка...</div>
+        <div class="show-all-btn" id="showAllBtn" style="display:none;" onclick="openAllNotifications()">Показать все</div>
       </div>
       <div class="section-title">👥 Мои сотрудники</div>
       <div class="team-grid" id="teamGrid"><div class="loading">Загрузка...</div></div>
     </div>
   </div>
 
-  <!-- Модальные окна без бельчонка -->
+  <!-- Модальное окно для проверки задания -->
   <div id="verifyModal" class="modal">
     <div class="modal-content">
       <p id="verifyModalText"></p>
@@ -173,6 +179,7 @@
     </div>
   </div>
 
+  <!-- Модальное окно для результата проверки -->
   <div id="resultModal" class="modal">
     <div class="modal-content">
       <p id="resultModalText"></p>
@@ -180,9 +187,19 @@
     </div>
   </div>
 
+  <!-- Модальное окно для всех уведомлений -->
+  <div id="allNotifModal" class="modal">
+    <div class="modal-content" style="max-height: 80vh; overflow-y: auto; text-align: left;">
+      <h3 style="text-align: center;">Все уведомления</h3>
+      <div id="allNotifContent"></div>
+      <button class="modal-close-btn" onclick="document.getElementById('allNotifModal').classList.remove('active')">Закрыть</button>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
+    let allNotifications = [];
 
     function showResultModal(message) {
       document.getElementById('resultModalText').textContent = message;
@@ -239,19 +256,41 @@
 
     async function loadNotifications() {
       const res = await fetch(`${API_URL}?action=getNotifications&managerLogin=${encodeURIComponent(currentLogin)}`);
-      const notifs = await res.json();
+      allNotifications = await res.json();
       const container = document.getElementById('notificationsList');
-      if (!notifs || notifs.length === 0) {
+      const showAllBtn = document.getElementById('showAllBtn');
+      
+      if (!allNotifications || allNotifications.length === 0) {
         container.innerHTML = '<div style="color:var(--text-secondary);">Нет новых уведомлений</div>';
+        showAllBtn.style.display = 'none';
         return;
       }
-      container.innerHTML = notifs.map(n => `
+
+      const toShow = allNotifications.slice(0, 3);
+      container.innerHTML = toShow.map(n => `
         <div class="notif-item">
           <strong>${n.employee}</strong> использовал(а) сертификат «${n.reward}».<br>
           Комментарий: ${n.comment || '—'}<br>
           <small style="color:var(--text-secondary);">${n.date}</small>
         </div>
       `).join('');
+
+      if (allNotifications.length > 3) {
+        showAllBtn.style.display = 'block';
+      } else {
+        showAllBtn.style.display = 'none';
+      }
+    }
+
+    function openAllNotifications() {
+      document.getElementById('allNotifContent').innerHTML = allNotifications.map(n => `
+        <div class="notif-item">
+          <strong>${n.employee}</strong> — «${n.reward}»<br>
+          Комментарий: ${n.comment || '—'}<br>
+          <small>${n.date}</small>
+        </div>
+      `).join('');
+      document.getElementById('allNotifModal').classList.add('active');
     }
 
     async function loadTeam() {
