@@ -53,6 +53,18 @@
       50% { text-shadow: 0 0 20px #34d399, 0 0 35px #059669; }
       100% { text-shadow: 0 0 10px #10b981, 0 0 20px #10b981; }
     }
+    @keyframes iconFloat {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(3deg); }
+      50% { transform: rotate(-3deg); }
+      75% { transform: rotate(1deg); }
+      100% { transform: rotate(0deg); }
+    }
 
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -203,18 +215,21 @@
       transition: all 0.3s ease;
       display: flex; flex-direction: column; align-items: center; gap: 6px;
       min-width: 80px; flex: 1;
-      position: relative;
-      overflow: hidden;
     }
-    .action-btn .lottie-icon {
-      width: 36px;
-      height: 36px;
-      pointer-events: none;
+    .action-btn .icon {
+      font-size: 1.8rem;
+      display: block;
+      animation: iconFloat 2.5s ease-in-out infinite;
+      transition: transform 0.2s;
     }
     .action-btn:hover {
       background: var(--accent);
       transform: scale(1.05);
       box-shadow: 0 0 15px rgba(249,115,22,0.4);
+    }
+    .action-btn:hover .icon {
+      animation: wiggle 0.5s ease-in-out;
+      transform: scale(1.2);
     }
 
     .level-icon { position: absolute; top: 14px; right: 14px; font-size: 2rem; }
@@ -229,17 +244,20 @@
       border: 1px solid var(--border); transition: all 0.2s ease;
       display: flex; flex-direction: column; align-items: center; gap: 6px;
       cursor: pointer;
-      position: relative;
     }
-    .menu-card .lottie-icon {
-      width: 48px;
-      height: 48px;
-      pointer-events: none;
+    .menu-card .menu-icon {
+      font-size: 2.5rem;
+      animation: iconFloat 3s ease-in-out infinite;
+      transition: transform 0.2s;
     }
     .menu-card:hover {
       border-color: var(--accent);
       transform: translateY(-3px);
       box-shadow: 0 8px 20px rgba(249,115,22,0.15);
+    }
+    .menu-card:hover .menu-icon {
+      animation: wiggle 0.5s ease-in-out;
+      transform: scale(1.2);
     }
     .menu-card.disabled {
       opacity: 0.6;
@@ -250,6 +268,9 @@
       border-color: var(--border);
       transform: none;
       box-shadow: none;
+    }
+    .menu-card.disabled .menu-icon {
+      animation: none;
     }
 
     .tasks-panel h3 {
@@ -339,7 +360,6 @@
       .knowledge-fab { bottom: 16px; right: 16px; padding: 12px 16px; font-size: 0.85rem; }
     }
   </style>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 <body>
   <div id="loginScreen" class="login-screen">
@@ -374,35 +394,28 @@
           </div>
           <div class="balance-actions">
             <button class="action-btn" onclick="openTransferModal()">
-              <lottie-player class="lottie-icon" src="https://assets3.lottiefiles.com/packages/lf20_xehtpvle.json" background="transparent" speed="1" hover="true"></lottie-player>
-              Перевести
+              <span class="icon">💰</span>Перевести
             </button>
             <button class="action-btn" onclick="window.location.href='/spend.html'">
-              <lottie-player class="lottie-icon" src="https://assets10.lottiefiles.com/packages/lf20_3vbhvsfa.json" background="transparent" speed="1" hover="true"></lottie-player>
-              Магазин
+              <span class="icon">🛒</span>Магазин
             </button>
             <button class="action-btn" onclick="window.location.href='/history.html'">
-              <lottie-player class="lottie-icon" src="https://assets6.lottiefiles.com/packages/lf20_yektlujc.json" background="transparent" speed="1" hover="true"></lottie-player>
-              История операций
+              <span class="icon">📋</span>История операций
             </button>
           </div>
         </div>
         <div class="menu-grid">
           <div class="menu-card disabled">
-            <lottie-player class="lottie-icon" src="https://assets2.lottiefiles.com/packages/lf20_qwy0xtey.json" background="transparent" speed="1" hover="true"></lottie-player>
-            Тренировка
+            <span class="menu-icon">🏋️</span>Тренировка
           </div>
           <div class="menu-card disabled">
-            <lottie-player class="lottie-icon" src="https://assets5.lottiefiles.com/packages/lf20_1pxqjysq.json" background="transparent" speed="1" hover="true"></lottie-player>
-            Обучение
+            <span class="menu-icon">📚</span>Обучение
           </div>
           <div class="menu-card" onclick="window.location.href='/purchases.html'">
-            <lottie-player class="lottie-icon" src="https://assets7.lottiefiles.com/packages/lf20_4x0vqbyb.json" background="transparent" speed="1" hover="true"></lottie-player>
-            Мои покупки
+            <span class="menu-icon">🛍</span>Мои покупки
           </div>
           <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'">
-            <lottie-player class="lottie-icon" src="https://assets9.lottiefiles.com/packages/lf20_8wotcvnm.json" background="transparent" speed="1" hover="true"></lottie-player>
-            Команда
+            <span class="menu-icon">👥</span>Команда
           </div>
         </div>
       </div>
@@ -435,16 +448,6 @@
     let currentLogin = localStorage.getItem('karmabank_login') || '';
     let currentPoints = 0, currentEnergy = 0;
     let levelsCache = [];
-
-    // анимации при наведении
-    document.addEventListener('mouseover', (e) => {
-      const icon = e.target.closest('.action-btn, .menu-card')?.querySelector('lottie-player');
-      if (icon) icon.setAttribute('play', '');
-    });
-    document.addEventListener('mouseout', (e) => {
-      const icon = e.target.closest('.action-btn, .menu-card')?.querySelector('lottie-player');
-      if (icon) icon.setAttribute('stop', '');
-    });
 
     async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
     function getLevelInfo(energy) {
