@@ -12,10 +12,16 @@
       --danger: #ef4444; --border: #1f3350;
     }
     body {
-      font-family: 'Inter', sans-serif; background: var(--bg-primary);
+      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
       color: var(--text-primary); padding: 20px; user-select: none;
     }
-    .back-btn { color: var(--text-secondary); cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
+    }
+    .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .purchase-card {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 12px; padding: 16px; margin-bottom: 10px;
@@ -31,9 +37,7 @@
     .btn.use:hover { background: #059669; }
     .btn.refund { background: var(--danger); }
     .btn.refund:hover { background: #dc2626; }
-    .status-used {
-      color: var(--success); font-size: 0.8rem; font-weight: 600;
-    }
+
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -54,6 +58,7 @@
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
     }
+    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
     .confirm-btn {
       background: var(--accent); color: white; border: none;
       padding: 10px 20px; border-radius: 14px; font-weight: 600;
@@ -67,7 +72,7 @@
   </style>
 </head>
 <body>
-  <div class="back-btn" onclick="window.location.href='/'">← Назад</div>
+  <a class="back-btn" href="/">← Назад</a>
   <h2>🛍 Мои покупки</h2>
   <div id="purchasesList">Загрузка...</div>
 
@@ -111,25 +116,18 @@
         container.innerHTML = '<p>У вас пока нет покупок.</p>';
         return;
       }
-      container.innerHTML = purchases.map(p => {
-        let statusHtml = '';
-        if (!p.canUse && !p.canRefund) {
-          statusHtml = '<div class="status-used">✅ Использован<br>' + p.usedDate + '</div>';
-        }
-        return `
-          <div class="purchase-card">
-            <div>
-              <strong>${p.rewardName}</strong>
-              <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
-              ${statusHtml}
-            </div>
-            <div>
-              ${p.canUse ? `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>` : ''}
-              ${p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : ''}
-            </div>
+      container.innerHTML = purchases.map(p => `
+        <div class="purchase-card">
+          <div>
+            <strong>${p.rewardName}</strong>
+            <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
           </div>
-        `;
-      }).join('');
+          <div>
+            ${p.canUse ? `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>` : ''}
+            ${p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : ''}
+          </div>
+        </div>
+      `).join('');
     }
 
     function openRefundModal(certId, rewardName, cost) {
@@ -164,7 +162,7 @@
       if (res) {
         const result = await res.json();
         if (result.success) {
-          showModal('✅ Сертификат использован!');
+          showModal('✅ ' + result.message);
           loadPurchases();
         } else {
           showModal('😢 ' + result.message);
