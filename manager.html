@@ -56,13 +56,6 @@
     .metric .value { font-size: 1.5rem; font-weight: 800; }
     .metric .label { font-size: 0.75rem; color: var(--text-secondary); }
     .value.success { color: var(--success); } .value.warning { color: var(--warning); } .value.accent { color: var(--accent); }
-    .ai-tip {
-      background: rgba(249, 115, 22, 0.1); border: 1px solid var(--accent);
-      border-radius: 16px; padding: 14px; margin-top: 16px;
-      font-size: 0.9rem; color: var(--text-secondary);
-      display: flex; align-items: flex-start; gap: 8px;
-    }
-    .ai-tip .icon { font-size: 1.2rem; }
     .task-review-section { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
     .review-item {
       background: var(--bg-primary); border: 1px solid var(--border);
@@ -206,22 +199,6 @@
       document.getElementById('resultModal').classList.add('active');
     }
 
-    async function fetchAITip(employee) {
-      try {
-        const metrics = {
-          points: employee.points,
-          energy: employee.energy,
-          completedTasks: employee.completedTasks,
-          pendingTasks: employee.pendingTasks,
-          inProgressTasks: employee.inProgressTasks
-        };
-        const res = await fetch(`${API_URL}?action=getAITip&name=${encodeURIComponent(employee.name)}&metrics=${encodeURIComponent(JSON.stringify(metrics))}`);
-        return await res.json();
-      } catch (e) {
-        return { icon: '✨', text: 'Стабильная работа. Рекомендую индивидуальную беседу.' };
-      }
-    }
-
     function openVerifyModal(taskName, login, comment) {
       document.getElementById('verifyModalText').innerHTML = `Проверить задание <b>${taskName}</b>?<br><br>Комментарий сотрудника: <i>${comment || 'нет'}</i>`;
       document.getElementById('verifyModal').classList.add('active');
@@ -229,7 +206,7 @@
         closeVerifyModal();
         const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
         const result = await res.json();
-        showResultModal(result.message); // <-- Вот здесь теперь красивое окно, а не alert
+        showResultModal(result.message);
         loadTeam();
       };
     }
@@ -317,10 +294,6 @@
               <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
               <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
             </div>
-            <div class="ai-tip" id="tip-${emp.login}">
-              <span class="icon">🤖</span>
-              <span>ИИ анализирует данные...</span>
-            </div>
             <div class="task-review-section" id="review-${emp.login}">Загрузка...</div>
           </div>
         `).join('');
@@ -342,11 +315,6 @@
                 `).join('');
               }
             });
-
-          fetchAITip(emp).then(tip => {
-            const tipElem = document.getElementById('tip-' + emp.login);
-            if (tipElem) tipElem.innerHTML = `<span class="icon">${tip.icon}</span><span>${tip.text}</span>`;
-          });
         });
 
       } catch (e) {
