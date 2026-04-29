@@ -15,7 +15,13 @@
       font-family: 'Inter', sans-serif; background: var(--bg-primary);
       color: var(--text-primary); padding: 20px; user-select: none;
     }
-    .back-btn { color: var(--text-secondary); cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
+    }
+    .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .task-card {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 16px; padding: 16px; margin-bottom: 12px;
@@ -45,7 +51,6 @@
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
     }
-    .confirm-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 14px; cursor: pointer; margin: 10px; }
     .modal input {
       width: 100%; padding: 10px; margin: 8px 0;
       border-radius: 10px; border: 1px solid var(--border);
@@ -54,8 +59,8 @@
   </style>
 </head>
 <body>
-  <div class="back-btn" onclick="window.location.href='/'">← Назад</div>
-  <h2>✅ Мои задания</h2>
+  <a class="back-btn" href="/">← Назад</a>
+  <h2 style="cursor:pointer;" onclick="window.location.href='/'">✅ Мои задания</h2>
   <div id="tasksList">Загрузка...</div>
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
@@ -93,7 +98,7 @@
       modal.innerHTML = `<div class="modal-content">
         <h3>Введите комментарий</h3>
         <input type="text" id="commentInput" placeholder="Например, номер договора...">
-        <button class="confirm-btn" id="submitCommentBtn">Отправить</button>
+        <button class="btn" id="submitCommentBtn">Отправить</button>
         <button class="modal-close-btn" id="cancelCommentBtn">Отмена</button>
       </div>`;
       document.body.appendChild(modal);
