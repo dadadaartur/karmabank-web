@@ -46,6 +46,15 @@
       width: 100px; height: 100px; border-radius: 50%;
       border: 2px solid var(--border); object-fit: cover; margin-bottom: 8px;
     }
+    .passport-display {
+      background: var(--bg-primary);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 600;
+      color: var(--accent);
+      display: inline-block;
+    }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -78,9 +87,9 @@
       const container = document.getElementById('profileContent');
       container.innerHTML = `
         <div class="profile-card">
-          <div class="field">
+          <div class="field" style="text-align: center;">
             <img src="${user.photo || 'belchonok.png'}" class="avatar-preview" id="avatarImg" alt="Аватар">
-            <label>Ссылка на фото</label>
+            <label style="text-align: left;">Ссылка на фото</label>
             <input type="text" id="photoInput" value="${user.photo || ''}" placeholder="Вставьте URL изображения">
           </div>
           <div class="field">
@@ -107,6 +116,10 @@
           <div class="field">
             <label>Ссылки (через запятую)</label>
             <input type="text" id="linksInput" value="${user.links || ''}">
+          </div>
+          <div class="field">
+            <label>Цифровой паспорт</label>
+            <div class="passport-display" id="passportValue">${user.passport || 'не назначен'}</div>
           </div>
           <button class="btn" onclick="saveProfile()">Сохранить</button>
         </div>
