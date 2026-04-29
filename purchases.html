@@ -31,7 +31,9 @@
     .btn.use:hover { background: #059669; }
     .btn.refund { background: var(--danger); }
     .btn.refund:hover { background: #dc2626; }
-
+    .status-used {
+      color: var(--success); font-size: 0.8rem; font-weight: 600;
+    }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -109,18 +111,25 @@
         container.innerHTML = '<p>У вас пока нет покупок.</p>';
         return;
       }
-      container.innerHTML = purchases.map(p => `
-        <div class="purchase-card">
-          <div>
-            <strong>${p.rewardName}</strong>
-            <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
+      container.innerHTML = purchases.map(p => {
+        let statusHtml = '';
+        if (!p.canUse && !p.canRefund) {
+          statusHtml = '<div class="status-used">✅ Использован<br>' + p.usedDate + '</div>';
+        }
+        return `
+          <div class="purchase-card">
+            <div>
+              <strong>${p.rewardName}</strong>
+              <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
+              ${statusHtml}
+            </div>
+            <div>
+              ${p.canUse ? `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>` : ''}
+              ${p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : ''}
+            </div>
           </div>
-          <div>
-            ${p.canUse ? `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>` : ''}
-            ${p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : ''}
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function openRefundModal(certId, rewardName, cost) {
@@ -156,7 +165,7 @@
         const result = await res.json();
         if (result.success) {
           showModal('✅ Сертификат использован!');
-          loadPurchases(); // <-- Вот здесь список перерисовывается, и сертификат исчезает
+          loadPurchases();
         } else {
           showModal('😢 ' + result.message);
         }
