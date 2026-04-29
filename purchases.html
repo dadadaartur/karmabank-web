@@ -156,7 +156,7 @@
         const result = await res.json();
         if (result.success) {
           showModal('✅ Сертификат использован!');
-          loadPurchases(); // Перерисовываем список, и он исчезнет
+          loadPurchases(); // <-- Вот здесь список перерисовывается, и сертификат исчезает
         } else {
           showModal('😢 ' + result.message);
         }
