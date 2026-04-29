@@ -209,7 +209,7 @@
     .action-btn .lottie-icon {
       width: 36px;
       height: 36px;
-      pointer-events: none; /* чтобы клик работал на кнопку */
+      pointer-events: none;
     }
     .action-btn:hover {
       background: var(--accent);
@@ -339,7 +339,6 @@
       .knowledge-fab { bottom: 16px; right: 16px; padding: 12px 16px; font-size: 0.85rem; }
     }
   </style>
-  <!-- Lottie Player -->
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 <body>
@@ -375,34 +374,34 @@
           </div>
           <div class="balance-actions">
             <button class="action-btn" onclick="openTransferModal()">
-              <lottie-player class="lottie-icon" data-src="https://assets5.lottiefiles.com/packages/lf20_myvzy6t3.json" background="transparent" speed="1" hover="true"></lottie-player>
+              <lottie-player class="lottie-icon" src="https://assets3.lottiefiles.com/packages/lf20_xehtpvle.json" background="transparent" speed="1" hover="true"></lottie-player>
               Перевести
             </button>
             <button class="action-btn" onclick="window.location.href='/spend.html'">
-              <lottie-player class="lottie-icon" data-src="https://assets7.lottiefiles.com/packages/lf20_onbctgvs.json" background="transparent" speed="1" hover="true"></lottie-player>
+              <lottie-player class="lottie-icon" src="https://assets10.lottiefiles.com/packages/lf20_3vbhvsfa.json" background="transparent" speed="1" hover="true"></lottie-player>
               Магазин
             </button>
             <button class="action-btn" onclick="window.location.href='/history.html'">
-              <lottie-player class="lottie-icon" data-src="https://assets2.lottiefiles.com/packages/lf20_wd8kmlcs.json" background="transparent" speed="1" hover="true"></lottie-player>
-              История
+              <lottie-player class="lottie-icon" src="https://assets6.lottiefiles.com/packages/lf20_yektlujc.json" background="transparent" speed="1" hover="true"></lottie-player>
+              История операций
             </button>
           </div>
         </div>
         <div class="menu-grid">
           <div class="menu-card disabled">
-            <lottie-player class="lottie-icon" data-src="https://assets1.lottiefiles.com/packages/lf20_0dlnl7hb.json" background="transparent" speed="1" hover="true"></lottie-player>
+            <lottie-player class="lottie-icon" src="https://assets2.lottiefiles.com/packages/lf20_qwy0xtey.json" background="transparent" speed="1" hover="true"></lottie-player>
             Тренировка
           </div>
           <div class="menu-card disabled">
-            <lottie-player class="lottie-icon" data-src="https://assets5.lottiefiles.com/packages/lf20_bg5mwxqv.json" background="transparent" speed="1" hover="true"></lottie-player>
+            <lottie-player class="lottie-icon" src="https://assets5.lottiefiles.com/packages/lf20_1pxqjysq.json" background="transparent" speed="1" hover="true"></lottie-player>
             Обучение
           </div>
-          <div class="menu-card disabled">
-            <lottie-player class="lottie-icon" data-src="https://assets3.lottiefiles.com/packages/lf20_0fsfzxbd.json" background="transparent" speed="1" hover="true"></lottie-player>
-            Соревнования
+          <div class="menu-card" onclick="window.location.href='/purchases.html'">
+            <lottie-player class="lottie-icon" src="https://assets7.lottiefiles.com/packages/lf20_4x0vqbyb.json" background="transparent" speed="1" hover="true"></lottie-player>
+            Мои покупки
           </div>
           <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'">
-            <lottie-player class="lottie-icon" data-src="https://assets10.lottiefiles.com/packages/lf20_9wzqcmft.json" background="transparent" speed="1" hover="true"></lottie-player>
+            <lottie-player class="lottie-icon" src="https://assets9.lottiefiles.com/packages/lf20_8wotcvnm.json" background="transparent" speed="1" hover="true"></lottie-player>
             Команда
           </div>
         </div>
@@ -437,17 +436,14 @@
     let currentPoints = 0, currentEnergy = 0;
     let levelsCache = [];
 
-    // Инициализация Lottie-анимаций при наведении
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.lottie-icon').forEach(icon => {
-        const player = icon.closest('.action-btn') ? icon : icon;
-        if (!player) return;
-        const parent = icon.parentNode;
-        if (parent.classList.contains('action-btn') || parent.classList.contains('menu-card')) {
-          parent.addEventListener('mouseenter', () => icon.setAttribute('play', ''));
-          parent.addEventListener('mouseleave', () => icon.setAttribute('stop', ''));
-        }
-      });
+    // анимации при наведении
+    document.addEventListener('mouseover', (e) => {
+      const icon = e.target.closest('.action-btn, .menu-card')?.querySelector('lottie-player');
+      if (icon) icon.setAttribute('play', '');
+    });
+    document.addEventListener('mouseout', (e) => {
+      const icon = e.target.closest('.action-btn, .menu-card')?.querySelector('lottie-player');
+      if (icon) icon.setAttribute('stop', '');
     });
 
     async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
