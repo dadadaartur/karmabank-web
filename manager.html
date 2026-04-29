@@ -127,7 +127,9 @@
     }
     .notifications-panel {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px; max-height: 250px; overflow: hidden;
+      border-radius: 16px; padding: 20px;
+      max-height: 250px; /* Ограничиваем высоту */
+      overflow: hidden;
     }
     .notif-item {
       padding: 10px 0; border-bottom: 1px solid var(--border);
@@ -170,7 +172,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно для проверки задания -->
+  <!-- Модальные окна -->
   <div id="verifyModal" class="modal">
     <div class="modal-content">
       <p id="verifyModalText"></p>
@@ -179,7 +181,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно для результата проверки -->
   <div id="resultModal" class="modal">
     <div class="modal-content">
       <p id="resultModalText"></p>
@@ -187,7 +188,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно для всех уведомлений -->
   <div id="allNotifModal" class="modal">
     <div class="modal-content" style="max-height: 80vh; overflow-y: auto; text-align: left;">
       <h3 style="text-align: center;">Все уведомления</h3>
