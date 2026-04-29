@@ -12,10 +12,16 @@
       --danger: #ef4444; --border: #1f3350;
     }
     body {
-      font-family: 'Inter', sans-serif; background: var(--bg-primary);
+      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
       color: var(--text-primary); padding: 20px; user-select: none;
     }
-    .back-btn { color: var(--text-secondary); cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
+    }
+    .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .history-item {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 12px; padding: 12px; margin-bottom: 8px;
@@ -27,7 +33,7 @@
   </style>
 </head>
 <body>
-  <div class="back-btn" onclick="window.location.href='/'">← Назад</div>
+  <a class="back-btn" href="/">← Назад</a>
   <h2>📋 История операций</h2>
   <div id="historyList">Загрузка...</div>
   <script>
