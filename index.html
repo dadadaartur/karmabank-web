@@ -20,7 +20,7 @@
       --danger: #ef4444;
       --border: #1f3350;
       --shadow: 0 20px 40px rgba(0,0,0,0.5);
-      --glow: 0 0 30px rgba(249, 115, 22, 0.3);
+      --glow: 0 0 30px rgba(16, 185, 129, 0.4);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -51,7 +51,7 @@
     }
     @keyframes karmaGlow {
       0% { text-shadow: 0 0 10px #10b981, 0 0 20px #10b981; }
-      50% { text-shadow: 0 0 20px #f59e0b, 0 0 40px #f97316; }
+      50% { text-shadow: 0 0 20px #34d399, 0 0 35px #059669; }
       100% { text-shadow: 0 0 10px #10b981, 0 0 20px #10b981; }
     }
     @keyframes iconFloat {
@@ -60,7 +60,6 @@
       100% { transform: translateY(0); }
     }
 
-    /* === ОБЩИЕ КЛАССЫ === */
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
@@ -160,7 +159,7 @@
     }
     .balance-value {
       font-size: 3.8rem; font-weight: 800;
-      background: linear-gradient(135deg, #f97316, #fbbf24, #10b981);
+      background: linear-gradient(135deg, #10b981, #34d399, #059669);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -175,10 +174,19 @@
       letter-spacing: 0.5px;
       margin-bottom: 12px;
     }
+    .energy-frame {
+      display: inline-block;
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 6px 18px;
+      background: rgba(249,115,22,0.05);
+      margin-bottom: 20px;
+      backdrop-filter: blur(5px);
+    }
     .energy-line {
       font-size: 1rem;
       color: var(--accent);
-      margin-bottom: 20px;
+      font-weight: 600;
     }
 
     .balance-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -347,7 +355,9 @@
           <div class="balance-label">Баланс</div>
           <div class="balance-value" id="userPoints">0</div>
           <div class="balance-sub">кармиков</div>
-          <div class="energy-line" id="energyDisplay">⚡ 0 энергии</div>
+          <div class="energy-frame">
+            <div class="energy-line" id="energyDisplay">⚡ 0 энергии</div>
+          </div>
           <div class="balance-actions">
             <button class="action-btn" onclick="openTransferModal()"><span class="icon">💰</span>Перевести</button>
             <button class="action-btn" onclick="window.location.href='/spend.html'"><span class="icon">🛒</span>Магазин</button>
@@ -447,6 +457,7 @@
         return;
       }
       container.innerHTML = displayTasks.map(t => {
+        // t.status будет строка: для общих заданий может быть 'Общее', иначе 'Назначено', 'В работе', 'На проверке', 'Выполнено'
         let btnHtml = '';
         if (t.isGlobal) {
           btnHtml = `<button class="btn" onclick="event.stopPropagation(); takeTask('${t.task}')">Взять</button>`;
@@ -459,6 +470,7 @@
         } else if (t.status === 'Выполнено') {
           btnHtml = `<span class="status status-active">Выполнено</span>`;
         }
+        // Если статус 'Общее' уже обработан isGlobal, а иначе просто метка (на всякий случай)
         return `<div class="task-card">
           <span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status status-global">Общее</span>' : ''}</span>
           ${btnHtml}
@@ -525,7 +537,6 @@
       document.body.appendChild(modal);
     }
 
-    // Автовход при наличии сохранённого логина
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
