@@ -86,6 +86,11 @@
     .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
     .user-info { display: flex; align-items: center; gap: 12px; }
     .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .profile-link {
+      color: var(--text-secondary); cursor: pointer; font-size: 1.2rem;
+      transition: color 0.2s; text-decoration: none;
+    }
+    .profile-link:hover { color: var(--accent); }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s;
@@ -123,7 +128,7 @@
     .tasks-panel h3 { margin-bottom: 14px; }
     .task-card {
       background: var(--bg-card); border-radius: 18px; padding: 18px; margin-bottom: 12px;
-      border: 1px solid var(--border); transition: all 0.2s;
+      border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
       display: flex; justify-content: space-between; align-items: center;
     }
     .task-card:hover { border-color: var(--accent); transform: translateY(-2px); }
@@ -178,6 +183,40 @@
       border-radius: 12px; border: 1px solid var(--border);
       background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem;
     }
+
+    /* Мобильная адаптация */
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 16px;
+      }
+      .left-column {
+        order: 1;
+      }
+      .tasks-panel {
+        order: 2;
+      }
+      .balance-value {
+        font-size: 2.5rem;
+      }
+      .balance-actions button {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+      }
+      .menu-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .menu-card {
+        padding: 14px;
+      }
+      .task-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -197,6 +236,7 @@
       <div class="user-info">
         <span id="userNameDisplay"></span>
         <span class="role" id="userDept"></span>
+        <a class="profile-link" href="/profile.html" title="Профиль">▶</a>
         <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
       </div>
     </div>
@@ -210,13 +250,13 @@
           <div style="margin-top:8px; color:var(--accent);" id="energyDisplay">⚡ 0 энергии</div>
           <div class="balance-actions">
             <button onclick="openTransferModal()"><span style="display:block; font-size:1.2rem;">💰</span>Перевести</button>
-            <button onclick="window.location.href='/spend.html'"><span style="display:block; font-size:1.2rem;">🎁</span>Потратить</button>
+            <button onclick="window.location.href='/spend.html'"><span style="display:block; font-size:1.2rem;">🛒</span>Магазин</button>
             <button onclick="window.location.href='/history.html'"><span style="display:block; font-size:1.2rem;">📋</span>История</button>
           </div>
         </div>
         <div class="menu-grid">
           <div class="menu-card" onclick="window.location.href='/tasks.html'"><span class="icon">✅</span>Задания</div>
-          <div class="menu-card" onclick="window.location.href='/spend.html'"><span class="icon">🎁</span>Магазин</div>
+          <div class="menu-card" onclick="window.location.href='/spend.html'"><span class="icon">🛒</span>Магазин</div>
           <div class="menu-card" onclick="window.location.href='/chat.html'"><span class="icon">💬</span>Чат</div>
           <div class="menu-card" onclick="window.location.href='/purchases.html'"><span class="icon">🛍</span>Мои покупки</div>
           <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'"><span class="icon">👥</span>Команда</div>
@@ -317,6 +357,20 @@
           ${btnHtml}
         </div>`;
       }).join('');
+    }
+    // Оптимистичный UI для кнопки "Взять"
+    async function takeTask(taskName) {
+      const btn = event.target;
+      const originalText = btn.textContent;
+      btn.textContent = '...';
+      btn.disabled = true;
+      try {
+        await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
+        loadInProgressTasks();
+      } catch(e) {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
     }
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
