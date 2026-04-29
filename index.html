@@ -8,37 +8,25 @@
   <link rel="apple-touch-icon" href="belchonok.png">
   <style>
     :root {
-      --bg-primary: #0a1628;
-      --bg-secondary: #0f1f35;
-      --bg-card: #152238;
-      --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1;
-      --accent: #f97316;
-      --accent-hover: #ea580c;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --border: #1f3350;
-      --shadow: 0 20px 40px rgba(0,0,0,0.5);
-      --glow: 0 0 30px rgba(249, 115, 22, 0.3);
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --accent-hover: #ea580c; --success: #10b981; --warning: #f59e0b;
+      --danger: #ef4444; --border: #1f3350;
+      --shadow: 0 20px 40px rgba(0,0,0,0.5); --glow: 0 0 30px rgba(249, 115, 22, 0.3);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
       background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary);
-      min-height: 100vh; 
-      display: flex; flex-direction: column;
-      overflow-x: hidden;
-      position: relative;
-      user-select: none;
-      font-size: 16px;
+      color: var(--text-primary); min-height: 100vh;
+      display: flex; flex-direction: column; overflow-x: hidden; position: relative;
+      user-select: none; font-size: 16px;
     }
-    input[type="text"], input[type="number"], textarea { user-select: text; }
-
-    @keyframes glowPulse {
-      0%, 100% { box-shadow: 0 0 5px var(--accent); }
-      50% { box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
+    input, textarea { user-select: text; }
+    /* Анимации */
+    @keyframes balanceGlow {
+      0%, 100% { text-shadow: 0 0 10px rgba(16,185,129,0.4); }
+      50% { text-shadow: 0 0 25px rgba(16,185,129,0.9), 0 0 45px rgba(16,185,129,0.5); }
     }
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
@@ -48,35 +36,32 @@
       0% { transform: scale(0.8); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
-
+    /* Экран входа */
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
     }
     .login-form {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 40px 30px;
-      box-shadow: var(--shadow); width: 100%; max-width: 400px;
-      text-align: center; animation: fadeInUp 0.6s ease;
+      border-radius: 24px; padding: 40px 30px; box-shadow: var(--shadow);
+      width: 100%; max-width: 400px; text-align: center; animation: fadeInUp 0.6s ease;
     }
-    .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .login-form h2 { font-size: 1.8rem; margin-bottom: 8px; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
-    .login-form input[type="text"] {
+    .login-form input {
       width: 100%; padding: 14px 16px; border: 1px solid var(--border);
       border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary);
       font-size: 1rem; margin-bottom: 16px; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .login-form input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+    .login-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
     .login-btn {
       width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00);
       color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
       cursor: pointer; transition: all 0.2s;
     }
-    .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); transform: scale(1.02); }
-    .login-btn:active { transform: scale(0.98); }
+    .login-btn:hover { transform: scale(1.02); }
     .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
-
+    /* Шапка */
     .main-screen { display: none; flex-direction: column; flex: 1; }
     .header {
       background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
@@ -85,7 +70,13 @@
     }
     .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
     .user-info { display: flex; align-items: center; gap: 12px; }
-    .user-info .role { background: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .chat-header-btn {
+      background: var(--success); color: white; border: none; width: 36px; height: 36px;
+      border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex;
+      align-items: center; justify-content: center; transition: all 0.2s;
+      box-shadow: 0 0 15px rgba(16,185,129,0.4);
+    }
+    .chat-header-btn:hover { transform: scale(1.1); }
     .profile-link {
       color: var(--text-secondary); cursor: pointer; font-size: 1.2rem;
       transition: color 0.2s; text-decoration: none;
@@ -93,38 +84,45 @@
     .profile-link:hover { color: var(--accent); }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s;
-      font-size: 0.85rem;
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
     }
     .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
-
+    /* Контейнер */
     .container {
-      max-width: 1300px; width: 100%; margin: 0 auto;
-      padding: 24px;
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 32px;
-      align-items: start;
+      max-width: 1300px; width: 100%; margin: 0 auto; padding: 24px;
+      display: grid; grid-template-columns: 420px 1fr; gap: 32px; align-items: start;
     }
-
     .left-column { display: flex; flex-direction: column; gap: 24px; }
-
+    /* Баланс */
     .balance-card {
-      background: var(--bg-card); border-radius: 24px; padding: 24px; text-align: center;
-      border: 1px solid var(--border); position: relative;
+      background: var(--bg-card); border-radius: 30px; padding: 32px 24px;
+      text-align: center; border: 1px solid var(--border); position: relative;
+      box-shadow: var(--shadow);
     }
-    .balance-value { font-size: 3rem; font-weight: 800; color: var(--success); }
-    .balance-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+    .balance-label { font-size: 1rem; color: var(--text-secondary); margin-bottom: 8px; letter-spacing: 1px; }
+    .balance-value {
+      font-size: 4.5rem; font-weight: 800;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: balanceGlow 2s infinite;
+    }
+    .balance-subtext { font-size: 0.9rem; color: var(--text-secondary); margin-top: 4px; }
+    .balance-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: center; }
     .balance-actions button {
       background: var(--border); color: var(--text-primary); border: none;
       padding: 10px 16px; border-radius: 14px; cursor: pointer; font-size: 0.9rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600;
-      flex: 1;
+      transition: all 0.3s; font-weight: 600; flex: 1;
     }
     .balance-actions button:hover { background: var(--accent); transform: scale(1.05); }
-
-    .level-icon { position: absolute; top: 14px; right: 14px; font-size: 2rem; }
-
+    /* Меню */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .menu-card {
+      background: var(--bg-card); border-radius: 18px; padding: 18px; text-align: center;
+      cursor: pointer; border: 1px solid var(--border); transition: all 0.2s;
+    }
+    .menu-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .menu-card .icon { font-size: 1.5rem; margin-bottom: 6px; display: block; }
+    /* Задания */
     .tasks-panel h3 { margin-bottom: 14px; }
     .task-card {
       background: var(--bg-card); border-radius: 18px; padding: 18px; margin-bottom: 12px;
@@ -137,31 +135,33 @@
     }
     .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
     .status-global { background: rgba(16,185,129,0.2); color: var(--success); }
-
     .empty-tasks {
       color: var(--text-secondary); padding: 30px; text-align: center;
       background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
     }
-
-    .menu-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .menu-card {
-      background: var(--bg-card); border-radius: 18px; padding: 18px; text-align: center;
-      cursor: pointer; border: 1px solid var(--border); transition: all 0.2s;
-    }
-    .menu-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .menu-card .icon { font-size: 1.5rem; margin-bottom: 6px; display: block; }
-
     .btn {
       background: var(--accent); color: white; border: none;
       padding: 10px 20px; border-radius: 14px; font-weight: 600; cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s;
     }
-    .btn:hover { background: var(--accent-hover); animation: glowPulse 1.5s infinite; }
-
+    .btn:hover { background: var(--accent-hover); transform: scale(1.05); }
+    /* Бельчонок */
+    .mascot-btn {
+      position: fixed; bottom: 20px; right: 20px; z-index: 999;
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-size: 30px; cursor: pointer; box-shadow: 0 0 25px rgba(249,115,22,0.5);
+      transition: transform 0.2s;
+    }
+    .mascot-btn:hover { transform: scale(1.1); }
+    .mascot-label {
+      position: fixed; bottom: 85px; right: 20px; z-index: 999;
+      color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .mascot-btn:hover + .mascot-label, .mascot-btn:active + .mascot-label { opacity: 1; }
+    /* Модальные окна */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -169,57 +169,25 @@
     .modal.active { display: flex; }
     .modal-content {
       background: linear-gradient(135deg, #1a2940, #152238);
-      border: 1px solid var(--accent);
-      border-radius: 28px; padding: 36px; max-width: 420px; width: 90%;
-      text-align: center; box-shadow: 0 0 60px rgba(249,115,22,0.6);
-      animation: modalPop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--accent); border-radius: 28px; padding: 36px;
+      max-width: 420px; width: 90%; text-align: center;
+      box-shadow: 0 0 60px rgba(249,115,22,0.6); animation: modalPop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 12px 24px; border-radius: 24px; cursor: pointer; margin-top: 24px; font-size: 0.9rem;
+      background: var(--accent); color: white; border: none;
+      padding: 10px 20px; border-radius: 14px; cursor: pointer; font-weight: 600;
+      margin-top: 20px; transition: background 0.2s;
     }
-    .modal input, .modal textarea {
+    .modal-close-btn:hover { background: var(--accent-hover); }
+    .modal input {
       width: 100%; padding: 12px; margin: 10px 0;
       border-radius: 12px; border: 1px solid var(--border);
       background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem;
     }
-
-    /* Мобильная адаптация */
-    @media (max-width: 768px) {
-      .container {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 16px;
-      }
-      .left-column {
-        order: 1;
-      }
-      .tasks-panel {
-        order: 2;
-      }
-      .balance-value {
-        font-size: 2.5rem;
-      }
-      .balance-actions button {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-      }
-      .menu-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .menu-card {
-        padding: 14px;
-      }
-      .task-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-    }
   </style>
 </head>
 <body>
+  <!-- Экран входа -->
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
       <h2>Кармический банк</h2>
@@ -229,46 +197,50 @@
       <div id="loginError" class="login-error"></div>
     </div>
   </div>
-
+  <!-- Главный экран -->
   <div id="mainScreen" class="main-screen">
     <div class="header">
       <h1 onclick="location.reload()">Кармический банк</h1>
       <div class="user-info">
         <span id="userNameDisplay"></span>
-        <span class="role" id="userDept"></span>
+        <button class="chat-header-btn" onclick="window.location.href='/chat.html'" title="Чат">💬</button>
         <a class="profile-link" href="/profile.html" title="Профиль">▶</a>
         <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
       </div>
     </div>
     <div class="container">
       <div class="left-column">
+        <!-- Блок баланса -->
         <div class="balance-card">
-          <div class="level-icon" id="levelIcon"></div>
-          <div style="font-size:0.9rem; color:var(--text-secondary)">Баланс</div>
+          <div class="balance-label">БАЛАНС</div>
           <div class="balance-value" id="userPoints">0</div>
-          <div>кармиков</div>
-          <div style="margin-top:8px; color:var(--accent);" id="energyDisplay">⚡ 0 энергии</div>
+          <div class="balance-subtext" id="energyDisplay">⚡ 0 энергии</div>
           <div class="balance-actions">
-            <button onclick="openTransferModal()"><span style="display:block; font-size:1.2rem;">💰</span>Перевести</button>
-            <button onclick="window.location.href='/spend.html'"><span style="display:block; font-size:1.2rem;">🛒</span>Магазин</button>
-            <button onclick="window.location.href='/history.html'"><span style="display:block; font-size:1.2rem;">📋</span>История</button>
+            <button onclick="window.location.href='/history.html'">📋 История</button>
+            <button onclick="openTransferModal()">💰 Перевести</button>
           </div>
         </div>
+        <!-- Меню -->
         <div class="menu-grid">
           <div class="menu-card" onclick="window.location.href='/tasks.html'"><span class="icon">✅</span>Задания</div>
           <div class="menu-card" onclick="window.location.href='/spend.html'"><span class="icon">🛒</span>Магазин</div>
-          <div class="menu-card" onclick="window.location.href='/chat.html'"><span class="icon">💬</span>Чат</div>
-          <div class="menu-card" onclick="window.location.href='/purchases.html'"><span class="icon">🛍</span>Мои покупки</div>
+          <div class="menu-card" onclick="window.location.href='/purchases.html'"><span class="icon">🛍</span>Покупки</div>
+          <div class="menu-card" onclick="alert('🏋️ Тренировка — скоро здесь будет симулятор')"><span class="icon">🏋️</span>Тренировка</div>
+          <div class="menu-card" onclick="alert('📚 Обучение — скоро здесь будут курсы')"><span class="icon">📚</span>Обучение</div>
+          <div class="menu-card" onclick="alert('🏆 Соревнования — скоро здесь будут чемпионаты')"><span class="icon">🏆</span>Соревнования</div>
           <div class="menu-card" id="teamCard" style="display:none" onclick="window.location.href='/manager.html'"><span class="icon">👥</span>Команда</div>
         </div>
       </div>
+      <!-- Задания -->
       <div class="tasks-panel">
         <h3>📋 Задания</h3>
         <div id="inProgressTasks">Нет активных заданий</div>
       </div>
     </div>
   </div>
-
+  <!-- Бельчонок -->
+  <div class="mascot-btn" onclick="alert('🐿️ База знаний — скоро здесь будет AI-помощник')">🐿️</div>
+  <div class="mascot-label">База знаний</div>
   <!-- Модальное окно перевода -->
   <div id="transferModal" class="modal">
     <div class="modal-content">
@@ -281,39 +253,32 @@
       <div id="transferError" style="color:var(--danger); margin-top:8px"></div>
     </div>
   </div>
-
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_login') || '';
     let currentPoints = 0, currentEnergy = 0;
-    let levelsCache = [];
-
-    async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
-    function getLevelInfo(energy) {
-      if (!levelsCache.length) return { icon: '🐟', name: 'Малёк' };
-      let level = levelsCache[0];
-      for (let i = levelsCache.length-1; i >= 0; i--) { if (energy >= levelsCache[i].energy) { level = levelsCache[i]; break; } }
-      return { icon: level.icon, name: level.name };
+    function showModal(html) {
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+      document.body.appendChild(modal);
     }
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
       fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`)
         .then(r => r.json())
-        .then(async user => {
+        .then(user => {
           if (user && user.name) {
             localStorage.setItem('karmabank_login', login);
             currentLogin = login;
             currentPoints = user.points || 0;
             currentEnergy = user.energy || 0;
-            await loadLevels();
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainScreen').style.display = 'flex';
             document.getElementById('userNameDisplay').textContent = user.name;
-            document.getElementById('userDept').textContent = user.department || '';
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
-            document.getElementById('levelIcon').textContent = getLevelInfo(currentEnergy).icon;
             fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
               .then(r => r.json())
               .then(isManager => { document.getElementById('teamCard').style.display = isManager ? 'block' : 'none'; });
@@ -358,19 +323,13 @@
         </div>`;
       }).join('');
     }
-    // Оптимистичный UI для кнопки "Взять"
     async function takeTask(taskName) {
       const btn = event.target;
-      const originalText = btn.textContent;
-      btn.textContent = '...';
-      btn.disabled = true;
+      btn.textContent = '...'; btn.disabled = true;
       try {
         await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
         loadInProgressTasks();
-      } catch(e) {
-        btn.textContent = originalText;
-        btn.disabled = false;
-      }
+      } catch(e) { btn.textContent = 'Взять'; btn.disabled = false; }
     }
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
@@ -384,32 +343,26 @@
       if (result.success) {
         closeTransferModal();
         showModal('✅ Перевод выполнен!');
-        const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
-        const user = await userRes.json();
-        if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; }
+        fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
+          .then(r => r.json())
+          .then(user => { if (user) { currentPoints = user.points || 0; document.getElementById('userPoints').textContent = currentPoints; } });
       } else { document.getElementById('transferError').textContent = result.message; }
-    }
-    function showModal(html) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
-      document.body.appendChild(modal);
     }
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
       fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
         .then(r => r.json())
-        .then(async user => {
+        .then(user => {
           if (user) {
             currentPoints = user.points || 0;
             currentEnergy = user.energy || 0;
             document.getElementById('userNameDisplay').textContent = user.name;
-            document.getElementById('userDept').textContent = user.department || '';
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
-            await loadLevels();
-            document.getElementById('levelIcon').textContent = getLevelInfo(currentEnergy).icon;
+            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(currentLogin)}`)
+              .then(r => r.json())
+              .then(isManager => { document.getElementById('teamCard').style.display = isManager ? 'block' : 'none'; });
             loadInProgressTasks();
           }
         });
