@@ -128,7 +128,7 @@
     .notifications-panel {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 16px; padding: 20px;
-      max-height: 250px; /* Ограничиваем высоту */
+      max-height: 250px;
       overflow: hidden;
     }
     .notif-item {
@@ -229,7 +229,7 @@
         closeVerifyModal();
         const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
         const result = await res.json();
-        showResultModal(result.message);
+        showResultModal(result.message); // <-- Вот здесь теперь красивое окно, а не alert
         loadTeam();
       };
     }
