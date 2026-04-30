@@ -10,6 +10,7 @@
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
       --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
       --accent-hover: #ea580c; --success: #10b981; --border: #1f3350; --danger: #ef4444;
+      --cosmic-glow: 0 0 25px rgba(99, 102, 241, 0.4);
     }
     body {
       font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
@@ -22,19 +23,31 @@
       transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
     }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
+    .rewards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
     .reward-card {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 16px; margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center;
+      border-radius: 20px; padding: 20px; text-align: center;
+      transition: all 0.3s;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
-    .reward-info { display: flex; flex-direction: column; }
-    .reward-cost { font-weight: bold; color: var(--accent); }
-    .btn {
+    .reward-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: var(--cosmic-glow);
+    }
+    .reward-name { font-weight: 600; font-size: 1.1rem; }
+    .reward-cost { color: var(--accent); font-weight: 700; font-size: 1.2rem; }
+    .reward-card .btn {
       background: var(--accent); color: white; border: none;
-      padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600;
-      min-width: 80px; text-align: center;
+      padding: 8px 20px; border-radius: 14px; cursor: pointer; font-weight: 600;
+      transition: all 0.2s; margin-top: auto;
     }
-    .btn:hover { background: var(--accent-hover); }
+    .reward-card .btn:hover { background: var(--accent-hover); }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -56,20 +69,18 @@
 <body>
   <a class="back-btn" href="/">← Назад</a>
   <h2>🛒 Магазин</h2>
-  <div id="rewardsList">Загрузка...</div>
+  <div class="rewards-grid" id="rewardsGrid">Загрузка...</div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     async function loadRewards() {
       const res = await fetch(`${API_URL}?action=getRewards`);
       const rewards = await res.json();
-      const container = document.getElementById('rewardsList');
+      const container = document.getElementById('rewardsGrid');
       container.innerHTML = rewards.map(r => `
         <div class="reward-card">
-          <div class="reward-info">
-            <span>${r.name}</span>
-            <span class="reward-cost">${r.cost} карм.</span>
-          </div>
+          <div class="reward-name">${r.name}</div>
+          <div class="reward-cost">${r.cost} карм.</div>
           <button class="btn" onclick="confirmBuy('${r.name}', ${r.cost})">Купить</button>
         </div>
       `).join('');
