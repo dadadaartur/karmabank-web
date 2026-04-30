@@ -6,30 +6,19 @@
   <title>История операций — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981;
-      --danger: #ef4444; --border: #1f3350;
-    }
-    body {
-      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); padding: 20px; user-select: none;
-    }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
-    }
+    :root { --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --danger: #ef4444; --border: #1f3350; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); padding: 20px; user-select: none; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; margin-bottom: 20px; }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    .history-item {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px; margin-bottom: 8px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .history-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     .income { color: var(--success); }
     .expense { color: var(--danger); }
+    .transfer { color: var(--accent); }
     .comment { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .loading-sphere { width:80px; height:80px; background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); border-radius:50%; animation: spinStar 2s linear infinite, colorShift 3s infinite; box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700; }
+    @keyframes spinStar { 100% { transform: rotate(360deg); } }
+    @keyframes colorShift { 0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } 50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); } 100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } }
   </style>
 </head>
 <body>
@@ -47,17 +36,35 @@
         container.innerHTML = '<p>Операций пока нет</p>';
         return;
       }
-      container.innerHTML = history.map(h => `
-        <div class="history-item">
+      // для определения переводов нам нужны имена, загрузим всех сотрудников
+      const empRes = await fetch(`${API_URL}?action=getAllEmployees`);
+      const employees = await empRes.json();
+      const empMap = {};
+      employees.forEach(e => empMap[e.login || e.name] = e.name);
+
+      container.innerHTML = history.map(h => {
+        let typeClass = h.type === 'income' ? 'income' : 'expense';
+        let prefix = h.type === 'income' ? '+' : '-';
+        let description = h.comment || '';
+        if (h.type === 'expense' && description.startsWith('Перевод пользователю ')) {
+          const loginTarget = description.replace('Перевод пользователю ', '');
+          const displayName = empMap[loginTarget] || loginTarget;
+          description = `→ ${displayName}` + (h.comment.includes('//') ? ' // ' + h.comment.split('//')[1] : '');
+          typeClass = 'transfer';
+        } else if (h.type === 'income' && description.startsWith('Перевод от пользователя ')) {
+          const loginSender = description.replace('Перевод от пользователя ', '');
+          const displayName = empMap[loginSender] || loginSender;
+          description = `← ${displayName}` + (h.comment.includes('//') ? ' // ' + h.comment.split('//')[1] : '');
+          typeClass = 'transfer';
+        }
+        return `<div class="history-item">
           <div>
-            <span class="${h.type === 'income' ? 'income' : 'expense'}">
-              ${h.type === 'income' ? '+' : '-'}${h.amount} кармиков
-            </span>
-            <div class="comment">${h.comment || ''}</div>
+            <span class="${typeClass}">${prefix}${h.amount} кармиков</span>
+            <div class="comment">${description}</div>
           </div>
           <div>${h.date} ${h.time}</div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
     loadHistory();
   </script>
