@@ -40,9 +40,10 @@
     .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; }
     .user-msg { align-self: flex-end; background: var(--accent); color: white; }
     .bot-msg { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border); }
-    .input-area { display: flex; padding: 12px; background: var(--bg-card); border-top: 1px solid var(--border); }
+    .input-area { display: flex; padding: 12px; background: var(--bg-card); border-top: 1px solid var(--border); align-items: center; gap: 8px; }
     .input-area input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0f1f35; color: var(--text-primary); }
-    .input-area button { margin-left: 8px; padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
+    .input-area button { padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
+    .mic-btn { background: var(--success); font-size: 1.2rem; }
     .evaluate-btn { background: var(--success); }
     .result-panel { background: var(--bg-card); border-top: 1px solid var(--accent); padding: 16px; text-align: center; display: none; }
   </style>
@@ -58,18 +59,19 @@
   </div>
   <div class="level-selector">
     <select id="levelSelect">
-      <option value="1">Уровень 1 — Новичок</option>
-      <option value="2">Уровень 2 — Ученик</option>
-      <option value="3" selected>Уровень 3 — Специалист</option>
-      <option value="4">Уровень 4 — Эксперт</option>
-      <option value="5">Уровень 5 — Мастер</option>
-      <option value="6">Уровень 6 — Профессор</option>
+      <option value="1">Уровень 1 — Искра</option>
+      <option value="2">Уровень 2 — Луч</option>
+      <option value="3" selected>Уровень 3 — Созвездие</option>
+      <option value="4">Уровень 4 — Галактика</option>
+      <option value="5">Уровень 5 — Вселенная</option>
+      <option value="6">Уровень 6 — Абсолют</option>
     </select>
   </div>
   <div class="instructions" id="instructions">Выберите сценарий и уровень, чтобы увидеть задание.</div>
   <div class="chat-box" id="chatBox"></div>
   <div class="input-area">
-    <input type="text" id="userInput" placeholder="Ваше сообщение (Enter для отправки)...">
+    <input type="text" id="userInput" placeholder="Ваше сообщение (Enter или 🎤)...">
+    <button class="mic-btn" id="micButton" onclick="toggleVoice()">🎤</button>
     <button onclick="sendMessage()">➤</button>
     <button class="evaluate-btn" onclick="confirmEvaluate()">Завершить</button>
   </div>
@@ -81,7 +83,49 @@
     let currentScenario = 'sales_manager';
     let currentLevel = '3';
     let messages = [];
+    let recognition = null;
+    let isListening = false;
 
+    // Инициализация Web Speech API
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'ru-RU';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('userInput').value = transcript;
+        sendMessage(); // сразу отправляем
+        toggleVoice(); // выключаем микрофон
+      };
+      recognition.onerror = () => { toggleVoice(); };
+    }
+
+    function toggleVoice() {
+      if (!recognition) return alert('Голосовой ввод не поддерживается вашим браузером. Попробуйте Chrome.');
+      if (isListening) {
+        recognition.stop();
+        document.getElementById('micButton').textContent = '🎤';
+        isListening = false;
+      } else {
+        recognition.start();
+        document.getElementById('micButton').textContent = '⏹️';
+        isListening = true;
+      }
+    }
+
+    // Озвучка текста (Text-to-Speech)
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ru-RU';
+        utterance.rate = 1.1;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Остальная логика симулятора
     document.querySelectorAll('.scenario-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
@@ -90,15 +134,8 @@
         resetChat();
       });
     });
-
-    document.getElementById('levelSelect').addEventListener('change', (e) => {
-      currentLevel = e.target.value;
-      resetChat();
-    });
-
-    document.getElementById('userInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
-    });
+    document.getElementById('levelSelect').addEventListener('change', (e) => { currentLevel = e.target.value; resetChat(); });
+    document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
     function resetChat() {
       messages = [];
@@ -110,14 +147,12 @@
     async function startScenario() {
       document.getElementById('instructions').textContent = 'Загрузка задания...';
       const formData = new URLSearchParams();
-      formData.append('mode', 'start');
-      formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel);
-      formData.append('login', login);
+      formData.append('mode', 'start'); formData.append('scenario', currentScenario);
+      formData.append('level', currentLevel); formData.append('login', login);
       const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
       if (data.instructions) document.getElementById('instructions').textContent = data.instructions;
-      if (data.message) addMessage('bot', data.message);
+      if (data.message) { addMessage('bot', data.message); speak(data.message); }
     }
 
     function addMessage(role, text) {
@@ -136,37 +171,32 @@
       addMessage('user', text);
       input.value = '';
       const formData = new URLSearchParams();
-      formData.append('mode', 'continue');
-      formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel);
-      formData.append('message', text);
-      formData.append('history', JSON.stringify(messages));
-      formData.append('login', login);
+      formData.append('mode', 'continue'); formData.append('scenario', currentScenario);
+      formData.append('level', currentLevel); formData.append('message', text);
+      formData.append('history', JSON.stringify(messages)); formData.append('login', login);
       const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
-      if (data.message) addMessage('bot', data.message);
+      if (data.message) { addMessage('bot', data.message); speak(data.message); }
     }
 
     function confirmEvaluate() {
-      if (confirm('Вы уверены, что хотите завершить тренировку и получить оценку? Это действие нельзя отменить.')) {
-        evaluateSession();
-      }
+      if (confirm('Завершить тренировку и получить оценку?')) evaluateSession();
     }
 
     async function evaluateSession() {
       const formData = new URLSearchParams();
-      formData.append('mode', 'evaluate');
-      formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel);
-      formData.append('history', JSON.stringify(messages));
+      formData.append('mode', 'evaluate'); formData.append('scenario', currentScenario);
+      formData.append('level', currentLevel); formData.append('history', JSON.stringify(messages));
       formData.append('login', login);
       const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
       const panel = document.getElementById('resultPanel');
       panel.style.display = 'block';
       if (data.error) { panel.innerHTML = `<p style="color:red">${data.error}</p>`; return; }
-      panel.innerHTML = `<h3>Оценка</h3><p>${data.feedback}</p><p>Навыки: ${Object.entries(data.scores || {}).map(([k,v]) => `${k}: ${v}`).join(', ')}</p><button class="back-btn" onclick="resetChat()">Попробовать ещё раз (без права отмены)</button>`;
+      panel.innerHTML = `<h3>Оценка</h3><p>${data.feedback}</p><p>Навыки: ${Object.entries(data.scores || {}).map(([k,v]) => `${k}: ${v}`).join(', ')}</p><button class="back-btn" onclick="resetChat()">Попробовать ещё раз</button>`;
     }
+
+    startScenario();
   </script>
 </body>
 </html>
