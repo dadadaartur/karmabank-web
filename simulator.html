@@ -33,6 +33,9 @@
       font-weight: 600; transition: all 0.2s;
     }
     .scenario-btn:hover, .scenario-btn.active { border-color: var(--accent); background: var(--accent); }
+    .level-selector { padding: 10px; text-align: center; }
+    .level-selector select { padding: 8px 16px; border-radius: 10px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
+    .instructions { padding: 15px; text-align: center; background: var(--bg-card); margin: 0 20px; border-radius: 16px; border: 1px solid var(--accent); }
     .chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
     .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; }
     .user-msg { align-self: flex-end; background: var(--accent); color: white; }
@@ -41,10 +44,7 @@
     .input-area input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0f1f35; color: var(--text-primary); }
     .input-area button { margin-left: 8px; padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
     .evaluate-btn { background: var(--success); }
-    .result-panel {
-      background: var(--bg-card); border-top: 1px solid var(--accent); padding: 16px;
-      text-align: center; display: none;
-    }
+    .result-panel { background: var(--bg-card); border-top: 1px solid var(--accent); padding: 16px; text-align: center; display: none; }
   </style>
 </head>
 <body>
@@ -52,26 +52,36 @@
     <h2>🏋️ AI-Симулятор</h2>
     <a class="back-btn" href="/">← Назад</a>
   </div>
-  <div class="scenario-selector" id="scenarioSelector">
-    <button class="scenario-btn active" data-scenario="sales">Продавец</button>
-    <button class="scenario-btn" data-scenario="hr">HR-менеджер</button>
-    <button class="scenario-btn" data-scenario="manager">Руководитель</button>
+  <div class="scenario-selector">
+    <button class="scenario-btn active" data-scenario="sales_manager">Руководитель отдела продаж</button>
+    <button class="scenario-btn" data-scenario="sales">Менеджер по продажам</button>
   </div>
+  <div class="level-selector">
+    <select id="levelSelect">
+      <option value="1">Уровень 1 — Новичок</option>
+      <option value="2">Уровень 2 — Ученик</option>
+      <option value="3" selected>Уровень 3 — Специалист</option>
+      <option value="4">Уровень 4 — Эксперт</option>
+      <option value="5">Уровень 5 — Мастер</option>
+      <option value="6">Уровень 6 — Профессор</option>
+    </select>
+  </div>
+  <div class="instructions" id="instructions">Выберите сценарий и уровень, чтобы увидеть задание.</div>
   <div class="chat-box" id="chatBox"></div>
   <div class="input-area">
-    <input type="text" id="userInput" placeholder="Ваше сообщение...">
+    <input type="text" id="userInput" placeholder="Ваше сообщение (Enter для отправки)...">
     <button onclick="sendMessage()">➤</button>
-    <button class="evaluate-btn" onclick="evaluateSession()">Завершить и получить оценку</button>
+    <button class="evaluate-btn" onclick="confirmEvaluate()">Завершить</button>
   </div>
   <div class="result-panel" id="resultPanel"></div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const login = localStorage.getItem('karmabank_login') || 'anonymous';
-    let currentScenario = 'sales';
-    let messages = []; // история диалога
+    let currentScenario = 'sales_manager';
+    let currentLevel = '3';
+    let messages = [];
 
-    // Выбор сценария
     document.querySelectorAll('.scenario-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
@@ -79,6 +89,15 @@
         currentScenario = btn.dataset.scenario;
         resetChat();
       });
+    });
+
+    document.getElementById('levelSelect').addEventListener('change', (e) => {
+      currentLevel = e.target.value;
+      resetChat();
+    });
+
+    document.getElementById('userInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
     });
 
     function resetChat() {
@@ -89,12 +108,15 @@
     }
 
     async function startScenario() {
-      const res = await fetch(`${API_URL}?action=simulatorChat`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `mode=start&scenario=${currentScenario}&login=${encodeURIComponent(login)}`
-      });
+      document.getElementById('instructions').textContent = 'Загрузка задания...';
+      const formData = new URLSearchParams();
+      formData.append('mode', 'start');
+      formData.append('scenario', currentScenario);
+      formData.append('level', currentLevel);
+      formData.append('login', login);
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
+      if (data.instructions) document.getElementById('instructions').textContent = data.instructions;
       if (data.message) addMessage('bot', data.message);
     }
 
@@ -113,38 +135,38 @@
       if (!text) return;
       addMessage('user', text);
       input.value = '';
-
-      const res = await fetch(`${API_URL}?action=simulatorChat`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `mode=continue&scenario=${currentScenario}&login=${encodeURIComponent(login)}&message=${encodeURIComponent(text)}&history=${encodeURIComponent(JSON.stringify(messages))}`
-      });
+      const formData = new URLSearchParams();
+      formData.append('mode', 'continue');
+      formData.append('scenario', currentScenario);
+      formData.append('level', currentLevel);
+      formData.append('message', text);
+      formData.append('history', JSON.stringify(messages));
+      formData.append('login', login);
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
       if (data.message) addMessage('bot', data.message);
     }
 
+    function confirmEvaluate() {
+      if (confirm('Вы уверены, что хотите завершить тренировку и получить оценку? Это действие нельзя отменить.')) {
+        evaluateSession();
+      }
+    }
+
     async function evaluateSession() {
-      const res = await fetch(`${API_URL}?action=simulatorChat`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `mode=evaluate&scenario=${currentScenario}&login=${encodeURIComponent(login)}&history=${encodeURIComponent(JSON.stringify(messages))}`
-      });
+      const formData = new URLSearchParams();
+      formData.append('mode', 'evaluate');
+      formData.append('scenario', currentScenario);
+      formData.append('level', currentLevel);
+      formData.append('history', JSON.stringify(messages));
+      formData.append('login', login);
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
       const panel = document.getElementById('resultPanel');
       panel.style.display = 'block';
-      if (data.error) {
-        panel.innerHTML = `<p style="color:red">${data.error}</p>`;
-        return;
-      }
-      panel.innerHTML = `
-        <h3>Оценка</h3>
-        <p>${data.feedback}</p>
-        <p>Навыки: ${data.scores ? Object.entries(data.scores).map(([k,v]) => `${k}: ${v}`).join(', ') : ''}</p>
-        <p>Записано в ЦПС ✅</p>
-      `;
+      if (data.error) { panel.innerHTML = `<p style="color:red">${data.error}</p>`; return; }
+      panel.innerHTML = `<h3>Оценка</h3><p>${data.feedback}</p><p>Навыки: ${Object.entries(data.scores || {}).map(([k,v]) => `${k}: ${v}`).join(', ')}</p><button class="back-btn" onclick="resetChat()">Попробовать ещё раз (без права отмены)</button>`;
     }
-
-    startScenario();
   </script>
 </body>
 </html>
