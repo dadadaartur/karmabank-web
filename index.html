@@ -65,13 +65,13 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    @keyframes textGlow {
-      0% { color: #10b981; text-shadow: 0 0 5px #10b981; }
-      50% { color: #34d399; text-shadow: 0 0 15px #34d399; }
-      100% { color: #10b981; text-shadow: 0 0 5px #10b981; }
-    }
     @keyframes spin {
       100% { transform: rotate(360deg); }
+    }
+    @keyframes cosmicPulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
     }
 
     .login-screen {
@@ -107,10 +107,7 @@
       border-bottom: 1px solid var(--border); padding: 12px 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .header h1 {
-      font-size: 1.4rem; font-weight: 800; cursor: pointer;
-      display: flex; align-items: center; gap: 10px;
-    }
+    .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; }
     .user-info { display: flex; align-items: center; gap: 16px; }
     .user-name-link {
       font-weight: 700; font-size: 1rem; cursor: pointer;
@@ -119,7 +116,7 @@
       background-clip: text;
       transition: all 0.2s;
     }
-    .user-name-link:hover { transform: scale(1.05); text-shadow: 0 0 15px rgba(139, 92, 246, 0.8); }
+    .user-name-link:hover { transform: scale(1.05); }
     .user-dept {
       color: #c084fc; font-weight: 500; font-size: 0.85rem;
       background: rgba(139, 92, 246, 0.1); padding: 4px 12px; border-radius: 20px;
@@ -127,10 +124,8 @@
     }
     .chat-header-btn {
       background: transparent; border: none; color: #10b981;
-      padding: 8px 16px; border-radius: 20px;
-      font-weight: 700; font-size: 0.9rem; cursor: pointer;
-      animation: textGlow 2s infinite;
-      transition: all 0.2s;
+      padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;
+      cursor: pointer; animation: karmaGlow 2s infinite; transition: all 0.2s;
     }
     .chat-header-btn:hover { color: #34d399; text-shadow: 0 0 15px #34d399; }
     .logout-btn {
@@ -146,36 +141,30 @@
     }
     .left-column { display: flex; flex-direction: column; gap: 24px; }
 
-    /* Карточка баланса с северным сиянием */
+    /* Карточка баланса */
     .balance-card {
       background: var(--bg-card); border-radius: 24px; padding: 28px 20px; text-align: center;
       border: 1px solid var(--border); position: relative;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4); overflow: hidden;
     }
     .balance-card::before {
       content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background: radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
                   radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 40%),
                   radial-gradient(circle at 50% 50%, rgba(249,115,22,0.06) 0%, transparent 50%);
       background-size: 200% 200%;
       animation: aurora 12s ease-in-out infinite;
-      z-index: 0;
-      pointer-events: none;
+      z-index: 0; pointer-events: none;
     }
     .balance-card > * { position: relative; z-index: 1; }
 
-    /* Обновлённые текстовые блоки — градиентные, одинакового размера */
     .balance-label {
       font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 8px;
       background: linear-gradient(135deg, #34d399, #10b981, #059669);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
+      background-clip: text; font-weight: 600;
       text-shadow: 0 0 8px rgba(16,185,129,0.5);
-      font-weight: 600;
     }
     .balance-value {
       font-size: 3.8rem; font-weight: 800;
@@ -188,8 +177,7 @@
       font-size: 1.1rem; margin-bottom: 12px;
       background: linear-gradient(135deg, #34d399, #10b981, #059669);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 600;
+      background-clip: text; font-weight: 600;
       text-shadow: 0 0 8px rgba(16,185,129,0.5);
     }
     .energy-frame {
@@ -207,30 +195,18 @@
       display: flex; flex-direction: column; align-items: center; gap: 8px;
       min-width: 90px; flex: 1;
     }
-    .action-btn .icon-wrapper {
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .action-btn .icon-wrapper { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
     .action-btn svg {
       width: 36px; height: 36px;
-      fill: none; stroke: var(--text-secondary);
-      stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+      fill: none; stroke: var(--text-secondary); stroke-width: 1.5;
+      stroke-linecap: round; stroke-linejoin: round;
       transition: all 0.3s ease;
     }
-    .action-btn:hover {
-      background: var(--accent);
-      transform: scale(1.05);
-      box-shadow: var(--cosmic-glow);
-    }
-    .action-btn:hover svg {
-      stroke: white;
-      stroke-width: 2;
-      animation: pulse-glow 1.5s infinite;
-    }
+    .action-btn:hover { background: var(--accent); transform: scale(1.05); box-shadow: var(--cosmic-glow); }
+    .action-btn:hover svg { stroke: white; stroke-width: 2; animation: pulse-glow 1.5s infinite; }
 
     .level-icon {
-      position: absolute; top: 14px; right: 14px;
-      font-size: 2.5rem; z-index: 1;
+      position: absolute; top: 14px; right: 14px; font-size: 2.5rem; z-index: 1;
       filter: drop-shadow(0 0 10px rgba(249,115,22,0.8));
       transition: transform 0.3s;
     }
@@ -240,31 +216,16 @@
     .menu-card {
       background: var(--bg-card); border-radius: 18px; padding: 20px; text-align: center;
       border: 1px solid var(--border); transition: all 0.2s ease;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;
     }
-    .menu-card .menu-icon {
-      width: 48px; height: 48px;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .menu-card .menu-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
     .menu-card svg {
-      width: 40px; height: 40px;
-      fill: none; stroke: var(--text-secondary);
-      stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
-      transition: all 0.3s ease;
+      width: 40px; height: 40px; fill: none; stroke: var(--text-secondary);
+      stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: all 0.3s ease;
     }
-    .menu-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(249,115,22,0.2);
-    }
-    .menu-card:hover svg {
-      stroke: var(--accent);
-      animation: pulse-glow 1.5s infinite;
-    }
-    .menu-card.disabled {
-      opacity: 0.5; cursor: default; pointer-events: none;
-    }
+    .menu-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(249,115,22,0.2); }
+    .menu-card:hover svg { stroke: var(--accent); animation: pulse-glow 1.5s infinite; }
+    .menu-card.disabled { opacity: 0.5; cursor: default; pointer-events: none; }
     .menu-card.disabled:hover { border-color: var(--border); transform: none; box-shadow: none; }
 
     .tasks-panel h3 {
@@ -275,20 +236,15 @@
     .task-card {
       background: var(--bg-card); border-radius: 18px; padding: 16px 18px; margin-bottom: 12px;
       border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; transition: all 0.2s;
-      position: relative; overflow: hidden;
+      cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
     }
     .task-card::before {
       content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background: radial-gradient(circle at 20% 30%, rgba(16,185,129,0.06) 0%, transparent 40%),
                   radial-gradient(circle at 80% 70%, rgba(99,102,241,0.06) 0%, transparent 40%);
-      background-size: 200% 200%;
-      animation: aurora 10s ease-in-out infinite;
-      z-index: 0;
-      pointer-events: none;
+      background-size: 200% 200%; animation: aurora 10s ease-in-out infinite;
+      z-index: 0; pointer-events: none;
     }
     .task-card > * { position: relative; z-index: 1; }
     .task-card:hover { border-color: var(--accent); }
@@ -312,6 +268,8 @@
       transition: all 0.2s;
     }
     .btn:hover { background: var(--accent-hover); box-shadow: var(--cosmic-glow); }
+    .btn.take-global { background: var(--success); }
+    .btn.take-global:hover { background: #059669; box-shadow: 0 0 20px rgba(16,185,129,0.6); }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -343,19 +301,18 @@
     }
     .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
 
-    /* Анимация загрузки (Путеводная звезда) */
+    /* Прелоадер (шарообразная звезда) */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); z-index: 3000;
       display: flex; align-items: center; justify-content: center;
       flex-direction: column; gap: 20px;
     }
-    .loading-overlay .star {
-      width: 50px; height: 50px;
-      animation: spin 2s linear infinite;
-      filter: drop-shadow(0 0 15px #c084fc);
+    .cosmic-spinner {
+      width: 60px; height: 60px;
+      animation: spin 1.5s linear infinite;
+      filter: drop-shadow(0 0 20px #c084fc);
     }
-
     @media (max-width: 768px) {
       .container { grid-template-columns: 1fr; padding: 16px; }
       .balance-value { font-size: 2.8rem; }
@@ -380,7 +337,7 @@
         <span id="userNameDisplay" class="user-name-link" onclick="window.location.href='/profile.html'"></span>
         <span class="user-dept" id="userDept"></span>
         <button class="chat-header-btn" onclick="window.location.href='/chat.html'">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
           Чат
@@ -392,52 +349,59 @@
       <div class="left-column">
         <div class="balance-card">
           <div class="level-icon" id="levelIcon"></div>
-          <div class="balance-label">Баланс</div>
+          <div class="balance-label">кармиков</div>
           <div class="balance-value" id="userPoints">0</div>
-          <div class="balance-sub">кармиков</div>
           <div class="energy-frame">
             <div class="energy-line" id="energyDisplay">⚡ 0 энергии</div>
           </div>
           <div class="balance-actions">
             <button class="action-btn" onclick="openTransferModal()">
               <span class="icon-wrapper">
-                <!-- Многогранная звезда для перевода -->
+                <!-- Иконка перевода (две стрелки обмена) -->
                 <svg viewBox="0 0 24 24">
                   <defs>
                     <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#c084fc"/>
-                      <stop offset="100%" stop-color="#38bdf8"/>
+                      <stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#38bdf8"/>
                     </linearGradient>
                   </defs>
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="url(#grad1)"/>
+                  <path d="M8 3L4 7l4 4" stroke="url(#grad1)"/>
+                  <path d="M4 7h16" stroke="url(#grad1)"/>
+                  <path d="M16 21l4-4-4-4" stroke="url(#grad1)"/>
+                  <path d="M20 17H4" stroke="url(#grad1)"/>
                 </svg>
               </span>
               Перевести
             </button>
             <button class="action-btn" onclick="window.location.href='/spend.html'">
               <span class="icon-wrapper">
+                <!-- Корзина -->
                 <svg viewBox="0 0 24 24">
                   <defs>
                     <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#f97316"/>
-                      <stop offset="100%" stop-color="#f59e0b"/>
+                      <stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#f59e0b"/>
                     </linearGradient>
                   </defs>
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="url(#grad2)"/>
+                  <path d="M3 3h2l1 5h13l1.5 7H6" stroke="url(#grad2)"/>
+                  <circle cx="8" cy="20" r="1.5" stroke="url(#grad2)"/>
+                  <circle cx="17" cy="20" r="1.5" stroke="url(#grad2)"/>
                 </svg>
               </span>
               Магазин
             </button>
             <button class="action-btn" onclick="window.location.href='/history.html'">
               <span class="icon-wrapper">
+                <!-- Журнал -->
                 <svg viewBox="0 0 24 24">
                   <defs>
                     <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#10b981"/>
-                      <stop offset="100%" stop-color="#34d399"/>
+                      <stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#34d399"/>
                     </linearGradient>
                   </defs>
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="url(#grad3)"/>
+                  <rect x="3" y="3" width="18" height="18" rx="3" stroke="url(#grad3)"/>
+                  <path d="M3 9h18" stroke="url(#grad3)"/>
+                  <path d="M8 3v18" stroke="url(#grad3)"/>
+                  <circle cx="7" cy="13" r="1" fill="url(#grad3)" stroke="none"/>
+                  <circle cx="15" cy="7" r="1" fill="url(#grad3)" stroke="none"/>
                 </svg>
               </span>
               Операции
@@ -450,11 +414,12 @@
               <svg viewBox="0 0 24 24">
                 <defs>
                   <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#34d399"/>
-                    <stop offset="100%" stop-color="#818cf8"/>
+                    <stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#818cf8"/>
                   </linearGradient>
                 </defs>
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="url(#grad4)"/>
+                <circle cx="12" cy="12" r="8" stroke="url(#grad4)"/>
+                <circle cx="12" cy="12" r="3" stroke="url(#grad4)"/>
+                <path d="M12 4v2M12 18v2M4 12h2M18 12h2" stroke="url(#grad4)"/>
               </svg>
             </span>
             Тренировка
@@ -462,7 +427,8 @@
           <div class="menu-card disabled">
             <span class="menu-icon">
               <svg viewBox="0 0 24 24">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="var(--text-secondary)"/>
+                <path d="M4 6h16M4 12h16M4 18h16" stroke="var(--text-secondary)"/>
+                <path d="M8 6v12" stroke="var(--text-secondary)"/>
               </svg>
             </span>
             Обучение
@@ -472,11 +438,13 @@
               <svg viewBox="0 0 24 24">
                 <defs>
                   <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#38bdf8"/>
-                    <stop offset="100%" stop-color="#c084fc"/>
+                    <stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#c084fc"/>
                   </linearGradient>
                 </defs>
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="url(#grad5)"/>
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="url(#grad5)"/>
+                <path d="M3 6h18" stroke="url(#grad5)"/>
+                <path d="M16 10a4 4 0 0 1-8 0" stroke="url(#grad5)"/>
+                <polyline points="9 14 12 17 15 14" stroke="url(#grad5)"/>
               </svg>
             </span>
             Мои покупки
@@ -486,11 +454,13 @@
               <svg viewBox="0 0 24 24">
                 <defs>
                   <linearGradient id="grad6" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#f59e0b"/>
-                    <stop offset="100%" stop-color="#f97316"/>
+                    <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#f97316"/>
                   </linearGradient>
                 </defs>
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="url(#grad6)"/>
+                <circle cx="8" cy="7" r="3" stroke="url(#grad6)"/>
+                <circle cx="18" cy="7" r="3" stroke="url(#grad6)"/>
+                <path d="M3 21v-2a4 4 0 0 1 4-4h2" stroke="url(#grad6)"/>
+                <path d="M21 21v-2a4 4 0 0 0-4-4h-2" stroke="url(#grad6)"/>
               </svg>
             </span>
             Команда
@@ -513,6 +483,7 @@
     </button>
   </div>
 
+  <!-- Модальные окна (перевод, алерт) -->
   <div id="transferModal" class="modal">
     <div class="modal-content">
       <h2 style="color: white;">Перевод кармиков</h2>
@@ -531,6 +502,20 @@
     let currentPoints = 0, currentEnergy = 0;
     let levelsCache = [];
 
+    // Кастомное уведомление
+    function showAlert(message, type) {
+      const icons = { success: '✅', error: '❌', info: '🌟' };
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <div style="font-size: 2.5rem;">${icons[type] || icons.info}</div>
+          <p style="margin:16px 0; color:var(--text-primary); font-size:1.1rem;">${message}</p>
+          <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
     async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
     function getLevelInfo(energy) {
       if (!levelsCache.length) return { icon: '✦', name: 'Искра' };
@@ -544,10 +529,23 @@
       overlay.className = 'loading-overlay';
       overlay.id = 'loadingOverlay';
       overlay.innerHTML = `
-        <svg class="star" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        <svg class="cosmic-spinner" viewBox="0 0 60 60" fill="none">
+          <defs>
+            <radialGradient id="sphereGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c084fc" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.3"/>
+            </radialGradient>
+          </defs>
+          <circle cx="30" cy="30" r="25" fill="url(#sphereGrad)" opacity="0.8"/>
+          <g stroke="white" stroke-width="2" stroke-linecap="round">
+            <line x1="30" y1="2" x2="30" y2="10"/>
+            <line x1="30" y1="50" x2="30" y2="58"/>
+            <line x1="2" y1="30" x2="10" y2="30"/>
+            <line x1="50" y1="30" x2="58" y2="30"/>
+          </g>
+          <polygon points="30,5 33,13 42,13 35,18 38,26 30,22 22,26 25,18 18,13 27,13" fill="white" opacity="0.9"/>
         </svg>
-        <p style="color:var(--text-secondary);">Загрузка...</p>
+        <p style="color:var(--text-secondary);">Идёт загрузка...</p>
       `;
       document.body.appendChild(overlay);
     }
@@ -607,7 +605,7 @@
       container.innerHTML = displayTasks.map(t => {
         let btnHtml = '';
         if (t.isGlobal) {
-          btnHtml = `<button class="btn" onclick="event.stopPropagation(); takeTask(event, '${t.task}')">Взять</button>`;
+          btnHtml = `<button class="btn take-global" onclick="event.stopPropagation(); takeTask(event, '${t.task}')">Взять</button>`;
         } else if (t.status === 'Назначено') {
           btnHtml = `<button class="btn" onclick="event.stopPropagation(); takeTask(event, '${t.task}')">Взять</button>`;
         } else if (t.status === 'В работе') {
@@ -631,14 +629,14 @@
         if (data && data.success) {
           loadInProgressTasks();
         } else {
-          alert(data?.message || 'Не удалось взять задание');
+          showAlert(data?.message || 'Не удалось взять задание', 'error');
           btn.disabled = false;
           btn.textContent = 'Взять';
         }
       } catch (e) {
+        showAlert('Ошибка соединения', 'error');
         btn.disabled = false;
         btn.textContent = 'Взять';
-        console.error(e);
       }
     }
 
@@ -681,16 +679,9 @@
           const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
           const user = await userRes.json();
           if (user) { currentPoints = user.points; document.getElementById('userPoints').textContent = currentPoints; }
-          showModal(`<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><p style="margin-top:10px;color:var(--success);">Перевод выполнен!</p>`);
+          showAlert('Перевод выполнен!', 'success');
         } else { document.getElementById('transferError').textContent = result.message; }
       } catch (e) { hideLoading(); document.getElementById('transferError').textContent = 'Ошибка соединения'; }
-    }
-
-    function showModal(html) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
-      document.body.appendChild(modal);
     }
 
     if (currentLogin) {
