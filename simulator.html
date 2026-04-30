@@ -6,32 +6,13 @@
   <title>AI-Симулятор — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350;
-      --success: #10b981;
-    }
-    body {
-      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); margin: 0; display: flex; flex-direction: column; height: 100vh;
-    }
-    .header {
-      background: rgba(21,38,56,0.7); backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border); padding: 12px 24px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .back-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      text-decoration: none;
-    }
+    :root { --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350; --success: #10b981; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); margin: 0; display: flex; flex-direction: column; height: 100vh; }
+    .header { background: rgba(21,38,56,0.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; }
     .back-btn:hover { background: var(--border); }
     .scenario-selector { padding: 20px; text-align: center; }
-    .scenario-btn {
-      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary);
-      padding: 10px 20px; border-radius: 14px; margin: 5px; cursor: pointer;
-      font-weight: 600; transition: all 0.2s;
-    }
+    .scenario-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); padding: 10px 20px; border-radius: 14px; margin: 5px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
     .scenario-btn:hover, .scenario-btn.active { border-color: var(--accent); background: var(--accent); }
     .level-selector { padding: 10px; text-align: center; }
     .level-selector select { padding: 8px 16px; border-radius: 10px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
@@ -44,15 +25,14 @@
     .input-area input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0f1f35; color: var(--text-primary); }
     .input-area button { padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
     .mic-btn { background: var(--success); font-size: 1.2rem; }
-    .evaluate-btn { background: var(--success); }
-    .result-panel { background: var(--bg-card); border-top: 1px solid var(--accent); padding: 16px; text-align: center; display: none; }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .loading-sphere { width:80px; height:80px; background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); border-radius:50%; animation: spinStar 2s linear infinite, colorShift 3s infinite; box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700; }
+    @keyframes spinStar { 100% { transform: rotate(360deg); } }
+    @keyframes colorShift { 0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } 50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); } 100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h2>🏋️ AI-Симулятор</h2>
-    <a class="back-btn" href="/">← Назад</a>
-  </div>
+  <div class="header"><h2>🏋️ Путь к совершенству</h2><a class="back-btn" href="/">← Назад</a></div>
   <div class="scenario-selector">
     <button class="scenario-btn active" data-scenario="sales_manager">Руководитель отдела продаж</button>
     <button class="scenario-btn" data-scenario="sales">Менеджер по продажам</button>
@@ -70,132 +50,43 @@
   <div class="instructions" id="instructions">Выберите сценарий и уровень, чтобы увидеть задание.</div>
   <div class="chat-box" id="chatBox"></div>
   <div class="input-area">
-    <input type="text" id="userInput" placeholder="Ваше сообщение (Enter или 🎤)...">
-    <button class="mic-btn" id="micButton" onclick="toggleVoice()">🎤</button>
+    <input type="text" id="userInput" placeholder="Ваше сообщение...">
+    <button class="mic-btn" onclick="toggleVoice()">🎤</button>
     <button onclick="sendMessage()">➤</button>
-    <button class="evaluate-btn" onclick="confirmEvaluate()">Завершить</button>
+    <button onclick="confirmEvaluate()">Завершить</button>
   </div>
-  <div class="result-panel" id="resultPanel"></div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const login = localStorage.getItem('karmabank_login') || 'anonymous';
-    let currentScenario = 'sales_manager';
-    let currentLevel = '3';
-    let messages = [];
-    let recognition = null;
-    let isListening = false;
-
-    // Инициализация Web Speech API
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'ru-RU';
-      recognition.interimResults = false;
-      recognition.continuous = false;
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('userInput').value = transcript;
-        sendMessage(); // сразу отправляем
-        toggleVoice(); // выключаем микрофон
-      };
-      recognition.onerror = () => { toggleVoice(); };
-    }
-
-    function toggleVoice() {
-      if (!recognition) return alert('Голосовой ввод не поддерживается вашим браузером. Попробуйте Chrome.');
-      if (isListening) {
-        recognition.stop();
-        document.getElementById('micButton').textContent = '🎤';
-        isListening = false;
-      } else {
-        recognition.start();
-        document.getElementById('micButton').textContent = '⏹️';
-        isListening = true;
-      }
-    }
-
-    // Озвучка текста (Text-to-Speech)
-    function speak(text) {
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ru-RU';
-        utterance.rate = 1.1;
-        window.speechSynthesis.speak(utterance);
-      }
-    }
-
-    // Остальная логика симулятора
-    document.querySelectorAll('.scenario-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentScenario = btn.dataset.scenario;
-        resetChat();
-      });
-    });
+    let currentScenario = 'sales_manager', currentLevel = '3', messages = [];
+    document.querySelectorAll('.scenario-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentScenario = btn.dataset.scenario; resetChat(); }));
     document.getElementById('levelSelect').addEventListener('change', (e) => { currentLevel = e.target.value; resetChat(); });
     document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-    function resetChat() {
-      messages = [];
-      document.getElementById('chatBox').innerHTML = '';
-      document.getElementById('resultPanel').style.display = 'none';
-      startScenario();
-    }
-
+    function resetChat() { messages = []; document.getElementById('chatBox').innerHTML = ''; startScenario(); }
     async function startScenario() {
-      document.getElementById('instructions').textContent = 'Загрузка задания...';
-      const formData = new URLSearchParams();
-      formData.append('mode', 'start'); formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel); formData.append('login', login);
-      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
+      const formData = new URLSearchParams(); formData.append('mode','start'); formData.append('scenario',currentScenario); formData.append('level',currentLevel); formData.append('login',login);
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method:'POST', body: formData });
       const data = await res.json();
       if (data.instructions) document.getElementById('instructions').textContent = data.instructions;
-      if (data.message) { addMessage('bot', data.message); speak(data.message); }
+      if (data.message) addMessage('bot', data.message);
     }
-
-    function addMessage(role, text) {
-      messages.push({ role, text });
-      const div = document.createElement('div');
-      div.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
-      div.textContent = text;
-      document.getElementById('chatBox').appendChild(div);
-      document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-    }
-
+    function addMessage(role, text) { messages.push({ role, text }); const div = document.createElement('div'); div.className = `message ${role==='user'?'user-msg':'bot-msg'}`; div.textContent = text; document.getElementById('chatBox').appendChild(div); }
     async function sendMessage() {
-      const input = document.getElementById('userInput');
-      const text = input.value.trim();
-      if (!text) return;
-      addMessage('user', text);
-      input.value = '';
-      const formData = new URLSearchParams();
-      formData.append('mode', 'continue'); formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel); formData.append('message', text);
-      formData.append('history', JSON.stringify(messages)); formData.append('login', login);
-      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
+      const input = document.getElementById('userInput'); const text = input.value.trim(); if (!text) return;
+      addMessage('user', text); input.value = '';
+      const formData = new URLSearchParams(); formData.append('mode','continue'); formData.append('scenario',currentScenario); formData.append('level',currentLevel); formData.append('message',text); formData.append('history',JSON.stringify(messages)); formData.append('login',login);
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method:'POST', body: formData });
       const data = await res.json();
-      if (data.message) { addMessage('bot', data.message); speak(data.message); }
+      if (data.message) addMessage('bot', data.message);
     }
-
-    function confirmEvaluate() {
-      if (confirm('Завершить тренировку и получить оценку?')) evaluateSession();
-    }
-
+    function confirmEvaluate() { if (confirm('Завершить тренировку?')) evaluateSession(); }
     async function evaluateSession() {
-      const formData = new URLSearchParams();
-      formData.append('mode', 'evaluate'); formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel); formData.append('history', JSON.stringify(messages));
-      formData.append('login', login);
-      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
+      const formData = new URLSearchParams(); formData.append('mode','evaluate'); formData.append('scenario',currentScenario); formData.append('level',currentLevel); formData.append('history',JSON.stringify(messages)); formData.append('login',login);
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method:'POST', body: formData });
       const data = await res.json();
-      const panel = document.getElementById('resultPanel');
-      panel.style.display = 'block';
-      if (data.error) { panel.innerHTML = `<p style="color:red">${data.error}</p>`; return; }
-      panel.innerHTML = `<h3>Оценка</h3><p>${data.feedback}</p><p>Навыки: ${Object.entries(data.scores || {}).map(([k,v]) => `${k}: ${v}`).join(', ')}</p><button class="back-btn" onclick="resetChat()">Попробовать ещё раз</button>`;
+      alert(`Оценка: ${data.feedback || 'Ошибка'}`);
     }
-
     startScenario();
   </script>
 </body>
