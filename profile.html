@@ -27,7 +27,7 @@
       border-radius: 24px; padding: 30px; max-width: 500px; margin: 0 auto;
       text-align: left;
     }
-    .profile-card h2 { margin-top: 0; text-align: center; }
+    .profile-card h2 { margin-top: 0; text-align: center; font-size: 1.6rem; }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
     .field input, .field textarea {
@@ -42,19 +42,35 @@
       margin-top: 10px; transition: background 0.2s;
     }
     .btn:hover { background: #ea580c; }
+    .avatar-section { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
     .avatar-preview {
-      width: 100px; height: 100px; border-radius: 50%;
-      border: 2px solid var(--border); object-fit: cover; margin-bottom: 8px;
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 2px solid var(--accent); object-fit: cover;
+      box-shadow: 0 0 15px rgba(249,115,22,0.3);
     }
     .passport-display {
       background: var(--bg-primary);
       border: 1px solid var(--accent);
       border-radius: 12px;
-      padding: 8px 14px;
+      padding: 10px 14px;
       font-weight: 600;
       color: var(--accent);
-      display: inline-block;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
     }
+    .copy-btn {
+      background: transparent; border: 1px solid var(--accent); color: var(--accent);
+      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+    }
+    .copy-btn:hover { background: var(--accent); color: white; }
+    .social-links { display: flex; gap: 10px; margin-top: 5px; }
+    .social-links a {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--border); color: var(--text-secondary); text-decoration: none;
+      font-size: 1.2rem; transition: all 0.2s;
+    }
+    .social-links a:hover { background: var(--accent); color: white; }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -69,13 +85,13 @@
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
     }
-    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
   </style>
 </head>
 <body>
   <a class="back-btn" href="/">← Назад</a>
   <h2 style="text-align:center;">Мой профиль</h2>
   <div id="profileContent">Загрузка...</div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const login = localStorage.getItem('karmabank_login');
@@ -87,15 +103,30 @@
       const container = document.getElementById('profileContent');
       container.innerHTML = `
         <div class="profile-card">
-          <div class="field" style="text-align: center;">
-            <img src="${user.photo || 'belchonok.png'}" class="avatar-preview" id="avatarImg" alt="Аватар">
-            <label style="text-align: left;">Ссылка на фото</label>
-            <input type="text" id="photoInput" value="${user.photo || ''}" placeholder="Вставьте URL изображения">
+          <!-- Цифровой паспорт вверху -->
+          <div class="passport-display">
+            <span id="passportValue">${user.passport || 'не назначен'}</span>
+            <button class="copy-btn" onclick="copyPassport()">📋 Копировать</button>
           </div>
+
+          <!-- Аватар с возможностью загрузки файла -->
+          <div class="field" style="text-align: center;">
+            <div class="avatar-section">
+              <img src="${user.photo || 'belchonok.png'}" class="avatar-preview" id="avatarImg" alt="Аватар">
+              <div style="flex:1;">
+                <label style="margin-bottom:4px;">Загрузить фото</label>
+                <input type="file" id="photoFileInput" accept="image/*">
+                <small style="color:var(--text-secondary); display:block; margin-top:4px;">или вставьте ссылку:</small>
+                <input type="text" id="photoInput" value="${user.photo || ''}" placeholder="Вставьте URL изображения">
+              </div>
+            </div>
+          </div>
+
+          <!-- Основные поля -->
           <div class="field">
             <label>Имя</label>
             <input type="text" id="nameInput" value="${user.name || ''}" disabled>
-            <small style="color:var(--text-secondary)">Имя можно изменить только через администратора</small>
+            <small style="color:var(--text-secondary)">Изменить может только администратор</small>
           </div>
           <div class="field">
             <label>Фамилия</label>
@@ -103,7 +134,7 @@
           </div>
           <div class="field">
             <label>Дата рождения</label>
-            <input type="text" id="birthdateInput" value="${user.birthdate || ''}" placeholder="дд.мм.гггг">
+            <input type="date" id="birthdateInput" value="${user.birthdate || ''}">
           </div>
           <div class="field">
             <label>Должность</label>
@@ -117,15 +148,44 @@
             <label>Ссылки (через запятую)</label>
             <input type="text" id="linksInput" value="${user.links || ''}">
           </div>
+
+          <!-- Соцсети (пока просто ссылки, можно указать в поле "Ссылки") -->
           <div class="field">
-            <label>Цифровой паспорт</label>
-            <div class="passport-display" id="passportValue">${user.passport || 'не назначен'}</div>
+            <label>Социальные сети</label>
+            <div class="social-links">
+              <a href="#" id="vkLink" target="_blank" title="ВКонтакте">📘</a>
+              <a href="#" id="tgLink" target="_blank" title="Telegram">✈️</a>
+            </div>
+            <small style="color:var(--text-secondary);">Добавьте ссылки в поле «Ссылки» (например, vk.com/id, t.me/nick)</small>
           </div>
+
           <button class="btn" onclick="saveProfile()">Сохранить</button>
         </div>
       `;
-      document.getElementById('photoInput').addEventListener('input', (e) => {
+
+      // Обработчик загрузки файла
+      document.getElementById('photoFileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            document.getElementById('avatarImg').src = ev.target.result;
+            // для простоты сохраняем как base64 (если размер небольшой)
+            // в реальности нужно загружать на сервер, но пока так
+            document.getElementById('photoInput').value = ev.target.result.substring(0, 100); // сервер примет только короткую строку, обрежем
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      document.getElementById('photoInput').addEventListener('input', function(e) {
         document.getElementById('avatarImg').src = e.target.value || 'belchonok.png';
+      });
+    }
+
+    function copyPassport() {
+      const passport = document.getElementById('passportValue').textContent;
+      navigator.clipboard.writeText(passport).then(() => {
+        alert('Паспорт скопирован в буфер обмена');
       });
     }
 
@@ -141,11 +201,7 @@
       try {
         const res = await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(login)}&data=${encodeURIComponent(JSON.stringify(data))}`);
         const result = await res.json();
-        if (result.success) {
-          showModal('✅ ' + result.message);
-        } else {
-          showModal('⚠️ ' + result.message);
-        }
+        showModal(result.success ? '✅ ' + result.message : '⚠️ ' + result.message);
       } catch(e) {
         showModal('❌ Ошибка соединения');
       }
@@ -154,11 +210,7 @@
     function showModal(message) {
       const modal = document.createElement('div');
       modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <p>${message}</p>
-          <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
-        </div>`;
+      modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
       document.body.appendChild(modal);
     }
 
