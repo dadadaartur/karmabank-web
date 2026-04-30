@@ -24,19 +24,36 @@
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .purchase-card {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px; margin-bottom: 10px;
+      border-radius: 16px; padding: 16px; margin-bottom: 10px;
       display: flex; justify-content: space-between; align-items: center;
+      transition: all 0.2s;
     }
+    .purchase-card.used {
+      border-color: rgba(16,185,129,0.3);
+      background: rgba(16,185,129,0.05);
+    }
+    .purchase-info { flex: 1; }
+    .purchase-actions { display: flex; gap: 6px; align-items: center; }
     .btn {
       background: var(--accent); color: white; border: none;
-      padding: 6px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
-      margin-left: 6px;
+      padding: 6px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
+      transition: all 0.2s;
     }
-    .btn:hover { background: #ea580c; }
+    .btn:hover { background: #ea580c; transform: translateY(-1px); }
     .btn.use { background: var(--success); }
     .btn.use:hover { background: #059669; }
     .btn.refund { background: var(--danger); }
     .btn.refund:hover { background: #dc2626; }
+    .used-badge {
+      display: inline-block;
+      background: rgba(16,185,129,0.2);
+      color: var(--success);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -55,7 +72,6 @@
     .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
     .confirm-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 14px; cursor: pointer; margin: 10px; }
     .modal input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary); }
-    .used-badge { background: rgba(16,185,129,0.2); color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; }
   </style>
 </head>
 <body>
@@ -94,39 +110,48 @@
 
     async function loadPurchases() {
       const login = localStorage.getItem('karmabank_login');
-      const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(login)}`);
-      const purchases = await res.json();
-      const container = document.getElementById('purchasesList');
-      if (!purchases || purchases.length === 0) {
-        container.innerHTML = '<p>У вас пока нет покупок.</p>';
-        return;
+      if (!login) return;
+      try {
+        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(login)}`);
+        const purchases = await res.json();
+        const container = document.getElementById('purchasesList');
+        if (!purchases || purchases.length === 0) {
+          container.innerHTML = '<p style="color:var(--text-secondary);">У вас пока нет покупок.</p>';
+          return;
+        }
+        container.innerHTML = purchases.map(p => {
+          const isUsed = !!p.usedDate;
+          const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
+          let buttonsHtml = '';
+          if (!isUsed && p.canUse) {
+            buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>`;
+          } else if (isUsed && p.canRefund) {
+            buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>`;
+          }
+          return `<div class="purchase-card ${isUsed ? 'used' : ''}">
+            <div class="purchase-info">
+              <strong>${p.rewardName}</strong>${usedHtml}
+              <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
+            </div>
+            <div class="purchase-actions">${buttonsHtml}</div>
+          </div>`;
+        }).join('');
+      } catch(e) {
+        document.getElementById('purchasesList').innerHTML = '<p style="color:var(--danger);">Ошибка загрузки.</p>';
       }
-      container.innerHTML = purchases.map(p => {
-        const usedHtml = p.usedDate ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
-        const buttonsHtml = !p.usedDate
-          ? (p.canUse ? `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>` : '')
-          : (p.canRefund ? `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>` : '');
-        return `<div class="purchase-card">
-          <div>
-            <strong>${p.rewardName}</strong>${usedHtml}
-            <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
-          </div>
-          <div>${buttonsHtml}</div>
-        </div>`;
-      }).join('');
     }
 
     function openRefundModal(certId, rewardName, cost) {
       pendingCertId = certId;
       pendingAction = 'refund';
-      document.getElementById('confirmText').textContent = `Вернуть "${rewardName}" и получить ${cost} кармиков?`;
+      document.getElementById('confirmText').textContent = `Вернуть "${rewardName}" и получить ${cost} кармиков на баланс?`;
       document.getElementById('confirmModal').classList.add('active');
     }
 
     function openUseModal(certId, rewardName) {
       pendingCertId = certId;
       pendingAction = 'use';
-      document.getElementById('useModalReward').textContent = rewardName;
+      document.getElementById('useModalReward').textContent = `Вы используете сертификат «${rewardName}». Укажите комментарий для руководителя:`;
       document.getElementById('useComment').value = '';
       document.getElementById('useModal').classList.add('active');
     }
@@ -136,24 +161,34 @@
 
     async function executeAction() {
       const login = localStorage.getItem('karmabank_login');
-      let res;
-      if (pendingAction === 'refund') {
-        res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`);
-      } else if (pendingAction === 'use') {
-        const comment = document.getElementById('useComment').value.trim();
-        res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}&comment=${encodeURIComponent(comment)}`);
-      }
       closeConfirmModal();
       closeUseModal();
-      if (res) {
+
+      let url = '';
+      if (pendingAction === 'refund') {
+        url = `${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`;
+      } else if (pendingAction === 'use') {
+        const comment = document.getElementById('useComment').value.trim();
+        url = `${API_URL}?action=useCertificate&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}&comment=${encodeURIComponent(comment)}`;
+      }
+
+      if (!url) return;
+      try {
+        const res = await fetch(url);
         const result = await res.json();
         showModal(result.success ? '✅ ' + result.message : '😢 ' + result.message);
-        loadPurchases();
+        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: принудительно обновляем список после любого действия
+        await loadPurchases();
+      } catch(e) {
+        showModal('❌ Ошибка соединения');
       }
     }
 
-    document.getElementById('confirmYesBtn').onclick = executeAction;
-    document.getElementById('useYesBtn').onclick = executeAction;
+    // Привязываем обработчики один раз
+    document.getElementById('confirmYesBtn').addEventListener('click', executeAction);
+    document.getElementById('useYesBtn').addEventListener('click', executeAction);
+
+    // Загружаем покупки при открытии страницы
     loadPurchases();
   </script>
 </body>
