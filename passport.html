@@ -3,171 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Профиль — Кармический банк</title>
+  <title>Цифровой паспорт — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
     :root {
       --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350;
+      --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981;
+      --border: #1f3350;
     }
     body {
-      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); padding: 20px; user-select: none;
-      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      color: var(--text-primary); min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; padding: 20px;
+      margin: 0;
     }
+    /* Голографическая карточка */
+    .passport-card {
+      max-width: 480px; width: 100%;
+      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 32px; padding: 30px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(249,115,22,0.2);
+      position: relative; overflow: hidden;
+    }
+    /* Анимированная голограмма */
+    .hologram {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(249,115,22,0.03) 20px, rgba(249,115,22,0.03) 40px),
+                  repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(16,185,129,0.03) 20px, rgba(16,185,129,0.03) 40px);
+      pointer-events: none;
+      animation: hologramMove 8s linear infinite;
+    }
+    @keyframes hologramMove {
+      0% { transform: translate(0,0); opacity: 0.5; }
+      50% { opacity: 0.8; }
+      100% { transform: translate(5px,5px); opacity: 0.5; }
+    }
+    .content { position: relative; z-index: 2; }
+    .header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+    .avatar {
+      width: 70px; height: 70px; border-radius: 50%;
+      border: 2px solid var(--accent); object-fit: cover;
+      box-shadow: 0 0 15px rgba(249,115,22,0.5);
+    }
+    .name-block h2 { margin: 0; font-size: 1.5rem; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .name-block p { margin: 5px 0 0; color: var(--text-secondary); font-size: 0.9rem; }
+    .badge {
+      background: rgba(16,185,129,0.15); border: 1px solid var(--success);
+      padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--success);
+      margin-left: auto;
+    }
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+    .metric {
+      background: rgba(21,38,56,0.6); border: 1px solid var(--border);
+      border-radius: 16px; padding: 15px; text-align: center; backdrop-filter: blur(5px);
+    }
+    .metric .value { font-size: 1.8rem; font-weight: 800; }
+    .metric .label { font-size: 0.8rem; color: var(--text-secondary); }
+    .value.accent { color: var(--accent); }
+    .value.success { color: var(--success); }
+    .ai-section {
+      background: rgba(21,38,56,0.6); border: 1px solid var(--accent);
+      border-radius: 16px; padding: 20px; backdrop-filter: blur(5px);
+    }
+    .ai-title { font-size: 1rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ai-text { font-size: 0.9rem; line-height: 1.6; color: var(--text-primary); white-space: pre-line; }
+    .refresh-btn {
+      margin-top: 15px; background: transparent; border: 1px solid var(--accent);
+      color: var(--accent); padding: 8px 16px; border-radius: 12px;
+      cursor: pointer; font-weight: 600; transition: all 0.2s;
+    }
+    .refresh-btn:hover { background: var(--accent); color: white; }
     .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
+      display: inline-block; margin-bottom: 20px; color: var(--text-secondary); text-decoration: none;
+      font-size: 0.85rem; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px;
     }
-    .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    .profile-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 30px; max-width: 500px; margin: 0 auto;
-      text-align: left;
-    }
-    .profile-card h2 { margin-top: 0; text-align: center; }
-    .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
-    .field input, .field textarea {
-      width: 100%; padding: 10px; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--bg-primary);
-      color: var(--text-primary); font-family: inherit;
-    }
-    .field input:focus, .field textarea:focus { border-color: var(--accent); outline: none; }
-    .btn {
-      background: var(--accent); color: white; border: none;
-      padding: 10px 20px; border-radius: 14px; cursor: pointer; font-weight: 600;
-      margin-top: 10px; transition: background 0.2s;
-    }
-    .btn:hover { background: #ea580c; }
-    .avatar-preview {
-      width: 100px; height: 100px; border-radius: 50%;
-      border: 2px solid var(--border); object-fit: cover; margin-bottom: 8px;
-    }
-    .passport-display {
-      background: var(--bg-primary);
-      border: 1px solid var(--accent);
-      border-radius: 12px;
-      padding: 8px 14px;
-      font-weight: 600;
-      color: var(--accent);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .copy-btn {
-      background: transparent; border: 1px solid var(--accent); color: var(--accent);
-      padding: 4px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
-    }
-    .copy-btn:hover { background: var(--accent); color: white; }
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-    }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: linear-gradient(135deg, #1a2940, #152238);
-      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-      max-width: 400px; width: 90%; text-align: center;
-    }
-    .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
-    }
-    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+    .back-btn:hover { background: var(--border); }
   </style>
 </head>
 <body>
+<div style="width: 100%;">
   <a class="back-btn" href="/">← Назад</a>
-  <h2 style="text-align:center;">Мой профиль</h2>
-  <div id="profileContent">Загрузка...</div>
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    const login = localStorage.getItem('karmabank_login');
-    if (!login) { window.location.href = '/'; }
-
-    async function loadProfile() {
-      const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
-      const user = await res.json();
-      const container = document.getElementById('profileContent');
-      container.innerHTML = `
-        <div class="profile-card">
-          <div class="field" style="text-align: center;">
-            <img src="${user.photo || 'belchonok.png'}" class="avatar-preview" id="avatarImg" alt="Аватар">
-            <label style="text-align: left;">Загрузить фото</label>
-            <input type="file" id="photoFileInput" accept="image/*" style="margin-bottom: 5px;">
-            <small style="color:var(--text-secondary)">или вставьте ссылку:</small>
-            <input type="text" id="photoInput" value="${user.photo || ''}" placeholder="Вставьте URL изображения">
-          </div>
-          <div class="field">
-            <label>Цифровой паспорт</label>
-            <div class="passport-display">
-              <span id="passportValue">${user.passport || 'не назначен'}</span>
-              <button class="copy-btn" onclick="copyPassport()">📋 Копировать</button>
-            </div>
-          </div>
-          <div class="field">
-            <label>Имя</label>
-            <input type="text" id="nameInput" value="${user.name || ''}" disabled>
-            <small style="color:var(--text-secondary)">Имя можно изменить только через администратора</small>
-          </div>
-          <div class="field">
-            <label>Фамилия</label>
-            <input type="text" id="surnameInput" value="${user.surname || ''}">
-          </div>
-          <div class="field">
-            <label>Дата рождения</label>
-            <input type="date" id="birthdateInput" value="${user.birthdate || ''}">
-          </div>
-          <div class="field">
-            <label>Должность</label>
-            <input type="text" id="positionInput" value="${user.position || ''}">
-          </div>
-          <div class="field">
-            <label>Обо мне</label>
-            <textarea id="aboutInput" rows="3">${user.about || ''}</textarea>
-          </div>
-          <div class="field">
-            <label>Ссылки (через запятую)</label>
-            <input type="text" id="linksInput" value="${user.links || ''}">
-          </div>
-          <button class="btn" onclick="saveProfile()">Сохранить</button>
+  <div class="passport-card" id="passportCard">
+    <div class="hologram"></div>
+    <div class="content">
+      <div class="header">
+        <img src="belchonok.png" class="avatar" id="avatarImg" alt="Фото">
+        <div class="name-block">
+          <h2 id="userName">Артур</h2>
+          <p id="userDept">Основатель</p>
         </div>
-      `;
-      document.getElementById('photoInput').addEventListener('input', (e) => {
-        document.getElementById('avatarImg').src = e.target.value || 'belchonok.png';
-      });
-    }
+        <div class="badge" id="levelBadge">🐟 Малёк</div>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="value success" id="pointsValue">0</div>
+          <div class="label">Кармиков</div>
+        </div>
+        <div class="metric">
+          <div class="value accent" id="energyValue">0</div>
+          <div class="label">Энергии</div>
+        </div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-title">🤖 Характеристика от ИИ</div>
+        <div class="ai-text" id="aiCharacteristic">Загрузка...</div>
+        <button class="refresh-btn" onclick="loadAIPassport()">🔄 Обновить характеристику</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+  const login = localStorage.getItem('karmabank_login') || 'arthur';
 
-    function copyPassport() {
-      const passport = document.getElementById('passportValue').textContent;
-      navigator.clipboard.writeText(passport).then(() => {
-        alert('Паспорт скопирован в буфер обмена');
-      });
-    }
+  async function loadAIPassport() {
+    // Показываем загрузку
+    document.getElementById('aiCharacteristic').innerHTML = '✨ Анализирую данные...';
+    try {
+      // Получаем базовые метрики и готовую характеристику
+      const [profileRes, levelsRes, tasksRes] = await Promise.all([
+        fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`),
+        fetch(`${API_URL}?action=getLevels`),
+        fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(login)}`)
+      ]);
+      const user = await profileRes.json();
+      const levels = await levelsRes.json();
+      const tasks = await tasksRes.json();
 
-    async function saveProfile() {
-      const data = {
-        surname: document.getElementById('surnameInput').value,
-        birthdate: document.getElementById('birthdateInput').value,
-        position: document.getElementById('positionInput').value,
-        about: document.getElementById('aboutInput').value,
-        links: document.getElementById('linksInput').value,
-        photo: document.getElementById('photoInput').value
-      };
-      try {
-        const res = await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(login)}&data=${encodeURIComponent(JSON.stringify(data))}`);
-        const result = await res.json();
-        const modal = document.createElement('div');
-        modal.className = 'modal active';
-        modal.innerHTML = `<div class="modal-content"><p>${result.success ? '✅ ' + result.message : '⚠️ ' + result.message}</p><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
-        document.body.appendChild(modal);
-      } catch(e) {
-        alert('Ошибка соединения');
+      // Обновляем визуал
+      document.getElementById('userName').textContent = user.name || 'Артур';
+      document.getElementById('userDept').textContent = user.department || 'Основатель';
+      document.getElementById('pointsValue').textContent = user.points || 0;
+      document.getElementById('energyValue').textContent = user.energy || 0;
+      if (user.photo) document.getElementById('avatarImg').src = user.photo;
+
+      // Уровень
+      let curLevel = levels[0] || { icon: '🐟', name: 'Малёк' };
+      for (let i = levels.length-1; i >= 0; i--) {
+        if ((user.energy || 0) >= levels[i].energy) { curLevel = levels[i]; break; }
       }
-    }
+      document.getElementById('levelBadge').textContent = `${curLevel.icon} ${curLevel.name}`;
 
-    loadProfile();
-  </script>
+      // Собираем метрики для ИИ
+      const completedTasks = tasks.filter(t => t.status === 'Выполнено').length;
+      const totalTasks = tasks.length;
+      const metrics = {
+        points: user.points || 0,
+        energy: user.energy || 0,
+        completedTasks: completedTasks,
+        totalTasks: totalTasks,
+        level: curLevel.name
+      };
+
+      // Получаем AI-характеристику
+      const aiRes = await fetch(`${API_URL}?action=getAIPassport&login=${encodeURIComponent(login)}&metrics=${encodeURIComponent(JSON.stringify(metrics))}`);
+      const aiData = await aiRes.json();
+      if (aiData.characteristic) {
+        document.getElementById('aiCharacteristic').textContent = aiData.characteristic;
+      } else {
+        document.getElementById('aiCharacteristic').textContent = 'Не удалось получить характеристику. Попробуйте позже.';
+      }
+    } catch (e) {
+      document.getElementById('aiCharacteristic').textContent = 'Ошибка соединения.';
+    }
+  }
+
+  // Загружаем сразу при входе
+  loadAIPassport();
+</script>
 </body>
 </html>
