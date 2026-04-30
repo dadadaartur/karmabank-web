@@ -38,6 +38,11 @@
       animation: aurora 10s ease-in-out infinite;
       z-index: 0; pointer-events: none;
     }
+    @keyframes aurora {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .task-card > * { position: relative; z-index: 1; }
     .task-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .btn {
@@ -72,11 +77,17 @@
   <div id="tasksList">Загрузка...</div>
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-sphere"></div>'; document.body.appendChild(overlay); }
+    function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
     async function loadTasks() {
       const login = localStorage.getItem('karmabank_login');
+      if (!login) return;
+      showLoading();
       const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(login)}`);
       const tasks = await res.json();
+      hideLoading();
       const container = document.getElementById('tasksList');
+      if (!tasks.length) { container.innerHTML = '<p>Нет активных заданий</p>'; return; }
       container.innerHTML = tasks.map(t => {
         let btnHtml = '';
         if (t.isGlobal) btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
@@ -88,7 +99,10 @@
       }).join('');
     }
     async function takeTask(taskName) {
-      await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(localStorage.getItem('karmabank_login'))}`);
+      const login = localStorage.getItem('karmabank_login');
+      showLoading();
+      await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}`);
+      hideLoading();
       loadTasks();
     }
     function openCommentModal(taskName) {
@@ -100,7 +114,9 @@
         const comment = document.getElementById('commentInput').value.trim();
         modal.remove();
         if (!comment) return;
+        showLoading();
         await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(localStorage.getItem('karmabank_login'))}&comment=${encodeURIComponent(comment)}`);
+        hideLoading();
         loadTasks();
       };
       document.getElementById('cancelCommentBtn').onclick = () => modal.remove();
