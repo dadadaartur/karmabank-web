@@ -14,6 +14,7 @@
     body {
       font-family: 'Inter', sans-serif; background: var(--bg-primary);
       color: var(--text-primary); padding: 20px; user-select: none;
+      margin: 0;
     }
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
@@ -50,30 +51,24 @@
     .status { padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
     .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
     .status-global { background: rgba(16,185,129,0.2); color: var(--success); }
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
     .modal-content {
       background: linear-gradient(135deg, #1a2940, #152238);
       border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
       max-width: 400px; width: 90%; text-align: center;
     }
-    .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
-    }
-    .modal input, .modal textarea {
-      width: 100%; padding: 10px; margin: 8px 0;
-      border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg-secondary); color: var(--text-primary);
-    }
+    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    .loading-sphere { width: 80px; height: 80px; background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); border-radius: 50%; animation: spinStar 2s linear infinite, colorShift 3s infinite; box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700; }
+    @keyframes spinStar { 100% { transform: rotate(360deg); } }
+    @keyframes colorShift { 0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } 50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); } 100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } }
   </style>
 </head>
 <body>
   <a class="back-btn" href="/">← Назад</a>
-  <h2 onclick="window.location.href='/'">✅ Мои задания</h2>
+  <h2>✅ Мои задания</h2>
   <div id="tasksList">Загрузка...</div>
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
@@ -84,22 +79,12 @@
       const container = document.getElementById('tasksList');
       container.innerHTML = tasks.map(t => {
         let btnHtml = '';
-        const attrs = `onclick="event.stopPropagation();"`;
-        if (t.isGlobal) {
-          btnHtml = `<button class="btn" ${attrs} onclick="takeTask('${t.task}')">Взять</button>`;
-        } else if (t.status === 'Назначено') {
-          btnHtml = `<button class="btn" ${attrs} onclick="takeTask('${t.task}')">Взять</button>`;
-        } else if (t.status === 'В работе') {
-          btnHtml = `<button class="btn complete" ${attrs} onclick="openCommentModal('${t.task}')">Выполнить</button>`;
-        } else if (t.status === 'На проверке') {
-          btnHtml = `<span class="status status-active">На проверке</span>`;
-        } else if (t.status === 'Выполнено') {
-          btnHtml = `<span class="status status-active">Выполнено</span>`;
-        }
-        return `<div class="task-card">
-          <span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status status-global">Общее</span>' : ''}</span>
-          ${btnHtml}
-        </div>`;
+        if (t.isGlobal) btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
+        else if (t.status === 'Назначено') btnHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
+        else if (t.status === 'В работе') btnHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Выполнить</button>`;
+        else if (t.status === 'На проверке') btnHtml = `<span class="status status-active">На проверке</span>`;
+        else if (t.status === 'Выполнено') btnHtml = `<span class="status status-active">Выполнено</span>`;
+        return `<div class="task-card"><span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status status-global">Общее</span>' : ''}</span>${btnHtml}</div>`;
       }).join('');
     }
     async function takeTask(taskName) {
@@ -109,12 +94,7 @@
     function openCommentModal(taskName) {
       const modal = document.createElement('div');
       modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content">
-        <h3>Введите комментарий</h3>
-        <textarea id="commentInput" placeholder="Опишите результат..."></textarea>
-        <button class="btn" id="submitCommentBtn">Отправить</button>
-        <button class="modal-close-btn" id="cancelCommentBtn">Отмена</button>
-      </div>`;
+      modal.innerHTML = `<div class="modal-content"><h3>Введите комментарий</h3><textarea id="commentInput" placeholder="Опишите результат..."></textarea><button class="btn" id="submitCommentBtn">Отправить</button><button class="modal-close-btn" id="cancelCommentBtn">Отмена</button></div>`;
       document.body.appendChild(modal);
       document.getElementById('submitCommentBtn').onclick = async () => {
         const comment = document.getElementById('commentInput').value.trim();
