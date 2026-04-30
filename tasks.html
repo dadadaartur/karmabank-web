@@ -12,7 +12,7 @@
       --success: #10b981; --warning: #f59e0b; --border: #1f3350;
     }
     body {
-      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      font-family: 'Inter', sans-serif; background: var(--bg-primary);
       color: var(--text-primary); padding: 20px; user-select: none;
     }
     .back-btn {
@@ -24,19 +24,30 @@
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .task-card {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 16px; margin-bottom: 12px;
+      border-radius: 20px; padding: 20px; margin-bottom: 14px;
       display: flex; justify-content: space-between; align-items: center;
+      transition: all 0.2s; position: relative; overflow: hidden;
     }
+    .task-card::before {
+      content: '';
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle at 20% 30%, rgba(16,185,129,0.06) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(99,102,241,0.06) 0%, transparent 40%);
+      background-size: 200% 200%;
+      animation: aurora 10s ease-in-out infinite;
+      z-index: 0; pointer-events: none;
+    }
+    .task-card > * { position: relative; z-index: 1; }
+    .task-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .btn {
       background: var(--accent); color: white; border: none;
-      padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600;
-      min-width: 90px; text-align: center;
+      padding: 10px 18px; border-radius: 14px; cursor: pointer; font-weight: 600;
+      min-width: 100px; text-align: center; transition: all 0.2s;
     }
-    .btn:hover { background: #ea580c; }
-    .btn.take-global { background: var(--success); }
-    .btn.take-global:hover { background: #059669; }
+    .btn:hover { background: #ea580c; box-shadow: 0 0 15px rgba(249,115,22,0.5); }
     .btn.complete { background: var(--success); }
-    .status { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+    .btn.complete:hover { background: #059669; }
+    .status { padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
     .status-active { background: rgba(249,115,22,0.3); color: var(--accent); }
     .status-global { background: rgba(16,185,129,0.2); color: var(--success); }
     .modal {
@@ -48,13 +59,12 @@
       background: linear-gradient(135deg, #1a2940, #152238);
       border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
       max-width: 400px; width: 90%; text-align: center;
-      box-shadow: 0 0 50px rgba(249,115,22,0.6);
     }
     .modal-close-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
     }
-    .modal input {
+    .modal input, .modal textarea {
       width: 100%; padding: 10px; margin: 8px 0;
       border-radius: 10px; border: 1px solid var(--border);
       background: var(--bg-secondary); color: var(--text-primary);
@@ -63,25 +73,10 @@
 </head>
 <body>
   <a class="back-btn" href="/">← Назад</a>
-  <h2>✅ Мои задания</h2>
+  <h2 onclick="window.location.href='/'">✅ Мои задания</h2>
   <div id="tasksList">Загрузка...</div>
-
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-
-    function showAlert(message, type) {
-      const icons = { success: '✅', error: '❌', info: '🌟' };
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <div style="font-size: 2.5rem;">${icons[type] || icons.info}</div>
-          <p style="margin:16px 0; color:var(--text-primary); font-size:1.1rem;">${message}</p>
-          <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
-        </div>`;
-      document.body.appendChild(modal);
-    }
-
     async function loadTasks() {
       const login = localStorage.getItem('karmabank_login');
       const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(login)}`);
@@ -89,12 +84,13 @@
       const container = document.getElementById('tasksList');
       container.innerHTML = tasks.map(t => {
         let btnHtml = '';
+        const attrs = `onclick="event.stopPropagation();"`;
         if (t.isGlobal) {
-          btnHtml = `<button class="btn take-global" onclick="takeTask(event, '${t.task}')">Взять</button>`;
+          btnHtml = `<button class="btn" ${attrs} onclick="takeTask('${t.task}')">Взять</button>`;
         } else if (t.status === 'Назначено') {
-          btnHtml = `<button class="btn" onclick="takeTask(event, '${t.task}')">Взять</button>`;
+          btnHtml = `<button class="btn" ${attrs} onclick="takeTask('${t.task}')">Взять</button>`;
         } else if (t.status === 'В работе') {
-          btnHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Выполнить</button>`;
+          btnHtml = `<button class="btn complete" ${attrs} onclick="openCommentModal('${t.task}')">Выполнить</button>`;
         } else if (t.status === 'На проверке') {
           btnHtml = `<span class="status status-active">На проверке</span>`;
         } else if (t.status === 'Выполнено') {
@@ -106,34 +102,16 @@
         </div>`;
       }).join('');
     }
-
-    async function takeTask(event, taskName) {
-      const btn = event.currentTarget;
-      btn.disabled = true;
-      btn.textContent = '...';
-      try {
-        const res = await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(localStorage.getItem('karmabank_login'))}`);
-        const data = await res.json();
-        if (data && data.success) {
-          loadTasks();
-        } else {
-          showAlert(data?.message || 'Не удалось взять задание', 'error');
-          btn.disabled = false;
-          btn.textContent = 'Взять';
-        }
-      } catch (e) {
-        showAlert('Ошибка соединения', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Взять';
-      }
+    async function takeTask(taskName) {
+      await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(localStorage.getItem('karmabank_login'))}`);
+      loadTasks();
     }
-
     function openCommentModal(taskName) {
       const modal = document.createElement('div');
       modal.className = 'modal active';
       modal.innerHTML = `<div class="modal-content">
         <h3>Введите комментарий</h3>
-        <input type="text" id="commentInput" placeholder="Например, номер договора...">
+        <textarea id="commentInput" placeholder="Опишите результат..."></textarea>
         <button class="btn" id="submitCommentBtn">Отправить</button>
         <button class="modal-close-btn" id="cancelCommentBtn">Отмена</button>
       </div>`;
@@ -147,7 +125,6 @@
       };
       document.getElementById('cancelCommentBtn').onclick = () => modal.remove();
     }
-
     loadTasks();
   </script>
 </body>
