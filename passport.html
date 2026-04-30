@@ -2,59 +2,172 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Цифровой паспорт специалиста — Кармический банк</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Профиль — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
+    :root {
+      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350;
+    }
     body {
-      font-family: 'Inter', sans-serif;
-      background: #0a1628;
-      color: #eaf0fb;
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
+      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary); padding: 20px; user-select: none;
+      min-height: 100vh;
     }
-    .record {
-      background: #152238;
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
+    }
+    .back-btn:hover { background: var(--border); color: var(--text-primary); }
+    .profile-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 30px; max-width: 500px; margin: 0 auto;
+      text-align: left;
+    }
+    .profile-card h2 { margin-top: 0; text-align: center; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
+    .field input, .field textarea {
+      width: 100%; padding: 10px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-primary);
+      color: var(--text-primary); font-family: inherit;
+    }
+    .field input:focus, .field textarea:focus { border-color: var(--accent); outline: none; }
+    .btn {
+      background: var(--accent); color: white; border: none;
+      padding: 10px 20px; border-radius: 14px; cursor: pointer; font-weight: 600;
+      margin-top: 10px; transition: background 0.2s;
+    }
+    .btn:hover { background: #ea580c; }
+    .avatar-preview {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 2px solid var(--border); object-fit: cover; margin-bottom: 8px;
+    }
+    .passport-display {
+      background: var(--bg-primary);
+      border: 1px solid var(--accent);
       border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 10px;
-      border: 1px solid #1f3350;
+      padding: 8px 14px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex; align-items: center; justify-content: space-between;
     }
-    h1 { color: #f97316; }
-    .error { color: #ef4444; }
+    .copy-btn {
+      background: transparent; border: 1px solid var(--accent); color: var(--accent);
+      padding: 4px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+    }
+    .copy-btn:hover { background: var(--accent); color: white; }
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: linear-gradient(135deg, #1a2940, #152238);
+      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
+      max-width: 400px; width: 90%; text-align: center;
+    }
+    .modal-close-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
+    }
+    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
   </style>
 </head>
 <body>
-  <h1>📜 Цифровой паспорт специалиста</h1>
-  <div id="result">Загрузка...</div>
+  <a class="back-btn" href="/">← Назад</a>
+  <h2 style="text-align:center;">Мой профиль</h2>
+  <div id="profileContent">Загрузка...</div>
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    const params = new URLSearchParams(window.location.search);
-    const passport = params.get('passport');
-    if (!passport) {
-      document.getElementById('result').innerHTML = '<p class="error">Не указан номер паспорта.</p>';
-    } else {
-      fetch(`${API_URL}?action=getPassportHistory&passport=${encodeURIComponent(passport)}`)
-        .then(r => r.json())
-        .then(history => {
-          if (!history || history.length === 0) {
-            document.getElementById('result').innerHTML = '<p class="error">По данному номеру нет записей.</p>';
-            return;
-          }
-          let html = `<p>Номер паспорта: <strong>${passport}</strong></p>`;
-          history.forEach(rec => {
-            html += `<div class="record">
-              <strong>${rec.event}</strong> — ${new Date(rec.date).toLocaleString('ru-RU')}<br>
-              ${rec.details ? JSON.stringify(rec.details) : ''}
-            </div>`;
-          });
-          document.getElementById('result').innerHTML = html;
-        })
-        .catch(() => {
-          document.getElementById('result').innerHTML = '<p class="error">Ошибка загрузки данных.</p>';
-        });
+    const login = localStorage.getItem('karmabank_login');
+    if (!login) { window.location.href = '/'; }
+
+    async function loadProfile() {
+      const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
+      const user = await res.json();
+      const container = document.getElementById('profileContent');
+      container.innerHTML = `
+        <div class="profile-card">
+          <div class="field" style="text-align: center;">
+            <img src="${user.photo || 'belchonok.png'}" class="avatar-preview" id="avatarImg" alt="Аватар">
+            <label style="text-align: left;">Загрузить фото</label>
+            <input type="file" id="photoFileInput" accept="image/*" style="margin-bottom: 5px;">
+            <small style="color:var(--text-secondary)">или вставьте ссылку:</small>
+            <input type="text" id="photoInput" value="${user.photo || ''}" placeholder="Вставьте URL изображения">
+          </div>
+          <div class="field">
+            <label>Цифровой паспорт</label>
+            <div class="passport-display">
+              <span id="passportValue">${user.passport || 'не назначен'}</span>
+              <button class="copy-btn" onclick="copyPassport()">📋 Копировать</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Имя</label>
+            <input type="text" id="nameInput" value="${user.name || ''}" disabled>
+            <small style="color:var(--text-secondary)">Имя можно изменить только через администратора</small>
+          </div>
+          <div class="field">
+            <label>Фамилия</label>
+            <input type="text" id="surnameInput" value="${user.surname || ''}">
+          </div>
+          <div class="field">
+            <label>Дата рождения</label>
+            <input type="date" id="birthdateInput" value="${user.birthdate || ''}">
+          </div>
+          <div class="field">
+            <label>Должность</label>
+            <input type="text" id="positionInput" value="${user.position || ''}">
+          </div>
+          <div class="field">
+            <label>Обо мне</label>
+            <textarea id="aboutInput" rows="3">${user.about || ''}</textarea>
+          </div>
+          <div class="field">
+            <label>Ссылки (через запятую)</label>
+            <input type="text" id="linksInput" value="${user.links || ''}">
+          </div>
+          <button class="btn" onclick="saveProfile()">Сохранить</button>
+        </div>
+      `;
+      document.getElementById('photoInput').addEventListener('input', (e) => {
+        document.getElementById('avatarImg').src = e.target.value || 'belchonok.png';
+      });
     }
+
+    function copyPassport() {
+      const passport = document.getElementById('passportValue').textContent;
+      navigator.clipboard.writeText(passport).then(() => {
+        alert('Паспорт скопирован в буфер обмена');
+      });
+    }
+
+    async function saveProfile() {
+      const data = {
+        surname: document.getElementById('surnameInput').value,
+        birthdate: document.getElementById('birthdateInput').value,
+        position: document.getElementById('positionInput').value,
+        about: document.getElementById('aboutInput').value,
+        links: document.getElementById('linksInput').value,
+        photo: document.getElementById('photoInput').value
+      };
+      try {
+        const res = await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(login)}&data=${encodeURIComponent(JSON.stringify(data))}`);
+        const result = await res.json();
+        const modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `<div class="modal-content"><p>${result.success ? '✅ ' + result.message : '⚠️ ' + result.message}</p><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+        document.body.appendChild(modal);
+      } catch(e) {
+        alert('Ошибка соединения');
+      }
+    }
+
+    loadProfile();
   </script>
 </body>
 </html>
