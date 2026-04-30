@@ -6,61 +6,30 @@
   <title>Мои покупки — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981;
-      --danger: #ef4444; --border: #1f3350;
-    }
-    body {
-      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); padding: 20px; user-select: none;
-    }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
-    }
+    :root { --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --danger: #ef4444; --border: #1f3350; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); padding: 20px; user-select: none; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; margin-bottom: 20px; }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .purchase-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 16px; margin-bottom: 10px;
-      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
     }
     .purchase-card.used { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
     .purchase-info { flex: 1; }
     .purchase-actions { display: flex; gap: 6px; align-items: center; }
-    .btn {
-      background: var(--accent); color: white; border: none;
-      padding: 6px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
-      transition: all 0.2s;
-    }
+    .btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
     .btn:hover { background: #ea580c; }
-    .btn.use { background: var(--success); }
-    .btn.use:hover { background: #059669; }
-    .btn.refund { background: var(--danger); }
-    .btn.refund:hover { background: #dc2626; }
-    .used-badge {
-      display: inline-block; background: rgba(16,185,129,0.2); color: var(--success);
-      padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 8px;
-    }
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-    }
+    .btn.use { background: var(--success); } .btn.use:hover { background: #059669; }
+    .btn.refund { background: var(--danger); } .btn.refund:hover { background: #dc2626; }
+    .used-badge { display: inline-block; background: rgba(16,185,129,0.2); color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
-    .modal-content {
-      background: linear-gradient(135deg, #1a2940, #152238);
-      border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%;
-      text-align: center; box-shadow: 0 0 50px rgba(249,115,22,0.6);
-    }
-    .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
-    }
-    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
-    .confirm-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 14px; cursor: pointer; margin: 10px; }
-    .modal input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary); }
+    .modal-content { background: linear-gradient(135deg, #1a2940, #152238); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .loading-sphere { width:80px; height:80px; background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); border-radius:50%; animation: spinStar 2s linear infinite, colorShift 3s infinite; box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700; }
+    @keyframes spinStar { 100% { transform: rotate(360deg); } }
+    @keyframes colorShift { 0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } 50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); } 100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } }
   </style>
 </head>
 <body>
@@ -69,112 +38,47 @@
   <div id="purchasesList">Загрузка...</div>
 
   <div id="confirmModal" class="modal">
-    <div class="modal-content">
-      <p id="confirmText"></p>
-      <button class="confirm-btn" id="confirmYesBtn">Да</button>
-      <button class="modal-close-btn" onclick="closeConfirmModal()">Отмена</button>
-    </div>
+    <div class="modal-content"><p id="confirmText"></p><button class="confirm-btn" id="confirmYesBtn">Да</button><button class="modal-close-btn" onclick="closeConfirmModal()">Отмена</button></div>
   </div>
-
   <div id="useModal" class="modal">
-    <div class="modal-content">
-      <h3>Использовать сертификат</h3>
-      <p id="useModalReward"></p>
-      <input type="text" id="useComment" placeholder="Комментарий для руководителя">
-      <button class="confirm-btn" id="useYesBtn">Отправить</button>
-      <button class="modal-close-btn" onclick="closeUseModal()">Отмена</button>
-    </div>
+    <div class="modal-content"><h3>Использовать сертификат</h3><p id="useModalReward"></p><input type="text" id="useComment" placeholder="Комментарий для руководителя"><button class="confirm-btn" id="useYesBtn">Отправить</button><button class="modal-close-btn" onclick="closeUseModal()">Отмена</button></div>
   </div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let pendingCertId = null, pendingAction = null;
-
-    function showModal(html) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
-      document.body.appendChild(modal);
-    }
-
     async function loadPurchases() {
       const login = localStorage.getItem('karmabank_login');
       if (!login) return;
-      try {
-        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(login)}`);
-        const purchases = await res.json();
-        const container = document.getElementById('purchasesList');
-        if (!purchases || purchases.length === 0) {
-          container.innerHTML = '<p style="color:var(--text-secondary);">У вас пока нет покупок.</p>';
-          return;
-        }
-        container.innerHTML = purchases.map(p => {
-          const isUsed = !!p.usedDate;
-          const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
-          let buttonsHtml = '';
-          if (!isUsed && p.canUse) {
-            buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}', '${p.rewardName}')">Использовать</button>`;
-          } else if (isUsed && p.canRefund) {
-            buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}', '${p.rewardName}', ${p.cost})">Вернуть</button>`;
-          }
-          return `<div class="purchase-card ${isUsed ? 'used' : ''}">
-            <div class="purchase-info">
-              <strong>${p.rewardName}</strong>${usedHtml}
-              <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
-            </div>
-            <div class="purchase-actions">${buttonsHtml}</div>
-          </div>`;
-        }).join('');
-      } catch(e) {
-        document.getElementById('purchasesList').innerHTML = '<p style="color:var(--danger);">Ошибка загрузки.</p>';
-      }
+      const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(login)}`);
+      const purchases = await res.json();
+      const container = document.getElementById('purchasesList');
+      if (!purchases || purchases.length === 0) { container.innerHTML = '<p>У вас пока нет покупок.</p>'; return; }
+      container.innerHTML = purchases.map(p => {
+        const isUsed = !!p.usedDate;
+        const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
+        let buttonsHtml = '';
+        if (!isUsed && p.canUse) buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}','${p.rewardName}')">Использовать</button>`;
+        else if (isUsed && p.canRefund) buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName}',${p.cost})">Вернуть</button>`;
+        return `<div class="purchase-card ${isUsed ? 'used' : ''}"><div class="purchase-info"><strong>${p.rewardName}</strong>${usedHtml}<div style="color:var(--text-secondary);font-size:0.85rem;">${p.date} — ${p.cost} карм.</div></div><div class="purchase-actions">${buttonsHtml}</div></div>`;
+      }).join('');
     }
-
-    function openRefundModal(certId, rewardName, cost) {
-      pendingCertId = certId;
-      pendingAction = 'refund';
-      document.getElementById('confirmText').textContent = `Вернуть "${rewardName}" и получить ${cost} кармиков на баланс?`;
-      document.getElementById('confirmModal').classList.add('active');
-    }
-
-    function openUseModal(certId, rewardName) {
-      pendingCertId = certId;
-      pendingAction = 'use';
-      document.getElementById('useModalReward').textContent = `Вы используете сертификат «${rewardName}». Укажите комментарий для руководителя:`;
-      document.getElementById('useComment').value = '';
-      document.getElementById('useModal').classList.add('active');
-    }
-
+    function openRefundModal(certId, rewardName, cost) { pendingCertId = certId; pendingAction = 'refund'; document.getElementById('confirmText').textContent = `Вернуть "${rewardName}" и получить ${cost} кармиков?`; document.getElementById('confirmModal').classList.add('active'); }
+    function openUseModal(certId, rewardName) { pendingCertId = certId; pendingAction = 'use'; document.getElementById('useModalReward').textContent = `Вы используете «${rewardName}». Укажите комментарий:`; document.getElementById('useComment').value = ''; document.getElementById('useModal').classList.add('active'); }
     function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('active'); }
     function closeUseModal() { document.getElementById('useModal').classList.remove('active'); }
-
     async function executeAction() {
       const login = localStorage.getItem('karmabank_login');
-      closeConfirmModal();
-      closeUseModal();
-
+      closeConfirmModal(); closeUseModal();
       let url = '';
-      if (pendingAction === 'refund') {
-        url = `${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`;
-      } else if (pendingAction === 'use') {
-        const comment = document.getElementById('useComment').value.trim();
-        url = `${API_URL}?action=useCertificate&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}&comment=${encodeURIComponent(comment)}`;
-      }
-
+      if (pendingAction === 'refund') url = `${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`;
+      else if (pendingAction === 'use') { const comment = document.getElementById('useComment').value.trim(); url = `${API_URL}?action=useCertificate&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}&comment=${encodeURIComponent(comment)}`; }
       if (!url) return;
-      try {
-        const res = await fetch(url);
-        const result = await res.json();
-        showModal(result.success ? '✅ ' + result.message : '😢 ' + result.message);
-        await loadPurchases();
-      } catch(e) {
-        showModal('❌ Ошибка соединения');
-      }
+      try { const res = await fetch(url); const result = await res.json(); showModal(result.message); loadPurchases(); } catch(e) { showModal('Ошибка'); }
     }
-
     document.getElementById('confirmYesBtn').addEventListener('click', executeAction);
     document.getElementById('useYesBtn').addEventListener('click', executeAction);
-
+    function showModal(msg) { const m = document.createElement('div'); m.className='modal active'; m.innerHTML=`<div class="modal-content"><p>${msg}</p><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`; document.body.appendChild(m); }
     loadPurchases();
   </script>
 </body>
