@@ -6,100 +6,36 @@
   <title>Профиль — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350;
-    }
-    body {
-      font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); padding: 20px; user-select: none;
-      min-height: 100vh;
-    }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      transition: all 0.2s; text-decoration: none; margin-bottom: 20px;
-    }
+    :root { --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); padding: 20px; user-select: none; min-height: 100vh; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; text-decoration: none; margin-bottom: 20px; }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    .profile-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 30px; max-width: 500px; margin: 0 auto;
-      text-align: left;
-    }
+    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; max-width: 500px; margin: 0 auto; text-align: left; }
     .profile-card h2 { margin-top: 0; text-align: center; font-size: 1.6rem; }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
-    .field input, .field textarea {
-      width: 100%; padding: 10px; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--bg-primary);
-      color: var(--text-primary); font-family: inherit;
-    }
+    .field input, .field textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; }
     .field input:focus, .field textarea:focus { border-color: var(--accent); outline: none; }
-    .btn {
-      background: var(--accent); color: white; border: none;
-      padding: 10px 20px; border-radius: 14px; cursor: pointer; font-weight: 600;
-      margin-top: 10px; transition: background 0.2s;
-    }
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 14px; cursor: pointer; font-weight: 600; margin-top: 10px; transition: background 0.2s; }
     .btn:hover { background: #ea580c; }
     .avatar-section { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-    .avatar-preview {
-      width: 80px; height: 80px; border-radius: 50%;
-      border: 2px solid var(--accent); object-fit: cover;
-      box-shadow: 0 0 15px rgba(249,115,22,0.3);
-    }
-    .passport-display {
-      background: var(--bg-primary);
-      border: 1px solid var(--accent);
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-weight: 600;
-      color: var(--accent);
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px;
-      flex-wrap: wrap; gap: 8px;
-    }
-    .passport-number {
-      text-decoration: none; color: var(--accent); cursor: pointer;
-      transition: color 0.2s;
-    }
+    .avatar-preview { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; box-shadow: 0 0 15px rgba(249,115,22,0.3); }
+    .passport-display { background: var(--bg-primary); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 14px; font-weight: 600; color: var(--accent); display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .passport-number { text-decoration: none; color: var(--accent); cursor: pointer; transition: color 0.2s; }
     .passport-number:hover { color: #fff; text-decoration: underline; }
     .passport-actions { display: flex; gap: 8px; align-items: center; }
-    .copy-btn, .view-btn {
-      background: transparent; border: 1px solid var(--accent); color: var(--accent);
-      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
-      white-space: nowrap;
-    }
+    .copy-btn, .view-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
     .copy-btn:hover, .view-btn:hover { background: var(--accent); color: white; }
-    .social-links { display: flex; gap: 10px; margin-top: 5px; }
-    .social-links a {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 10px;
-      background: var(--border); color: var(--text-secondary); text-decoration: none;
-      font-size: 1.2rem; transition: all 0.2s;
-    }
-    .social-links a:hover { background: var(--accent); color: white; }
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
-    .modal-content {
-      background: linear-gradient(135deg, #1a2940, #152238);
-      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-      max-width: 400px; width: 90%; text-align: center;
-    }
-    .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
-    }
+    .modal-content { background: linear-gradient(135deg, #1a2940, #152238); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
   </style>
 </head>
 <body>
   <a class="back-btn" href="/">← Назад</a>
   <h2 style="text-align:center;">Мой профиль</h2>
   <div id="profileContent">Загрузка...</div>
-
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const login = localStorage.getItem('karmabank_login');
@@ -112,13 +48,12 @@
       container.innerHTML = `
         <div class="profile-card">
           <div class="passport-display">
-            <a class="passport-number" href="/passport.html" title="Открыть цифровой паспорт">${user.passport || 'не назначен'}</a>
+            <a class="passport-number" href="/passport.html">${user.passport || 'не назначен'}</a>
             <div class="passport-actions">
               <button class="copy-btn" onclick="copyPassport()">📋 Копировать</button>
               <button class="view-btn" onclick="window.location.href='/passport.html'">🔍 Посмотреть</button>
             </div>
           </div>
-
           <div class="field" style="text-align: center;">
             <div class="avatar-section">
               <img src="${user.photo || 'belchonok.png'}" class="avatar-preview" id="avatarImg" alt="Аватар">
@@ -130,67 +65,23 @@
               </div>
             </div>
           </div>
-
-          <div class="field">
-            <label>Имя</label>
-            <input type="text" id="nameInput" value="${user.name || ''}" disabled>
-            <small style="color:var(--text-secondary)">Имя можно изменить только через администратора</small>
-          </div>
-          <div class="field">
-            <label>Фамилия</label>
-            <input type="text" id="surnameInput" value="${user.surname || ''}">
-          </div>
-          <div class="field">
-            <label>Дата рождения</label>
-            <input type="date" id="birthdateInput" value="${user.birthdate || ''}">
-          </div>
-          <div class="field">
-            <label>Должность</label>
-            <input type="text" id="positionInput" value="${user.position || ''}">
-          </div>
-          <div class="field">
-            <label>Обо мне</label>
-            <textarea id="aboutInput" rows="3">${user.about || ''}</textarea>
-          </div>
-          <div class="field">
-            <label>Ссылки (через запятую)</label>
-            <input type="text" id="linksInput" value="${user.links || ''}">
-          </div>
-
-          <div class="field">
-            <label>Социальные сети</label>
-            <div class="social-links">
-              <a href="#" id="vkLink" target="_blank" title="ВКонтакте">📘</a>
-              <a href="#" id="tgLink" target="_blank" title="Telegram">✈️</a>
-            </div>
-            <small style="color:var(--text-secondary);">Добавьте ссылки в поле «Ссылки»</small>
-          </div>
-
+          <div class="field"><label>Имя</label><input type="text" value="${user.name || ''}" disabled></div>
+          <div class="field"><label>Фамилия</label><input type="text" id="surnameInput" value="${user.surname || ''}"></div>
+          <div class="field"><label>Дата рождения</label><input type="date" id="birthdateInput" value="${user.birthdate || ''}"></div>
+          <div class="field"><label>Должность</label><input type="text" id="positionInput" value="${user.position || ''}"></div>
+          <div class="field"><label>Обо мне</label><textarea id="aboutInput" rows="3">${user.about || ''}</textarea></div>
+          <div class="field"><label>Ссылки</label><input type="text" id="linksInput" value="${user.links || ''}"></div>
           <button class="btn" onclick="saveProfile()">Сохранить</button>
         </div>
       `;
-
-      document.getElementById('photoFileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(ev) {
-            document.getElementById('avatarImg').src = ev.target.result;
-            document.getElementById('photoInput').value = ev.target.result.substring(0, 100);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-      document.getElementById('photoInput').addEventListener('input', function(e) {
+      document.getElementById('photoInput').addEventListener('input', (e) => {
         document.getElementById('avatarImg').src = e.target.value || 'belchonok.png';
       });
     }
 
     function copyPassport() {
       const passport = document.querySelector('.passport-number').textContent;
-      navigator.clipboard.writeText(passport).then(() => {
-        alert('Паспорт скопирован в буфер обмена');
-      });
+      navigator.clipboard.writeText(passport).then(() => alert('Паспорт скопирован'));
     }
 
     async function saveProfile() {
@@ -202,13 +93,9 @@
         links: document.getElementById('linksInput').value,
         photo: document.getElementById('photoInput').value
       };
-      try {
-        const res = await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(login)}&data=${encodeURIComponent(JSON.stringify(data))}`);
-        const result = await res.json();
-        showModal(result.success ? '✅ ' + result.message : '⚠️ ' + result.message);
-      } catch(e) {
-        showModal('❌ Ошибка соединения');
-      }
+      const res = await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(login)}&data=${encodeURIComponent(JSON.stringify(data))}`);
+      const result = await res.json();
+      showModal(result.success ? '✅ ' + result.message : '⚠️ ' + result.message);
     }
 
     function showModal(message) {
