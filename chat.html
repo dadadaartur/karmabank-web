@@ -6,37 +6,27 @@
   <title>Чат команды — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
-      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --border: #1f3350; --success: #10b981;
-    }
-    body {
-      font-family: 'Inter', sans-serif; background: var(--bg-primary);
-      color: var(--text-primary); display: flex; height: 100vh; margin: 0;
-    }
-    .sidebar {
-      width: 220px; background: var(--bg-card); border-right: 1px solid var(--border);
-      padding: 16px; overflow-y: auto;
-    }
+    :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350; --success: #10b981; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); display: flex; height: 100vh; margin: 0; }
+    .sidebar { width: 220px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 16px; overflow-y: auto; }
     .sidebar h3 { margin-bottom: 12px; }
-    .member {
-      padding: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer;
-      border-radius: 8px;
-    }
+    .member { padding: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 8px; }
     .member:hover { background: var(--bg-secondary); }
     .main-chat { flex: 1; display: flex; flex-direction: column; }
     .chat-header { padding: 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .back-btn { color: var(--text-secondary); cursor: pointer; background: none; border: 1px solid var(--border); padding: 5px 12px; border-radius: 15px; text-decoration: none; }
     .chat-box { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .message { max-width: 80%; padding: 10px 16px; border-radius: 16px; position: relative; }
+    .message { max-width: 80%; padding: 10px 16px; border-radius: 16px; }
     .user { align-self: flex-end; background: var(--accent); color: white; }
     .colleague { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border); }
-    .private { border: 1px dashed var(--accent); }
     .input-area { display: flex; padding: 12px; background: var(--bg-card); border-top: 1px solid var(--border); align-items: center; gap: 5px; }
     .input-area input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); }
     .input-area button { padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; }
-    .emoji-btn { font-size: 1.2rem; cursor: pointer; background: none; border: none; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: linear-gradient(135deg, #1a2940, #152238); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
+    .modal input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); }
   </style>
 </head>
 <body>
@@ -46,34 +36,40 @@
   </div>
   <div class="main-chat">
     <div class="chat-header">
-      <span><b>Общий чат</b> | Личные сообщения: <span id="privateTo">все</span></span>
       <a class="back-btn" href="/">← Назад</a>
+      <button class="btn" onclick="callAI()">🤖 Бельчонок</button>
     </div>
     <div class="chat-box" id="chatBox"></div>
     <div class="input-area">
-      <button class="emoji-btn" onclick="addEmoji()">😀</button>
-      <input type="text" id="userInput" placeholder="Введите сообщение (Enter — отправить)...">
+      <input type="text" id="userInput" placeholder="Введите сообщение...">
       <button onclick="sendMessage()">➤</button>
     </div>
   </div>
+
+  <div class="member-card-modal" id="memberCardModal">
+    <div class="member-card-content" id="memberCardContent"></div>
+  </div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const currentUser = localStorage.getItem('karmabank_login') || 'anonymous';
-    let privateRecipient = null;
 
     async function loadMembers() {
       const res = await fetch(`${API_URL}?action=getAllEmployees`);
       const employees = await res.json();
       document.getElementById('membersList').innerHTML = employees.map(e => `
-        <div class="member">
-          <span onclick="setPrivate('${e.name}')" style="cursor:pointer;color:var(--accent);">@${e.name}</span>
+        <div class="member" onclick="showMemberCard('${e.name}', '${e.department || ''}', '${e.energy || 0}')">
+          <span>${e.name}</span>
         </div>
       `).join('');
     }
 
-    function setPrivate(name) {
-      privateRecipient = name;
-      document.getElementById('privateTo').textContent = `@${name}`;
+    function showMemberCard(name, dept, energy) {
+      document.getElementById('memberCardContent').innerHTML = `
+        <h3>${name}</h3><p>Отдел: ${dept || '—'}</p><p>Энергия: ${energy}</p>
+        <button class="close-card-btn" onclick="document.getElementById('memberCardModal').classList.remove('active')">Закрыть</button>
+      `;
+      document.getElementById('memberCardModal').classList.add('active');
     }
 
     function addMessage(sender, text, cls) {
@@ -88,21 +84,35 @@
       const input = document.getElementById('userInput');
       const text = input.value.trim();
       if (!text) return;
-      const isPrivate = privateRecipient ? true : false;
-      addMessage(currentUser, (isPrivate ? `[лично для ${privateRecipient}] ` : '') + text, isPrivate ? 'user private' : 'user');
+      addMessage(currentUser, text, 'user');
       input.value = '';
-      try {
-        await fetch(`${API_URL}?action=sendMessage&sender=${encodeURIComponent(currentUser)}&text=${encodeURIComponent(text)}&private=${isPrivate ? '1' : '0'}&recipient=${encodeURIComponent(privateRecipient || '')}`);
-      } catch(e) {}
+      try { await fetch(`${API_URL}?action=sendMessage&sender=${encodeURIComponent(currentUser)}&text=${encodeURIComponent(text)}`); } catch(e) {}
     }
 
-    function addEmoji() {
-      document.getElementById('userInput').value += '😀';
+    function callAI() {
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `<div class="modal-content">
+        <h3>🤖 Задайте вопрос Бельчонку</h3>
+        <input type="text" id="aiQuestion" placeholder="Введите вопрос...">
+        <button class="btn" id="askBtn">Спросить</button>
+        <button class="modal-close-btn" id="cancelBtn">Отмена</button>
+      </div>`;
+      document.body.appendChild(modal);
+      document.getElementById('askBtn').onclick = async () => {
+        const question = document.getElementById('aiQuestion').value.trim();
+        modal.remove();
+        if (!question) return;
+        addMessage('Бельчонок', 'Думаю...', 'colleague');
+        try {
+          const res = await fetch(`${API_URL}?action=knowledgeChat&prompt=${encodeURIComponent(question)}`);
+          const data = await res.json();
+          document.querySelectorAll('.colleague').forEach(b => { if (b.textContent.startsWith('Бельчонок: Думаю')) b.remove(); });
+          addMessage('Бельчонок', data.reply || 'Нет ответа', 'colleague');
+        } catch(e) { addMessage('Бельчонок', 'Ошибка', 'colleague'); }
+      };
+      document.getElementById('cancelBtn').onclick = () => modal.remove();
     }
-
-    document.getElementById('userInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
 
     loadMembers();
   </script>
