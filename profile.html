@@ -57,12 +57,20 @@
       color: var(--accent);
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 16px;
+      flex-wrap: wrap; gap: 8px;
     }
-    .copy-btn {
+    .passport-number {
+      text-decoration: none; color: var(--accent); cursor: pointer;
+      transition: color 0.2s;
+    }
+    .passport-number:hover { color: #fff; text-decoration: underline; }
+    .passport-actions { display: flex; gap: 8px; align-items: center; }
+    .copy-btn, .view-btn {
       background: transparent; border: 1px solid var(--accent); color: var(--accent);
       padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+      white-space: nowrap;
     }
-    .copy-btn:hover { background: var(--accent); color: white; }
+    .copy-btn:hover, .view-btn:hover { background: var(--accent); color: white; }
     .social-links { display: flex; gap: 10px; margin-top: 5px; }
     .social-links a {
       display: inline-flex; align-items: center; justify-content: center;
@@ -103,13 +111,14 @@
       const container = document.getElementById('profileContent');
       container.innerHTML = `
         <div class="profile-card">
-          <!-- Цифровой паспорт вверху -->
           <div class="passport-display">
-            <span id="passportValue">${user.passport || 'не назначен'}</span>
-            <button class="copy-btn" onclick="copyPassport()">📋 Копировать</button>
+            <a class="passport-number" href="/passport.html" title="Открыть цифровой паспорт">${user.passport || 'не назначен'}</a>
+            <div class="passport-actions">
+              <button class="copy-btn" onclick="copyPassport()">📋 Копировать</button>
+              <button class="view-btn" onclick="window.location.href='/passport.html'">🔍 Посмотреть</button>
+            </div>
           </div>
 
-          <!-- Аватар с возможностью загрузки файла -->
           <div class="field" style="text-align: center;">
             <div class="avatar-section">
               <img src="${user.photo || 'belchonok.png'}" class="avatar-preview" id="avatarImg" alt="Аватар">
@@ -122,11 +131,10 @@
             </div>
           </div>
 
-          <!-- Основные поля -->
           <div class="field">
             <label>Имя</label>
             <input type="text" id="nameInput" value="${user.name || ''}" disabled>
-            <small style="color:var(--text-secondary)">Изменить может только администратор</small>
+            <small style="color:var(--text-secondary)">Имя можно изменить только через администратора</small>
           </div>
           <div class="field">
             <label>Фамилия</label>
@@ -149,30 +157,26 @@
             <input type="text" id="linksInput" value="${user.links || ''}">
           </div>
 
-          <!-- Соцсети (пока просто ссылки, можно указать в поле "Ссылки") -->
           <div class="field">
             <label>Социальные сети</label>
             <div class="social-links">
               <a href="#" id="vkLink" target="_blank" title="ВКонтакте">📘</a>
               <a href="#" id="tgLink" target="_blank" title="Telegram">✈️</a>
             </div>
-            <small style="color:var(--text-secondary);">Добавьте ссылки в поле «Ссылки» (например, vk.com/id, t.me/nick)</small>
+            <small style="color:var(--text-secondary);">Добавьте ссылки в поле «Ссылки»</small>
           </div>
 
           <button class="btn" onclick="saveProfile()">Сохранить</button>
         </div>
       `;
 
-      // Обработчик загрузки файла
       document.getElementById('photoFileInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
           reader.onload = function(ev) {
             document.getElementById('avatarImg').src = ev.target.result;
-            // для простоты сохраняем как base64 (если размер небольшой)
-            // в реальности нужно загружать на сервер, но пока так
-            document.getElementById('photoInput').value = ev.target.result.substring(0, 100); // сервер примет только короткую строку, обрежем
+            document.getElementById('photoInput').value = ev.target.result.substring(0, 100);
           };
           reader.readAsDataURL(file);
         }
@@ -183,7 +187,7 @@
     }
 
     function copyPassport() {
-      const passport = document.getElementById('passportValue').textContent;
+      const passport = document.querySelector('.passport-number').textContent;
       navigator.clipboard.writeText(passport).then(() => {
         alert('Паспорт скопирован в буфер обмена');
       });
