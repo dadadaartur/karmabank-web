@@ -27,6 +27,14 @@
     .modal-content { background: linear-gradient(135deg, #1a2940, #152238); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
     .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
     .modal input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); }
+    .ai-btn {
+      background: transparent; border: 1px solid var(--success); color: var(--success);
+      padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 6px;
+      cursor: pointer; font-weight: 600;
+    }
+    .ai-btn svg { width: 16px; height: 16px; stroke: var(--success); }
+    .ai-btn:hover { background: var(--success); color: white; }
+    .ai-btn:hover svg { stroke: white; }
   </style>
 </head>
 <body>
@@ -37,7 +45,10 @@
   <div class="main-chat">
     <div class="chat-header">
       <a class="back-btn" href="/">← Назад</a>
-      <button class="btn" onclick="callAI()">🤖 Бельчонок</button>
+      <button class="ai-btn" onclick="callAI()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Бельчонок AI
+      </button>
     </div>
     <div class="chat-box" id="chatBox"></div>
     <div class="input-area">
