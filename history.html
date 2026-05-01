@@ -28,7 +28,6 @@
       position: relative;
       overflow-x: hidden;
     }
-    /* Звёздный фон */
     .stars {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0; pointer-events: none;
@@ -181,7 +180,7 @@
     async function loadHistory() {
       const login = localStorage.getItem('karmabank_login');
       if (!login) {
-        document.getElementById('historyList').innerHTML = '<div class="empty-message">Необходимо войти.</div>';
+        document.getElementById('historyList').innerHTML = '<div class="empty-message">Войдите в систему, чтобы увидеть историю.</div>';
         return;
       }
 
@@ -191,20 +190,37 @@
           fetch(`${API_URL}?action=getHistory&login=${encodeURIComponent(login)}`),
           fetch(`${API_URL}?action=getAllEmployees`)
         ]);
-        const history = await histRes.json();
+
+        // Проверяем, что ответы успешны
+        if (!histRes.ok || !empRes.ok) {
+          throw new Error('Ошибка сети или сервера');
+        }
+
+        const historyData = await histRes.json();
         const employees = await empRes.json();
+
+        // Проверяем, что historyData — массив
+        if (!Array.isArray(historyData)) {
+          console.warn('История не массив:', historyData);
+          document.getElementById('historyList').innerHTML = '<div class="empty-message">Некорректные данные от сервера.</div>';
+          hideLoading();
+          return;
+        }
+
         hideLoading();
 
         const empMap = {};
-        employees.forEach(e => { empMap[e.login] = e.name; });
+        if (Array.isArray(employees)) {
+          employees.forEach(e => { empMap[e.login] = e.name; });
+        }
 
         const container = document.getElementById('historyList');
-        if (!history || history.length === 0) {
+        if (historyData.length === 0) {
           container.innerHTML = '<div class="empty-message">Операций пока нет</div>';
           return;
         }
 
-        container.innerHTML = history.map(h => {
+        container.innerHTML = historyData.map(h => {
           let typeClass = h.type === 'income' ? 'income' : 'expense';
           let prefix = h.type === 'income' ? '+' : '-';
           let description = h.comment || '';
@@ -221,19 +237,25 @@
             typeClass = 'transfer';
           }
 
+          // Безопасное отображение даты и времени
+          const dateStr = h.date || '';
+          const timeStr = h.time || '';
+          const dateTime = [dateStr, timeStr].filter(Boolean).join(' ');
+
           return `
             <div class="history-item">
               <div class="history-left">
                 <span class="history-amount ${typeClass}">${prefix}${h.amount} кармиков</span>
                 <span class="history-desc">${description}</span>
               </div>
-              <div class="history-date">${h.date} ${h.time}</div>
+              <div class="history-date">${dateTime}</div>
             </div>
           `;
         }).join('');
       } catch (e) {
         hideLoading();
-        document.getElementById('historyList').innerHTML = '<div class="empty-message">Ошибка загрузки данных</div>';
+        document.getElementById('historyList').innerHTML = `<div class="empty-message">Ошибка загрузки: ${e.message}</div>`;
+        console.error(e);
       }
     }
 
