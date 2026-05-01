@@ -37,10 +37,11 @@
     /* Анимации */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    /* Плавное медленное свечение баланса */
     @keyframes softGlow {
-      0% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.3)); }
-      50% { filter: drop-shadow(0 0 6px rgba(16,185,129,0.6)) drop-shadow(0 0 3px #34d399); }
-      100% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.3)); }
+      0% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.2)); }
+      50% { filter: drop-shadow(0 0 8px rgba(16,185,129,0.5)) drop-shadow(0 0 4px #34d399); }
+      100% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.2)); }
     }
     @keyframes starTwinkle {
       0% { transform: scale(1); opacity: 0.8; }
@@ -57,6 +58,7 @@
       50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
+    /* Исправленная анимация загрузки (стрелочки) */
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 6px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); }
@@ -202,11 +204,11 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: softGlow 3s infinite;
+      animation: softGlow 4s ease-in-out infinite;
       margin-bottom: 4px;
       font-weight: 700;
     }
-    /* Цифры баланса — только зелёные оттенки, мерцание слабое */
+    /* Цифры баланса — только зелёные оттенки, медленное мерцание */
     .balance-value {
       font-size: 3.6rem;
       font-weight: 800;
@@ -215,7 +217,7 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: softGlow 2s infinite;
+      animation: softGlow 4s ease-in-out infinite;
       line-height: 1;
       margin-bottom: 4px;
       -webkit-text-stroke: 0.6px rgba(0,0,0,0.5);
@@ -228,7 +230,7 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: softGlow 3s infinite;
+      animation: softGlow 4s ease-in-out infinite;
       margin-bottom: 22px;
     }
     .energy-line-wide {
@@ -425,7 +427,7 @@
       transform: translateY(-2px);
     }
 
-    /* База знаний (иконка книги, чтобы не дублировать звезду) */
+    /* База знаний — иконка книги (как было раньше) */
     .knowledge-fab {
       position: fixed; bottom: 24px; right: 24px;
       background: rgba(21,38,56,0.7);
@@ -555,17 +557,25 @@
           </button>
           <button class="action-btn" onclick="window.location.href='/spend.html'">
             <span class="icon-wrapper">
-              <!-- Объёмное яблоко с веточкой и листочком -->
+              <!-- Яркий сочный апельсин (вместо яблока) -->
               <svg viewBox="0 0 24 24" fill="none">
-                <defs><linearGradient id="gradAppleBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
-                <!-- Яблоко -->
-                <path d="M12 3.5 C9 3.5 7.5 5.5 7.5 8.5 C7.5 11.5 9 14 12 14 C15 14 16.5 11.5 16.5 8.5 C16.5 5.5 15 3.5 12 3.5Z" stroke="url(#gradAppleBody)" stroke-width="1.8" fill="url(#gradAppleBody)" fill-opacity="0.25"/>
-                <!-- Веточка -->
-                <path d="M12 3.5 L11.5 1.5" stroke="#a0522d" stroke-width="2" stroke-linecap="round"/>
+                <defs><linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+                <!-- Апельсин -->
+                <path d="M12 3 C8 3 6 5.5 6 9 C6 12.5 8 15 12 15 C16 15 18 12.5 18 9 C18 5.5 16 3 12 3Z" stroke="url(#orangeGrad)" stroke-width="1.8" fill="url(#orangeGrad)" fill-opacity="0.3"/>
+                <!-- Текстура апельсина (маленькие точки) -->
+                <circle cx="9" cy="7" r="0.6" fill="#fbbf24"/>
+                <circle cx="11" cy="6" r="0.6" fill="#fbbf24"/>
+                <circle cx="14" cy="7.5" r="0.6" fill="#fbbf24"/>
+                <circle cx="10" cy="9" r="0.6" fill="#fbbf24"/>
+                <circle cx="13" cy="10" r="0.6" fill="#fbbf24"/>
+                <circle cx="8" cy="10" r="0.6" fill="#fbbf24"/>
+                <circle cx="15" cy="9" r="0.6" fill="#fbbf24"/>
                 <!-- Листочек -->
-                <path d="M11.5 2.5 C10.5 1.5 9 1.8 9.5 3 C10 4 11 3.8 11.5 2.5Z" fill="#10b981" stroke="#10b981" stroke-width="0.5"/>
+                <path d="M12 3.5 C12 2.5 13.5 2 14 3 C14.5 4 13 4 12 3.5Z" fill="#10b981" stroke="#10b981" stroke-width="0.5"/>
+                <!-- Веточка -->
+                <path d="M12.5 3.2 L13.5 2.5" stroke="#a0522d" stroke-width="1.2" stroke-linecap="round"/>
                 <!-- Блик -->
-                <ellipse cx="10" cy="7" rx="1.2" ry="1.5" fill="white" fill-opacity="0.4"/>
+                <ellipse cx="9.5" cy="7" rx="1.5" ry="2" fill="white" fill-opacity="0.35" transform="rotate(-20 9.5 7)"/>
               </svg>
             </span>
             <span>Магазин</span>
@@ -624,7 +634,7 @@
       </div>
     </div>
   </div>
-  <!-- База знаний с иконкой книги (вместо звезды) -->
+  <!-- База знаний: вернули иконку книги (как раньше) -->
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path d="M4 6h16v12H4z" stroke-width="1.8"/>
