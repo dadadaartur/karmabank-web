@@ -34,7 +34,6 @@
     }
     input, textarea { user-select: text; }
 
-    /* Анимации */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes softGlow {
@@ -57,15 +56,13 @@
       50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
-    /* Анимация загрузки */
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
     .loading-arrows { display: flex; gap: 12px; align-items: center; justify-content: center; }
     .arrow {
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       background: linear-gradient(135deg, #f97316, #fbbf24);
       border-radius: 2px;
       animation: arrowPulse 1.2s infinite ease-in-out both;
@@ -82,15 +79,13 @@
 
     /* Звёздный фон */
     .stars-bg {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0; pointer-events: none;
     }
     .star-dot {
       position: absolute;
-      border-radius: 50%;
       background: white;
-      will-change: transform, opacity;
+      border-radius: 50%;
       animation: twinkleStar 2.5s infinite alternate;
       opacity: 0.6;
     }
@@ -109,39 +104,26 @@
       100% { opacity: 1; transform: scale(1); }
     }
     .success-animation {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 28px;
+      display: flex; flex-direction: column; align-items: center; gap: 28px;
     }
     .check-circle-large {
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      background: rgba(16,185,129,0.08);
-      border: 1.5px solid #10b981;
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(16,185,129,0.08); border: 1.5px solid #10b981;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 0 18px rgba(16,185,129,0.3);
       animation: checkFadeIn 0.9s cubic-bezier(0.23, 1, 0.32, 1) forwards;
     }
     .check-circle-large svg {
-      width: 32px; height: 32px;
-      stroke: #10b981;
-      stroke-width: 2.8;
-      fill: none;
-      stroke-dasharray: 50;
-      stroke-dashoffset: 50;
+      width: 32px; height: 32px; stroke: #10b981; stroke-width: 2.8;
+      fill: none; stroke-dasharray: 50; stroke-dashoffset: 50;
       animation: checkDraw 1s 0.3s ease forwards, softGlow 2s infinite;
     }
     .success-message {
-      font-size: 1.3rem;
-      font-weight: 600;
+      font-size: 1.3rem; font-weight: 600;
       background: linear-gradient(135deg, #10b981, #34d399);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
       animation: checkFadeIn 1s 0.5s ease forwards;
-      opacity: 0;
-      letter-spacing: 1px;
+      opacity: 0; letter-spacing: 1px;
     }
 
     /* Логин */
@@ -151,28 +133,21 @@
     }
     .login-form {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--accent);
-      border-radius: 24px; padding: 40px 30px;
+      border: 1px solid var(--accent); border-radius: 24px; padding: 40px 30px;
       box-shadow: 0 0 40px rgba(249,115,22,0.4), 0 15px 30px rgba(0,0,0,0.5);
-      width: 100%; max-width: 400px;
-      text-align: center; animation: fadeInUp 0.6s ease;
-      position: relative;
-      overflow: hidden;
+      width: 100%; max-width: 400px; text-align: center; animation: fadeInUp 0.6s ease;
+      position: relative; overflow: hidden;
     }
     .login-form::before {
-      content: '';
-      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 40%),
                   radial-gradient(circle at 80% 70%, rgba(16,185,129,0.1) 0%, transparent 40%);
-      background-size: 200% 200%;
-      animation: aurora 8s ease infinite;
-      pointer-events: none;
+      background-size: 200% 200%; animation: aurora 8s ease infinite; pointer-events: none;
     }
     .login-form > * { position: relative; z-index: 1; }
     .login-form .login-star {
       width: 48px; height: 48px; margin: 0 auto 16px;
-      filter: drop-shadow(0 0 8px #f97316);
-      animation: starTwinkle 2s infinite;
+      filter: drop-shadow(0 0 8px #f97316); animation: starTwinkle 2s infinite;
     }
     .login-form h2 { font-size: 2rem; margin-bottom: 8px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
@@ -195,8 +170,7 @@
     .header {
       background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border); padding: 12px 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
     }
     .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -211,97 +185,67 @@
       background: rgba(139, 92, 246, 0.1); padding: 4px 12px; border-radius: 20px;
       border: 1px solid rgba(139, 92, 246, 0.3);
     }
-
     .chat-header-btn, .path-to-perfect, .health-btn {
-      background: rgba(21,38,56,0.6);
-      border: 1px solid rgba(249,115,22,0.8);
-      border-radius: 40px;
-      padding: 6px 18px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s;
-      cursor: pointer;
-      color: var(--text-primary);
+      background: rgba(21,38,56,0.6); border: 1px solid rgba(249,115,22,0.8); border-radius: 40px;
+      padding: 6px 18px; font-weight: 600; font-size: 0.85rem; display: inline-flex;
+      align-items: center; gap: 8px; transition: all 0.3s; cursor: pointer; color: var(--text-primary);
     }
     .chat-header-btn svg, .path-to-perfect svg, .health-btn svg {
-      width: 20px;
-      height: 20px;
-      filter: drop-shadow(0 0 2px #f97316);
-      transition: all 0.3s;
+      width: 20px; height: 20px; filter: drop-shadow(0 0 2px #f97316); transition: all 0.3s;
     }
     .chat-header-btn:hover, .path-to-perfect:hover, .health-btn:hover {
-      box-shadow: var(--hologram-glow);
-      border-color: #c084fc;
-      transform: translateY(-2px);
+      box-shadow: var(--hologram-glow); border-color: #c084fc; transform: translateY(-2px);
     }
     .chat-text-glow {
       font-weight: 600; font-size: 0.85rem;
       background: linear-gradient(135deg, #c084fc, #38bdf8);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
       animation: softGlow 4s ease-in-out infinite;
     }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer;
-      display: flex; align-items: center; gap: 6px; font-size: 0.85rem;
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center;
+      gap: 6px; font-size: 0.85rem;
     }
     .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
 
     .container {
       max-width: 1300px; width: 100%; margin: 0 auto;
       padding: 24px; display: grid;
-      grid-template-columns: 420px 1fr; gap: 32px;
-      align-items: start;
+      grid-template-columns: 420px 1fr; gap: 32px; align-items: start;
     }
     .left-column { display: flex; flex-direction: column; gap: 20px; }
 
     .balance-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border-radius: 24px; padding: 28px 20px 20px;
-      text-align: center;
-      border: 1px solid var(--border);
-      position: relative;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-      overflow: hidden;
+      border-radius: 24px; padding: 28px 20px 20px; text-align: center;
+      border: 1px solid var(--border); position: relative;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4); overflow: hidden;
     }
     .balance-card::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.1) 0%, transparent 40%),
                   radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 40%);
-      background-size: 200% 200%;
-      animation: aurora 12s ease infinite;
-      pointer-events: none;
+      background-size: 200% 200%; animation: aurora 12s ease infinite; pointer-events: none;
     }
     .balance-card > * { position: relative; z-index: 1; }
     .balance-label {
       font-size: 1.2rem; letter-spacing: 2px;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; background-clip: text; color: transparent;
-      animation: softGlow 4s ease-in-out infinite;
-      margin-bottom: 4px; font-weight: 700;
+      animation: softGlow 4s ease-in-out infinite; margin-bottom: 4px; font-weight: 700;
     }
     .balance-value {
       font-size: 3.6rem; font-weight: 800;
       background: linear-gradient(135deg, #10b981, #34d399, #059669);
-      background-size: 200% 200%;
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      animation: softGlow 4s ease-in-out infinite;
-      line-height: 1; margin-bottom: 4px;
+      background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: softGlow 4s ease-in-out infinite; line-height: 1; margin-bottom: 4px;
     }
     .balance-sub {
       font-size: 1.2rem; font-weight: 700;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; background-clip: text; color: transparent;
-      animation: softGlow 4s ease-in-out infinite;
-      margin-bottom: 22px;
+      animation: softGlow 4s ease-in-out infinite; margin-bottom: 22px;
     }
     .energy-line-wide {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -310,12 +254,9 @@
       background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.15);
     }
     .energy-icon {
-      width: 20px; height: 20px;
-      stroke: #f97316; fill: none;
-      filter: drop-shadow(0 0 4px #f97316);
-      animation: softGlow 2s infinite;
+      width: 20px; height: 20px; stroke: #f97316; fill: none;
+      filter: drop-shadow(0 0 4px #f97316); animation: softGlow 2s infinite;
     }
-
     .balance-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
     .action-btn {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
@@ -343,22 +284,6 @@
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    .task-card {
-      background: var(--bg-card); border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
-      border: 1px solid rgba(249,115,22,0.5); display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
-    }
-    .task-card:hover { border-color: #c084fc; box-shadow: 0 0 18px rgba(249,115,22,0.6); transform: translateY(-2px); }
-    .btn-task {
-      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
-      padding: 8px 24px; font-weight: 800; font-size: 0.85rem; cursor: pointer;
-      transition: all 0.3s;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .btn-task:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02); }
-    .status-global { background: rgba(16,185,129,0.2); color: var(--success); padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; }
-
     .premium-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 20px; justify-content: space-between; }
     .premium-feature-btn {
       flex: 1; min-width: 160px; background: rgba(21,38,56,0.5); backdrop-filter: blur(4px);
@@ -419,7 +344,6 @@
   </style>
 </head>
 <body>
-<!-- Оптимизированный звёздный фон -->
 <div class="stars-bg" id="starsBackground"></div>
 
 <div id="loginScreen" class="login-screen">
@@ -517,20 +441,23 @@
     </div>
     <div class="tasks-panel">
       <h3 onclick="window.location.href='/tasks.html'">Задания</h3>
-      <div id="inProgressTasks"></div>
+      <!-- Вместо списка заданий теперь кнопка перехода -->
+      <div id="inProgressTasks" style="margin-bottom: 18px;">
+        <button class="wide-btn" onclick="window.location.href='/tasks.html'" style="max-width: 300px;">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Перейти к заданиям
+        </button>
+      </div>
       <div class="premium-row">
         <div class="premium-feature-btn">
           <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#f97316" stroke-width="1.5"/><circle cx="9" cy="7" r="3" stroke="#f97316" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="#c084fc" stroke-width="1.5"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#c084fc" stroke-width="1.5"/></svg>
           <span>Задания от партнёров</span>
         </div>
         <div class="premium-feature-btn">
-          <!-- Новый значок турниров -->
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M8 2h8l-2 5h-4L8 2z" stroke="#fbbf24" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="M9 7v3a4 4 0 0 0 8 0V7" stroke="#fbbf24" stroke-width="1.5"/>
-            <path d="M12 11v2" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="12" cy="14" r="1.5" fill="#fbbf24" stroke="none"/>
-            <path d="M8 18h8l-1 3H9l-1-3z" stroke="#fbbf24" stroke-width="1.5" stroke-linejoin="round" fill="rgba(251,191,36,0.1)"/>
+          <svg viewBox="0 0 24 24" fill="none" style="width:30px; height:30px;">
+            <path d="M8 3h8l-2 4H10L8 3z" stroke="#fbbf24" stroke-width="1.5"/>
+            <path d="M10 7v2a3 3 0 0 0 6 0V7" stroke="#fbbf24" stroke-width="1.5" fill="rgba(251,191,36,0.15)"/>
+            <circle cx="12" cy="12" r="1" fill="#fbbf24"/>
           </svg>
           <span>Турниры</span>
         </div>
@@ -539,7 +466,7 @@
           <span>Обсуждения</span>
         </div>
         <div class="premium-feature-btn">
-          <svg viewBox="0 0 24 24" fill="none">
+          <svg viewBox="0 0 24 24" fill="none" style="width:30px; height:30px;">
             <circle cx="12" cy="12" r="5.5" stroke="#f97316" stroke-width="1.5"/>
             <circle cx="12" cy="12" r="1" fill="#f97316"/>
             <ellipse cx="12" cy="12" rx="8.5" ry="2.5" stroke="#f97316" stroke-width="1.2" fill="none" transform="rotate(-15 12 12)"/>
@@ -596,7 +523,7 @@
     overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
     document.body.appendChild(overlay);
   }
-  function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+  function hideLoading() { const o = document.querySelector('.loading-overlay'); if (o) o.remove(); }
 
   function updateEnergyDisplay(energy) {
     document.getElementById('energyDisplay').innerHTML = `
@@ -608,8 +535,7 @@
   }
 
   function showSuccessNotification(message) {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
+    const modal = document.createElement('div'); modal.className = 'modal active';
     modal.innerHTML = `
       <div class="modal-content">
         <div class="success-animation">
@@ -619,13 +545,9 @@
           <div class="success-message">${message}</div>
         </div>
         <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
-      </div>
-    `;
+      </div>`;
     document.body.appendChild(modal);
-    // Увеличил время показа до 6 секунд
-    setTimeout(() => {
-      if (modal && modal.parentNode) modal.remove();
-    }, 6000);
+    setTimeout(() => { if (modal && modal.parentNode) modal.remove(); }, 6000);
   }
 
   function login() {
@@ -648,38 +570,16 @@
           document.getElementById('userDept').textContent = user.department || '';
           document.getElementById('userPoints').textContent = currentPoints;
           updateEnergyDisplay(currentEnergy);
-          loadInProgressTasks();
+          // Задания на главной больше не загружаются
         } else { document.getElementById('loginError').textContent = 'Пользователь не найден'; }
       })
       .catch(() => { hideLoading(); document.getElementById('loginError').textContent = 'Ошибка соединения'; });
   }
   function logout() { localStorage.removeItem('karmabank_login'); location.reload(); }
-  async function loadInProgressTasks() {
-    showLoading();
-    try {
-      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
-      const tasks = await res.json();
-      const activeTasks = tasks.filter(t => t.status === 'Назначено' || t.status === 'В работе');
-      const container = document.getElementById('inProgressTasks');
-      if (!activeTasks.length) { container.innerHTML = `<div class="empty-tasks">✨ Новых заданий пока нет ✨</div>`; return; }
-      container.innerHTML = activeTasks.slice(0,3).map(t => {
-        let btnHtml = '';
-        if (t.status === 'Назначено') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); takeTask('${t.task}')">Взять</button>`;
-        else if (t.status === 'В работе') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); openCommentModal('${t.task}')">Выполнить</button>`;
-        return `<div class="task-card" onclick="window.location.href='/tasks.html'"><span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status-global">Общее</span>' : ''}</span>${btnHtml}</div>`;
-      }).join('');
-    } finally { hideLoading(); }
-  }
-  async function takeTask(taskName) { showLoading(); await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`); hideLoading(); loadInProgressTasks(); }
-  function openCommentModal(taskName) {
-    const modal = document.createElement('div'); modal.className='modal active';
-    modal.innerHTML=`<div class="modal-content"><h3>Отчёт</h3><textarea id="commentInput" placeholder="Опишите результат..."></textarea><button class="btn-task" id="submitCommentBtn">Отправить</button><button class="modal-close-btn" id="cancelCommentBtn">Отмена</button></div>`;
-    document.body.appendChild(modal);
-    document.getElementById('submitCommentBtn').onclick=async()=>{ const comment=document.getElementById('commentInput').value.trim(); modal.remove(); if(!comment)return; showLoading(); await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`); hideLoading(); loadInProgressTasks(); };
-    document.getElementById('cancelCommentBtn').onclick=()=>modal.remove();
-  }
+
   function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
   function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
+
   async function executeTransfer() {
     const receiver = document.getElementById('receiverLogin').value.trim();
     const amount = document.getElementById('transferAmount').value;
@@ -707,43 +607,39 @@
     } catch (e) { hideLoading(); document.getElementById('transferError').textContent = 'Ошибка соединения'; }
   }
 
-  // Оптимизированный фон звёзд
-  function initStars() {
+  // Инициализация звёзд
+  (function initStars() {
     const container = document.getElementById('starsBackground');
     const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc', '#38bdf8'];
     for (let i = 0; i < 50; i++) {
-      const star = document.createElement('div');
-      star.className = 'star-dot';
+      const star = document.createElement('div'); star.className = 'star-dot';
       const size = Math.random() * 2.5 + 0.8;
-      star.style.width = size + 'px';
-      star.style.height = size + 'px';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
+      star.style.width = size + 'px'; star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
       star.style.background = colors[Math.floor(Math.random() * colors.length)];
       star.style.animationDelay = Math.random() * 2 + 's';
       star.style.animationDuration = (Math.random() * 2 + 1.8) + 's';
       container.appendChild(star);
     }
-  }
-  initStars();
+  })();
 
   if (currentLogin) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainScreen').style.display = 'flex';
     showLoading();
     fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
-      .then(r=>r.json()).then(async user=>{
+      .then(r => r.json()).then(async user => {
         hideLoading();
-        if(user){
-          currentPoints=user.points||0; currentEnergy=user.energy||0;
-          document.getElementById('userNameDisplay').textContent=user.name;
-          document.getElementById('userDept').textContent=user.department||'';
+        if (user) {
+          currentPoints = user.points || 0;
+          currentEnergy = user.energy || 0;
+          document.getElementById('userNameDisplay').textContent = user.name;
+          document.getElementById('userDept').textContent = user.department || '';
           await loadLevels();
-          document.getElementById('userPoints').textContent=currentPoints;
+          document.getElementById('userPoints').textContent = currentPoints;
           updateEnergyDisplay(currentEnergy);
-          loadInProgressTasks();
         }
-      }).catch(()=>hideLoading());
+      }).catch(() => hideLoading());
   }
 </script>
 </body>
