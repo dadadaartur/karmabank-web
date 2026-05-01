@@ -33,13 +33,17 @@
     }
     input[type="text"], input[type="number"], textarea { user-select: text; }
 
-    /* Анимации */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes karmaGlow {
       0% { text-shadow: 0 0 10px #10b981, 0 0 20px #10b981; }
       50% { text-shadow: 0 0 20px #34d399, 0 0 35px #059669; }
       100% { text-shadow: 0 0 10px #10b981, 0 0 20px #10b981; }
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
     @keyframes pulse-glow {
@@ -52,60 +56,49 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    @keyframes spinStar { 100% { transform: rotate(360deg); } }
-    @keyframes colorShift {
-      0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); }
-      50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); }
-      100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); }
-    }
 
-    /* Загрузочное солнце (только на главной) */
-    .loading-overlay.sun {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
+    /* Супер-мерцающие стрелочки загрузки (голограмма + градиент) */
+    @keyframes arrowPulse {
+      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
+      50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
-    .loading-sphere {
-      width: 90px; height: 90px;
-      background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0);
-      border-radius: 50%;
-      animation: spinStar 2s linear infinite, colorShift 3s infinite;
-      box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700;
-      position: relative;
-    }
-    .loading-sphere::after {
-      content: '';
-      position: absolute;
-      top: -10px; left: -10px; right: -10px; bottom: -10px;
-      background: radial-gradient(circle at 30% 30%, rgba(255,215,0,0.6), transparent 70%);
-      border-radius: 50%;
-      animation: spinStar 2s linear infinite reverse;
-      filter: blur(15px);
-    }
-
-    /* Альтернативная загрузка (стрелочки) для всех остальных мест */
-    .loading-arrows {
-      display: flex; gap: 8px;
-      align-items: center; justify-content: center;
-    }
-    .loading-arrows .arrow {
-      width: 10px; height: 10px;
-      background: var(--accent);
+    .loading-arrows { display: flex; gap: 10px; align-items: center; justify-content: center; }
+    .arrow {
+      width: 12px; height: 12px;
+      background: linear-gradient(135deg, #f97316, #fbbf24);
       border-radius: 2px;
       animation: arrowPulse 1.2s infinite ease-in-out both;
       transform: rotate(45deg);
+      box-shadow: 0 0 10px var(--accent);
     }
-    .loading-arrows .arrow:nth-child(1) { animation-delay: 0s; }
-    .loading-arrows .arrow:nth-child(2) { animation-delay: 0.2s; }
-    .loading-arrows .arrow:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes arrowPulse {
-      0%, 100% { opacity: 0.3; transform: rotate(45deg) scale(0.8); }
-      50% { opacity: 1; transform: rotate(45deg) scale(1.2); }
-    }
-    .loading-overlay.arrows {
+    .arrow:nth-child(1) { animation-delay: 0s; }
+    .arrow:nth-child(2) { animation-delay: 0.15s; }
+    .arrow:nth-child(3) { animation-delay: 0.3s; }
+    .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 9999;
       display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Анимация успешного перевода (стрелки → галочка) */
+    @keyframes transformToCheck {
+      0% { opacity: 1; transform: scale(1) rotate(45deg); }
+      50% { opacity: 0.5; transform: scale(1.5) rotate(45deg); }
+      100% { opacity: 0; transform: scale(1) rotate(45deg); }
+    }
+    @keyframes checkAppear {
+      0% { opacity: 0; transform: scale(0); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .success-animation {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .success-animation .arrows { display: flex; gap: 6px; animation: transformToCheck 0.8s forwards; }
+    .success-animation .checkmark {
+      display: none; width: 30px; height: 30px;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      clip-path: polygon(30% 50%, 15% 65%, 0% 50%, 15% 35%);
+      animation: checkAppear 0.4s forwards;
     }
 
     .login-screen {
@@ -118,7 +111,7 @@
       box-shadow: var(--shadow); width: 100%; max-width: 400px;
       text-align: center; animation: fadeInUp 0.6s ease;
     }
-    .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .login-form h2 { font-size: 2rem; margin-bottom: 8px; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
     .login-form input[type="text"] {
       width: 100%; padding: 14px 16px; border: 1px solid var(--border);
@@ -141,27 +134,20 @@
       display: flex; align-items: center; justify-content: space-between;
       gap: 12px;
     }
-    .header h1 {
-      font-size: 1.4rem; font-weight: 800; cursor: pointer;
-      display: flex; align-items: center; gap: 10px;
-      white-space: nowrap;
-    }
+    .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
     .header-left-group { display: flex; align-items: center; gap: 16px; }
     .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .user-name-link {
       font-weight: 700; font-size: 1rem; cursor: pointer;
       background: linear-gradient(135deg, #c084fc, #818cf8, #38bdf8);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transition: all 0.2s;
     }
-    .user-name-link:hover { transform: scale(1.05); text-shadow: 0 0 15px rgba(139, 92, 246, 0.8); }
     .user-level-badge {
       display: flex; align-items: center; gap: 4px;
       background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3);
       padding: 4px 10px; border-radius: 20px;
-      font-size: 1.2rem;
     }
+    .user-level-badge .level-icon { font-size: 1.5rem; }
     .user-dept {
       color: #c084fc; font-weight: 500; font-size: 0.85rem;
       background: rgba(139, 92, 246, 0.1); padding: 4px 12px; border-radius: 20px;
@@ -171,28 +157,24 @@
       background: linear-gradient(135deg, #f97316, #c084fc);
       border: none; color: white; padding: 6px 14px; border-radius: 20px;
       font-weight: 700; font-size: 0.8rem; cursor: pointer;
-      display: flex; align-items: center; gap: 6px;
-      transition: all 0.2s; white-space: nowrap;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
     }
     .path-to-perfect svg { width: 16px; height: 16px; stroke: white; stroke-width: 2; fill: none; }
     .path-to-perfect:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(249,115,22,0.5); }
     .chat-header-btn {
       background: transparent; border: 1px solid var(--accent); color: var(--accent);
       padding: 6px 12px; border-radius: 20px; cursor: pointer;
-      font-weight: 600; font-size: 0.8rem;
-      display: flex; align-items: center; gap: 4px;
-      transition: all 0.2s;
+      font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;
     }
     .chat-header-btn svg { width: 16px; height: 16px; stroke: currentColor; }
     .chat-header-btn:hover { background: var(--accent); color: white; }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer;
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 6px; font-size: 0.85rem;
     }
-    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
     .logout-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
 
     .container {
       max-width: 1300px; width: 100%; margin: 0 auto;
@@ -205,28 +187,23 @@
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border-radius: 24px; padding: 28px 20px 20px; text-align: center;
       border: 1px solid var(--border); position: relative;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4); overflow: hidden;
     }
     .balance-card::before {
       content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background: radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
                   radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 40%),
                   radial-gradient(circle at 50% 50%, rgba(249,115,22,0.06) 0%, transparent 50%);
       background-size: 200% 200%;
       animation: aurora 12s ease-in-out infinite;
-      z-index: 0;
-      pointer-events: none;
+      z-index: 0; pointer-events: none;
     }
     .balance-card > * { position: relative; z-index: 1; }
     .balance-label {
       font-size: 1.2rem; letter-spacing: 2px;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
       animation: karmaGlow 3s infinite;
       margin-bottom: 4px; font-weight: 700;
     }
@@ -235,20 +212,13 @@
       background: linear-gradient(135deg, #10b981, #34d399, #f9a826, #f97316);
       background-size: 300% 300%;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
       animation: karmaGlow 2.5s infinite, gradientShift 4s ease infinite;
       line-height: 1; margin-bottom: 4px;
-    }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
     .balance-sub {
       font-size: 1.2rem; font-weight: 700;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
       animation: karmaGlow 3s infinite;
       margin-bottom: 22px;
     }
@@ -256,8 +226,7 @@
       display: block; width: 100%; text-align: center;
       font-size: 1rem; color: var(--accent); font-weight: 600;
       margin-bottom: 20px; padding: 8px; border-radius: 12px;
-      background: rgba(249,115,22,0.05);
-      border: 1px solid rgba(249,115,22,0.15);
+      background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.15);
     }
     .balance-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
     .action-btn {
@@ -307,14 +276,9 @@
     .menu-card:hover svg { stroke: var(--accent); animation: pulse-glow 1.5s infinite; }
 
     .tasks-panel h3 {
-      cursor: pointer;
-      font-size: 1.4rem;
-      font-weight: 800;
-      margin-bottom: 18px;
+      cursor: pointer; font-size: 1.4rem; font-weight: 800; margin-bottom: 18px;
       background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
     .task-card {
       background: var(--bg-card); border-radius: 18px; padding: 16px 18px; margin-bottom: 12px;
@@ -338,29 +302,24 @@
     .empty-tasks { color: var(--text-secondary); padding: 30px; text-align: center; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); }
 
     .fancy-buttons-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      justify-content: space-between;
+      display: flex; gap: 12px; margin-top: 20px; justify-content: space-between;
     }
     .fancy-btn-disabled {
       flex: 1;
       background: linear-gradient(135deg, rgba(21,38,56,0.7), rgba(15,31,53,0.7));
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 10px;
-      text-align: center;
-      font-weight: 600;
-      color: var(--text-secondary);
-      cursor: default;
-      transition: all 0.3s;
-      backdrop-filter: blur(5px);
+      border-radius: 16px; padding: 14px 10px; text-align: center;
+      font-weight: 600; color: var(--text-secondary);
+      cursor: default; transition: all 0.3s; backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
+    .fancy-btn-disabled svg { width: 20px; height: 20px; stroke: var(--text-secondary); }
     .fancy-btn-disabled:hover {
       border-color: var(--accent);
       box-shadow: 0 0 20px rgba(249,115,22,0.3);
       color: var(--text-primary);
     }
+    .fancy-btn-disabled:hover svg { stroke: var(--accent); }
 
     .knowledge-fab {
       position: fixed; bottom: 24px; right: 24px;
@@ -369,7 +328,7 @@
       display: flex; align-items: center; gap: 10px;
       cursor: pointer; border: none; color: white; font-weight: 700;
       box-shadow: 0 10px 30px rgba(249,115,22,0.5);
-      transition: transform 0.3s; z-index: 1000; font-size: 0.95rem;
+      z-index: 1000; font-size: 0.95rem;
     }
     .knowledge-fab img { height: 28px; }
     .knowledge-fab:hover { transform: translateY(-3px); }
@@ -378,7 +337,7 @@
       padding: 10px 20px; border-radius: 14px; font-weight: 600; cursor: pointer;
       transition: all 0.2s;
     }
-    .btn:hover { background: var(--accent-hover); box-shadow: var(--cosmic-glow); }
+    .btn:hover { background: var(--accent-hover); box-shadow: 0 0 15px rgba(249,115,22,0.5); }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -392,23 +351,9 @@
       box-shadow: 0 0 60px rgba(249,115,22,0.6), 0 0 120px rgba(99, 102, 241, 0.2);
       animation: modalPop 0.4s ease;
     }
-    .modal-content h2 {
-      font-size: 1.8rem; margin-bottom: 20px;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .modal-content input, .modal-content textarea {
-      width: 100%; padding: 14px; margin-bottom: 16px;
-      background: rgba(21,38,56,0.6); border: 1px solid var(--border);
-      border-radius: 14px; color: var(--text-primary); font-size: 1rem;
-      outline: none;
-    }
-    .modal-content input:focus, .modal-content textarea:focus { border-color: var(--accent); }
     .modal-close-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 12px 24px; border-radius: 24px; cursor: pointer; margin-top: 16px;
-      transition: all 0.2s;
     }
     .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
 
@@ -435,21 +380,13 @@
       <div class="header-left-group">
         <h1 onclick="location.reload()">Кармический банк</h1>
         <button class="path-to-perfect" onclick="window.location.href='/simulator.html'">
-          <svg viewBox="0 0 24 24">
-            <defs>
-              <linearGradient id="perfectStar" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#f97316" />
-                <stop offset="100%" stop-color="#c084fc" />
-              </linearGradient>
-            </defs>
-            <polygon points="12,2 14,8 21,9 16,14 18,21 12,17 6,21 8,14 3,9 10,8" stroke="url(#perfectStar)" fill="none" />
-          </svg>
+          <svg viewBox="0 0 24 24"><defs><linearGradient id="perfectStar" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs><polygon points="12,2 14,8 21,9 16,14 18,21 12,17 6,21 8,14 3,9 10,8" stroke="url(#perfectStar)" fill="none"/></svg>
           Путь к совершенству
         </button>
       </div>
       <div class="user-info">
         <span id="userNameDisplay" class="user-name-link" onclick="window.location.href='/profile.html'"></span>
-        <span class="user-level-badge" id="userLevelBadge"></span>
+        <span class="user-level-badge" id="userLevelBadge"><span class="level-icon"></span></span>
         <span class="user-dept" id="userDept"></span>
         <button class="chat-header-btn" onclick="window.location.href='/chat.html'">
           <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -472,25 +409,31 @@
             <button class="action-btn" onclick="openTransferModal()">
               <span class="icon-wrapper">
                 <svg viewBox="0 0 24 24">
-                  <defs>
-                    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#c084fc"/>
-                      <stop offset="100%" stop-color="#38bdf8"/>
-                    </linearGradient>
-                  </defs>
-                  <!-- Широкая красивая иконка перевода -->
+                  <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs>
                   <path d="M2 7 L22 7 M15 2 L22 7 L15 12 M22 17 L2 17 M9 12 L2 17 L9 22" stroke="url(#g1)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                  <polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" stroke="url(#g1)" fill="none" opacity="0.5" transform="scale(0.6) translate(8, 8)" />
                 </svg>
               </span>
               Перевести
             </button>
             <button class="action-btn" onclick="window.location.href='/spend.html'">
-              <span class="icon-wrapper"><svg viewBox="0 0 24 24"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs><path d="M3 3h2l1 5h13l1.5 7H6" stroke="url(#g2)"/><circle cx="8" cy="20" r="1.5" stroke="url(#g2)"/><circle cx="17" cy="20" r="1.5" stroke="url(#g2)"/></svg></span>
+              <span class="icon-wrapper">
+                <svg viewBox="0 0 24 24">
+                  <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
+                  <!-- Яблоко с листочком -->
+                  <path d="M12 4 C8 4 6 7 6 12 C6 16 9 20 12 20 C15 20 18 16 18 12 C18 7 16 4 12 4Z M12 2 L10 5 M14 2 L16 5" stroke="url(#g2)" stroke-width="1.5" fill="none"/>
+                </svg>
+              </span>
               Магазин
             </button>
             <button class="action-btn" onclick="window.location.href='/history.html'">
-              <span class="icon-wrapper"><svg viewBox="0 0 24 24"><defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="3" stroke="url(#g3)"/><path d="M3 9h18" stroke="url(#g3)"/><path d="M8 3v18" stroke="url(#g3)"/><circle cx="7" cy="13" r="1" fill="url(#g3)" stroke="none"/><circle cx="15" cy="7" r="1" fill="url(#g3)" stroke="none"/></svg></span>
+              <span class="icon-wrapper">
+                <svg viewBox="0 0 24 24">
+                  <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs>
+                  <!-- Кошелёк -->
+                  <path d="M4 8 H20 V16 H4 Z M6 8 V6 A2 2 0 0 1 10 6 M14 8 V6 A2 2 0 0 1 18 6" stroke="url(#g3)" stroke-width="1.5" fill="none"/>
+                  <circle cx="12" cy="12" r="2" stroke="url(#g3)" stroke-width="1.5"/>
+                </svg>
+              </span>
               Операции
             </button>
           </div>
@@ -511,15 +454,15 @@
         <div id="inProgressTasks">Нет активных заданий</div>
         <div class="fancy-buttons-row">
           <div class="fancy-btn-disabled">
-            <svg viewBox="0 0 24 24" class="menu-icon" style="width:24px;height:24px;stroke:var(--accent);margin-bottom:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 4 L15 10 L21 11 L16 16 L18 22 L12 18 L6 22 L8 16 L3 11 L9 10 Z" stroke="var(--text-secondary)"/><circle cx="12" cy="12" r="2" fill="none" stroke="var(--text-secondary)"/></svg>
             Забота о здоровье
           </div>
           <div class="fancy-btn-disabled">
-            <svg viewBox="0 0 24 24" class="menu-icon" style="width:24px;height:24px;stroke:var(--accent);margin-bottom:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 9 L22 10 L17 16 L19 22 L12 17 L5 22 L7 16 L2 10 L9 9 Z" stroke="var(--text-secondary)"/><line x1="12" y1="14" x2="12" y2="20" stroke="var(--text-secondary)"/></svg>
             Новости проекта
           </div>
           <div class="fancy-btn-disabled">
-            <svg viewBox="0 0 24 24" class="menu-icon" style="width:24px;height:24px;stroke:var(--accent);margin-bottom:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 17 L6 21 L7 14 L2 9 L9 8 Z" stroke="var(--text-secondary)"/><circle cx="12" cy="14" r="5" fill="none" stroke="var(--text-secondary)"/></svg>
             Бизнес-гороскоп
           </div>
         </div>
@@ -549,23 +492,17 @@
     let levelsCache = [];
 
     async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
-    function getLevelInfo(energy) {
+    function getLevelIcon(energy) {
       const icons = ['✦','✧','⭑','✶','✷','✸'];
-      if (!levelsCache.length) return { icon: icons[0], name: 'Искра', id: 0 };
-      let level = levelsCache[0], idx = 0;
-      for (let i=levelsCache.length-1; i>=0; i--) { if (energy >= levelsCache[i].energy) { level = levelsCache[i]; idx = i; break; } }
-      return { icon: icons[idx] || '✨', name: level.name, id: idx };
+      if (!levelsCache.length) return icons[0];
+      let idx = 0;
+      for (let i=levelsCache.length-1; i>=0; i--) { if (energy >= levelsCache[i].energy) { idx = i; break; } }
+      return icons[idx] || '✨';
     }
 
-    function showSunLoading() {
+    function showLoading() {
       const overlay = document.createElement('div');
-      overlay.className = 'loading-overlay sun';
-      overlay.innerHTML = '<div class="loading-sphere"></div>';
-      document.body.appendChild(overlay);
-    }
-    function showArrowsLoading() {
-      const overlay = document.createElement('div');
-      overlay.className = 'loading-overlay arrows';
+      overlay.className = 'loading-overlay';
       overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
       document.body.appendChild(overlay);
     }
@@ -577,7 +514,7 @@
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
-      showSunLoading();
+      showLoading();
       fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`)
         .then(r => r.json())
         .then(async user => {
@@ -592,8 +529,8 @@
             document.getElementById('mainScreen').style.display = 'flex';
             document.getElementById('userNameDisplay').textContent = user.name;
             document.getElementById('userDept').textContent = user.department || '';
-            const lvl = getLevelInfo(currentEnergy);
-            document.getElementById('userLevelBadge').innerHTML = `<span class="level-icon">${lvl.icon}</span>`;
+            const icon = getLevelIcon(currentEnergy);
+            document.querySelector('#userLevelBadge .level-icon').textContent = icon;
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
             fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
@@ -653,7 +590,7 @@
         const comment = document.getElementById('commentInput').value.trim();
         modal.remove();
         if (!comment) return;
-        showArrowsLoading();
+        showLoading();
         await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`);
         hideLoading();
         loadInProgressTasks();
@@ -663,12 +600,13 @@
 
     function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
     function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
+
     async function executeTransfer() {
       const receiver = document.getElementById('receiverLogin').value.trim();
       const amount = document.getElementById('transferAmount').value;
       const comment = document.getElementById('transferComment').value.trim();
       if (!receiver || !amount) { document.getElementById('transferError').textContent = 'Заполните обязательные поля'; return; }
-      showArrowsLoading();
+      showLoading();
       try {
         const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}&comment=${encodeURIComponent(comment)}`);
         const result = await res.json();
@@ -678,22 +616,35 @@
           const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
           const user = await userRes.json();
           if (user) { currentPoints = user.points; document.getElementById('userPoints').textContent = currentPoints; }
-          showModal(`<p style="color:var(--success);">Перевод выполнен!</p>`);
+          showSuccessAnimation();
         } else { document.getElementById('transferError').textContent = result.message; }
       } catch (e) { hideLoading(); document.getElementById('transferError').textContent = 'Ошибка соединения'; }
     }
 
-    function showModal(html) {
+    function showSuccessAnimation() {
       const modal = document.createElement('div');
       modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content">${html}<button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+      modal.innerHTML = `<div class="modal-content" style="text-align:center;">
+        <div class="success-animation">
+          <div class="arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>
+          <div class="checkmark"></div>
+        </div>
+        <p style="color:var(--success); margin-top:20px;">Перевод выполнен!</p>
+        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
+      </div>`;
       document.body.appendChild(modal);
+      setTimeout(() => {
+        const arrows = modal.querySelector('.arrows');
+        const check = modal.querySelector('.checkmark');
+        if (arrows) { arrows.style.animation = 'transformToCheck 0.8s forwards'; arrows.style.opacity = '0'; }
+        if (check) { check.style.display = 'block'; check.style.animation = 'checkAppear 0.4s forwards'; }
+      }, 100);
     }
 
     if (currentLogin) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
-      showSunLoading();
+      showLoading();
       fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
         .then(r => r.json())
         .then(async user => {
@@ -704,8 +655,7 @@
             document.getElementById('userNameDisplay').textContent = user.name;
             document.getElementById('userDept').textContent = user.department || '';
             await loadLevels();
-            const lvl = getLevelInfo(currentEnergy);
-            document.getElementById('userLevelBadge').innerHTML = `<span class="level-icon">${lvl.icon}</span>`;
+            document.querySelector('#userLevelBadge .level-icon').textContent = getLevelIcon(currentEnergy);
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
             loadInProgressTasks();
