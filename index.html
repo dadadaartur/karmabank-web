@@ -86,16 +86,17 @@
       top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0; pointer-events: none;
     }
-    .stars-bg .star-dot {
+    .star-dot {
       position: absolute;
-      background: white;
       border-radius: 50%;
-      animation: twinkleStar 2s infinite alternate;
+      background: white;
+      will-change: transform, opacity;
+      animation: twinkleStar 2.5s infinite alternate;
       opacity: 0.6;
     }
     @keyframes twinkleStar {
-      0% { opacity: 0.2; transform: scale(0.7); }
-      100% { opacity: 1; transform: scale(1.4); box-shadow: 0 0 8px #f97316, 0 0 14px #c084fc; }
+      0% { opacity: 0.25; transform: scale(0.7); }
+      100% { opacity: 0.9; transform: scale(1.2); }
     }
 
     /* Успешный перевод */
@@ -133,7 +134,7 @@
     }
     .success-message {
       font-size: 1.3rem;
-      font-weight: 800;
+      font-weight: 600;
       background: linear-gradient(135deg, #10b981, #34d399);
       -webkit-background-clip: text;
       background-clip: text;
@@ -418,7 +419,7 @@
   </style>
 </head>
 <body>
-<!-- Фон со звёздами -->
+<!-- Оптимизированный звёздный фон -->
 <div class="stars-bg" id="starsBackground"></div>
 
 <div id="loginScreen" class="login-screen">
@@ -523,10 +524,13 @@
           <span>Задания от партнёров</span>
         </div>
         <div class="premium-feature-btn">
-          <svg viewBox="0 0 24 24" fill="none" style="width:30px; height:30px;">
-            <path d="M8 3h8l-2 4H10L8 3z" stroke="#fbbf24" stroke-width="1.5"/>
-            <path d="M10 7v2a3 3 0 0 0 6 0V7" stroke="#fbbf24" stroke-width="1.5" fill="rgba(251,191,36,0.15)"/>
-            <circle cx="12" cy="12" r="1" fill="#fbbf24"/>
+          <!-- Новый значок турниров -->
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M8 2h8l-2 5h-4L8 2z" stroke="#fbbf24" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M9 7v3a4 4 0 0 0 8 0V7" stroke="#fbbf24" stroke-width="1.5"/>
+            <path d="M12 11v2" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="14" r="1.5" fill="#fbbf24" stroke="none"/>
+            <path d="M8 18h8l-1 3H9l-1-3z" stroke="#fbbf24" stroke-width="1.5" stroke-linejoin="round" fill="rgba(251,191,36,0.1)"/>
           </svg>
           <span>Турниры</span>
         </div>
@@ -535,7 +539,7 @@
           <span>Обсуждения</span>
         </div>
         <div class="premium-feature-btn">
-          <svg viewBox="0 0 24 24" fill="none" style="width:30px; height:30px;">
+          <svg viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="5.5" stroke="#f97316" stroke-width="1.5"/>
             <circle cx="12" cy="12" r="1" fill="#f97316"/>
             <ellipse cx="12" cy="12" rx="8.5" ry="2.5" stroke="#f97316" stroke-width="1.2" fill="none" transform="rotate(-15 12 12)"/>
@@ -618,10 +622,10 @@
       </div>
     `;
     document.body.appendChild(modal);
-
+    // Увеличил время показа до 6 секунд
     setTimeout(() => {
       if (modal && modal.parentNode) modal.remove();
-    }, 4000);
+    }, 6000);
   }
 
   function login() {
@@ -703,18 +707,21 @@
     } catch (e) { hideLoading(); document.getElementById('transferError').textContent = 'Ошибка соединения'; }
   }
 
-  // Звёзды на фоне
+  // Оптимизированный фон звёзд
   function initStars() {
     const container = document.getElementById('starsBackground');
-    for (let i = 0; i < 90; i++) {
+    const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc', '#38bdf8'];
+    for (let i = 0; i < 50; i++) {
       const star = document.createElement('div');
       star.className = 'star-dot';
-      const size = Math.random() * 3 + 1;
+      const size = Math.random() * 2.5 + 0.8;
       star.style.width = size + 'px';
       star.style.height = size + 'px';
       star.style.left = Math.random() * 100 + '%';
       star.style.top = Math.random() * 100 + '%';
+      star.style.background = colors[Math.floor(Math.random() * colors.length)];
       star.style.animationDelay = Math.random() * 2 + 's';
+      star.style.animationDuration = (Math.random() * 2 + 1.8) + 's';
       container.appendChild(star);
     }
   }
