@@ -82,7 +82,7 @@
     }
     .task-card.in-progress {
       border-color: var(--accent);
-      order: -1; /* всегда наверху */
+      order: -1;
     }
     .task-card.completed {
       opacity: 0.7;
@@ -230,150 +230,131 @@
   </style>
 </head>
 <body>
-  <div class="stars" id="starsContainer"></div>
-  <a class="back-btn" href="/">← Назад</a>
-  <h2>Задания</h2>
-  <div class="tasks-container" id="tasksContainer">Загрузка...</div>
+<div class="stars" id="starsContainer"></div>
+<a class="back-btn" href="/">← Назад</a>
+<h2>Задания</h2>
+<div class="tasks-container" id="tasksContainer">Загрузка...</div>
 
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    const currentLogin = localStorage.getItem('karmabank_login');
-    if (!currentLogin) window.location.href = '/';
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+  const currentLogin = localStorage.getItem('karmabank_login');
+  if (!currentLogin) window.location.href = '/';
 
-    // Звёздный фон
-    function createStars() {
-      const container = document.getElementById('starsContainer');
-      const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
-      for (let i = 0; i < 80; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        const size = Math.random() * 3 + 1;
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.background = colors[Math.floor(Math.random() * colors.length)];
-        star.style.animationDelay = Math.random() * 3 + 's';
-        container.appendChild(star);
-      }
+  // Звёзды
+  function createStars() {
+    const container = document.getElementById('starsContainer');
+    const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div'); star.className = 'star';
+      const size = Math.random() * 3 + 1;
+      star.style.width = size + 'px'; star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+      star.style.background = colors[Math.floor(Math.random() * colors.length)];
+      star.style.animationDelay = Math.random() * 3 + 's';
+      container.appendChild(star);
     }
-    createStars();
+  }
+  createStars();
 
-    function showLoading() {
-      const overlay = document.createElement('div');
-      overlay.className = 'loading-overlay';
-      overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
-      document.body.appendChild(overlay);
-    }
-    function hideLoading() {
-      const overlay = document.querySelector('.loading-overlay');
-      if (overlay) overlay.remove();
-    }
+  function showLoading() {
+    const overlay = document.createElement('div'); overlay.className = 'loading-overlay';
+    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
+    document.body.appendChild(overlay);
+  }
+  function hideLoading() { const o = document.querySelector('.loading-overlay'); if (o) o.remove(); }
 
-    function showModal(message, callback) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" id="modalCloseBtn">Закрыть</button></div>`;
-      document.body.appendChild(modal);
-      document.getElementById('modalCloseBtn').onclick = () => {
-        modal.remove();
-        if (callback) callback();
-      };
-    }
+  function showModal(message) {
+    const modal = document.createElement('div'); modal.className = 'modal active';
+    modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" id="modalCloseBtn">Закрыть</button></div>`;
+    document.body.appendChild(modal);
+    document.getElementById('modalCloseBtn').onclick = () => modal.remove();
+  }
 
-    function openCommentModal(taskName) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <h3>Отчёт о выполнении</h3>
-          <textarea id="commentInput" placeholder="Опишите результат..."></textarea>
-          <button class="btn complete" id="submitCommentBtn">Завершить</button>
-          <button class="modal-close-btn" id="cancelCommentBtn">Отмена</button>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      document.getElementById('submitCommentBtn').onclick = async () => {
-        const comment = document.getElementById('commentInput').value.trim();
-        if (!comment) return;
-        modal.remove();
-        showLoading();
-        await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`);
-        hideLoading();
-        loadTasks();
-      };
-      document.getElementById('cancelCommentBtn').onclick = () => modal.remove();
-    }
-
-    async function takeTask(taskName) {
+  function openCommentModal(taskName) {
+    const modal = document.createElement('div'); modal.className = 'modal active';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h3>Отчёт о выполнении</h3>
+        <textarea id="commentInput" placeholder="Опишите результат..."></textarea>
+        <button class="btn complete" id="submitCommentBtn">Завершить</button>
+        <button class="modal-close-btn" id="cancelCommentBtn">Отмена</button>
+      </div>`;
+    document.body.appendChild(modal);
+    document.getElementById('submitCommentBtn').onclick = async () => {
+      const comment = document.getElementById('commentInput').value.trim();
+      if (!comment) return;
+      modal.remove();
       showLoading();
-      const res = await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
-      const result = await res.json();
+      await fetch(`${API_URL}?action=completeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}&comment=${encodeURIComponent(comment)}`);
       hideLoading();
-      if (result && result.message) {
-        showModal(result.message);
-      }
       loadTasks();
+    };
+    document.getElementById('cancelCommentBtn').onclick = () => modal.remove();
+  }
+
+  async function takeTask(taskName) {
+    showLoading();
+    const res = await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
+    const result = await res.json();
+    hideLoading();
+    if (result && result.message) {
+      showModal(result.message);
     }
-
-    async function loadTasks() {
-      showLoading();
-      try {
-        const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
-        const tasks = await res.json();
-        hideLoading();
-        const container = document.getElementById('tasksContainer');
-        if (!Array.isArray(tasks) || tasks.length === 0) {
-          container.innerHTML = '<div class="empty-message">✨ Нет активных заданий</div>';
-          return;
-        }
-
-        // Сортируем: сначала "В работе", затем остальные, общие в основной части
-        const inProgress = tasks.filter(t => t.status === 'В работе');
-        const other = tasks.filter(t => t.status !== 'В работе' && t.status !== 'Выполнено');
-        const completed = tasks.filter(t => t.status === 'Выполнено');
-
-        const sorted = [...inProgress, ...other, ...completed];
-
-        container.innerHTML = sorted.map(t => {
-          let actionHtml = '';
-          let cardClass = '';
-          if (t.status === 'В работе') {
-            actionHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Завершить</button>`;
-            cardClass = 'in-progress';
-          } else if (t.status === 'Назначено') {
-            actionHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
-          } else if (t.isGlobal && !t.status || t.status === 'Общее') {
-            actionHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
-          } else if (t.status === 'На проверке') {
-            actionHtml = `<span class="status-badge pending">На проверке</span>`;
-          } else if (t.status === 'Выполнено') {
-            actionHtml = `<span class="status-badge">Выполнено</span>`;
-            cardClass = 'completed';
-          }
-
-          return `
-            <div class="task-card ${cardClass}">
-              <div class="task-info">
-                <div class="task-name">${t.task} ${t.isGlobal ? '<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:var(--success); padding:2px 8px; border-radius:10px; margin-left:8px;">Общее</span>' : ''}</div>
-                <div class="task-meta">
-                  <span class="points">${t.points} карм.</span>
-                  <span>•</span>
-                  <span>${t.status}</span>
-                  ${t.comment ? `<span>• ${t.comment}</span>` : ''}
-                </div>
-              </div>
-              <div class="task-actions">${actionHtml}</div>
-            </div>
-          `;
-        }).join('');
-      } catch (e) {
-        hideLoading();
-        document.getElementById('tasksContainer').innerHTML = '<div class="empty-message">Ошибка загрузки заданий</div>';
-      }
-    }
-
     loadTasks();
-  </script>
+  }
+
+  async function loadTasks() {
+    showLoading();
+    try {
+      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
+      const tasks = await res.json();
+      hideLoading();
+      const container = document.getElementById('tasksContainer');
+      if (!Array.isArray(tasks) || tasks.length === 0) {
+        container.innerHTML = '<div class="empty-message">✨ Нет активных заданий</div>';
+        return;
+      }
+
+      const inProgress = tasks.filter(t => t.status === 'В работе');
+      const other = tasks.filter(t => t.status !== 'В работе' && t.status !== 'Выполнено');
+      const completed = tasks.filter(t => t.status === 'Выполнено');
+      const sorted = [...inProgress, ...other, ...completed];
+
+      container.innerHTML = sorted.map(t => {
+        let actionHtml = '';
+        let cardClass = '';
+        if (t.status === 'В работе') {
+          actionHtml = `<button class="btn complete" data-task="${t.task.replace(/"/g, '&quot;')}" onclick="openCommentModal(this.dataset.task)">Завершить</button>`;
+          cardClass = 'in-progress';
+        } else if (t.status === 'Назначено' || t.isGlobal) {
+          actionHtml = `<button class="btn" data-task="${t.task.replace(/"/g, '&quot;')}" onclick="takeTask(this.dataset.task)">Взять</button>`;
+        } else if (t.status === 'На проверке') {
+          actionHtml = `<span class="status-badge pending">На проверке</span>`;
+        } else if (t.status === 'Выполнено') {
+          actionHtml = `<span class="status-badge">Выполнено</span>`;
+          cardClass = 'completed';
+        }
+        return `
+        <div class="task-card ${cardClass}">
+          <div class="task-info">
+            <div class="task-name">${t.task} ${t.isGlobal ? '<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:var(--success); padding:2px 8px; border-radius:10px; margin-left:8px;">Общее</span>' : ''}</div>
+            <div class="task-meta">
+              <span class="points">${t.points} карм.</span>
+              <span>•</span>
+              <span>${t.status}</span>
+              ${t.comment ? `<span>• ${t.comment}</span>` : ''}
+            </div>
+          </div>
+          <div class="task-actions">${actionHtml}</div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      hideLoading();
+      document.getElementById('tasksContainer').innerHTML = '<div class="empty-message">Ошибка загрузки заданий</div>';
+    }
+  }
+
+  loadTasks();
+</script>
 </body>
 </html>
