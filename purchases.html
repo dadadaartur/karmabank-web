@@ -7,68 +7,159 @@
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
     :root {
-      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981;
-      --danger: #ef4444; --border: #1f3350;
+      --bg-primary: #0a1628;
+      --bg-card: #152238;
+      --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1;
+      --accent: #f97316;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border: #1f3350;
+      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary); padding: 20px; user-select: none; min-height: 100vh;
+      background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
+      color: var(--text-primary);
+      padding: 20px;
+      min-height: 100vh;
+      user-select: none;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .stars {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
+      opacity: 0.7;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
     }
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      text-decoration: none; margin-bottom: 20px;
+      text-decoration: none; margin-bottom: 20px; position: relative; z-index: 2;
     }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
+    h2 {
+      font-size: 1.8rem; font-weight: 800;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 24px;
+      position: relative; z-index: 2;
+    }
+    .purchases-list {
+      display: flex; flex-direction: column; gap: 12px;
+      position: relative; z-index: 2;
+    }
     .purchase-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 18px; padding: 18px; margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center;
-      transition: all 0.2s;
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.3s;
+      backdrop-filter: blur(4px);
+      animation: fadeInUp 0.4s ease forwards;
+      opacity: 0;
     }
-    .purchase-card.used { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
-    .purchase-info { flex: 1; }
-    .purchase-actions { display: flex; gap: 6px; align-items: center; }
+    .purchase-card:nth-child(1) { animation-delay: 0.05s; }
+    .purchase-card:nth-child(2) { animation-delay: 0.1s; }
+    .purchase-card:nth-child(3) { animation-delay: 0.15s; }
+    .purchase-card:nth-child(4) { animation-delay: 0.2s; }
+    .purchase-card:nth-child(5) { animation-delay: 0.25s; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .purchase-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 5px 15px rgba(249,115,22,0.2);
+      transform: translateY(-2px);
+    }
+    .purchase-info {
+      flex: 1;
+    }
+    .purchase-info .reward-name {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    .purchase-info .reward-date {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .purchase-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
     .btn {
-      background: var(--accent); color: white; border: none;
-      padding: 8px 16px; border-radius: 12px; cursor: pointer;
-      font-weight: 600; font-size: 0.8rem; transition: all 0.2s;
-      display: flex; align-items: center; gap: 4px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      border-radius: 40px;
+      padding: 6px 18px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      white-space: nowrap;
     }
-    .btn svg { width: 14px; height: 14px; stroke: white; }
-    .btn:hover { background: #ea580c; box-shadow: 0 0 15px rgba(249,115,22,0.5); }
-    .btn.use { background: var(--success); }
-    .btn.use:hover { background: #059669; }
+    .btn:hover {
+      border-color: #c084fc;
+      box-shadow: 0 0 18px rgba(249,115,22,0.6);
+      transform: scale(1.03);
+    }
+    .btn.use {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      border-color: var(--success);
+    }
     .btn.refund {
-      background: transparent; border: 1px solid var(--accent); color: var(--accent);
+      background: linear-gradient(135deg, #f97316, #e65c00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      border-color: var(--danger);
     }
-    .btn.refund:hover { background: var(--accent); color: white; }
     .used-badge {
-      display: inline-block; background: rgba(16,185,129,0.2); color: var(--success);
-      padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 8px;
+      display: inline-block;
+      background: rgba(16,185,129,0.15);
+      color: var(--success);
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: 1px solid rgba(16,185,129,0.3);
+      margin-left: 8px;
     }
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+    .empty-message {
+      text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem;
     }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
-      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-      max-width: 400px; width: 90%; text-align: center;
-      box-shadow: 0 0 60px rgba(249,115,22,0.6);
-    }
-    .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
-    }
+    /* Загрузка */
     .loading-overlay {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.5); z-index:9999;
-      display:flex; align-items:center; justify-content:center;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 3000;
+      display: flex; align-items: center; justify-content: center;
     }
     .loading-arrows { display: flex; gap: 10px; }
     .arrow {
@@ -86,134 +177,159 @@
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
-    h2 {
-      display: flex; align-items: center; gap: 10px;
+    /* Модальные окна */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
     }
-    .purchases-icon {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, #38bdf8, #c084fc);
-      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 7h14l-1 13H6L5 7z M9 7V5a2 2 0 0 1 4 0v2 M9 11h6M9 15h4'/%3E%3C/svg%3E") no-repeat center;
-      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 7h14l-1 13H6L5 7z M9 7V5a2 2 0 0 1 4 0v2 M9 11h6M9 15h4'/%3E%3C/svg%3E") no-repeat center;
-      display: inline-block;
+    .modal.active { display: flex; }
+    .modal-content {
+      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
+      max-width: 400px; width: 90%; text-align: center;
+      box-shadow: 0 0 60px rgba(249,115,22,0.6);
+      animation: modalPop 0.4s ease;
+      color: var(--text-primary);
     }
+    @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .modal-content textarea {
+      width: 100%; padding: 12px; margin: 16px 0; border-radius: 16px;
+      border: 1px solid rgba(249,115,22,0.5); background: var(--bg-secondary);
+      color: var(--text-primary); font-size: 1rem; outline: none; resize: vertical;
+    }
+    .modal-content textarea:focus { border-color: var(--accent); }
+    .modal-close-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
+    }
+    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
   </style>
 </head>
 <body>
+  <div class="stars" id="starsContainer"></div>
   <a class="back-btn" href="/">← Назад</a>
-  <h2><span class="purchases-icon"></span> Мои покупки</h2>
-  <div id="purchasesList">Загрузка...</div>
-
-  <div id="confirmModal" class="modal">
-    <div class="modal-content">
-      <p id="confirmText"></p>
-      <button class="btn" id="confirmYesBtn">Да</button>
-      <button class="modal-close-btn" onclick="closeConfirmModal()">Отмена</button>
-    </div>
-  </div>
-
-  <div id="useModal" class="modal">
-    <div class="modal-content">
-      <h3>Использовать сертификат</h3>
-      <p id="useModalReward"></p>
-      <input type="text" id="useComment" placeholder="Комментарий для руководителя" style="width:100%;padding:10px;margin:8px 0;border-radius:10px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);">
-      <button class="btn use" id="useYesBtn">Отправить</button>
-      <button class="modal-close-btn" onclick="closeUseModal()">Отмена</button>
-    </div>
-  </div>
+  <h2>Мои покупки</h2>
+  <div class="purchases-list" id="purchasesList">Загрузка...</div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    let pendingCertId = null, pendingAction = null;
+    const currentLogin = localStorage.getItem('karmabank_login');
+    if (!currentLogin) window.location.href = '/';
+
+    let pendingCertId = null;
+    let pendingAction = null;
+
+    // Звёзды
+    function createStars() {
+      const container = document.getElementById('starsContainer');
+      const colors = ['#ffffff','#e0f0ff','#fbbf24','#c084fc'];
+      for (let i=0; i<80; i++) {
+        const star = document.createElement('div'); star.className='star';
+        const size = Math.random()*3+1;
+        star.style.width = size+'px'; star.style.height = size+'px';
+        star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+        star.style.background = colors[Math.floor(Math.random()*colors.length)];
+        star.style.animationDelay = Math.random()*3+'s';
+        container.appendChild(star);
+      }
+    }
+    createStars();
 
     function showLoading() {
-      const overlay = document.createElement('div');
-      overlay.className = 'loading-overlay';
+      const overlay = document.createElement('div'); overlay.className='loading-overlay';
       overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
       document.body.appendChild(overlay);
     }
-    function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+    function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
+
+    function showModal(message, type='info') {
+      const modal = document.createElement('div'); modal.className='modal active';
+      modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" id="modalCloseBtn">Закрыть</button></div>`;
+      document.body.appendChild(modal);
+      document.getElementById('modalCloseBtn').onclick = () => modal.remove();
+    }
 
     async function loadPurchases() {
-      const login = localStorage.getItem('karmabank_login');
-      if (!login) return;
       showLoading();
-      const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(login)}`);
-      const purchases = await res.json();
-      hideLoading();
-      const container = document.getElementById('purchasesList');
-      if (!purchases || purchases.length === 0) {
-        container.innerHTML = '<p>У вас пока нет покупок.</p>';
-        return;
-      }
-      container.innerHTML = purchases.map(p => {
-        const isUsed = !!p.usedDate;
-        const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
-        let buttonsHtml = '';
-        if (!isUsed && p.canUse) {
-          buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}','${p.rewardName}')"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Использовать</button>`;
-        } else if (isUsed && p.canRefund) {
-          buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName}',${p.cost})"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg> Вернуть</button>`;
+      try {
+        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}`);
+        if (!res.ok) throw new Error('Сетевая ошибка');
+        const data = await res.json();
+        hideLoading();
+
+        const container = document.getElementById('purchasesList');
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = '<div class="empty-message">У вас пока нет покупок.</div>';
+          return;
         }
-        return `<div class="purchase-card ${isUsed ? 'used' : ''}">
-          <div class="purchase-info">
-            <strong>${p.rewardName}</strong>${usedHtml}
-            <div style="color:var(--text-secondary); font-size:0.85rem;">${p.date} — ${p.cost} карм.</div>
-          </div>
-          <div class="purchase-actions">${buttonsHtml}</div>
-        </div>`;
-      }).join('');
+
+        container.innerHTML = data.map(p => {
+          const isUsed = p.usedDate ? true : false;
+          const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
+          let buttonsHtml = '';
+          if (!isUsed && p.canUse) {
+            buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}','${p.rewardName}')">Использовать</button>`;
+          } else if (isUsed && p.canRefund) {
+            buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName}',${p.cost})">Вернуть</button>`;
+          }
+          return `
+            <div class="purchase-card">
+              <div class="purchase-info">
+                <div class="reward-name">${p.rewardName}${usedHtml}</div>
+                <div class="reward-date">${p.date} — ${p.cost} карм.</div>
+              </div>
+              <div class="purchase-actions">${buttonsHtml}</div>
+            </div>`;
+        }).join('');
+      } catch(e) {
+        hideLoading();
+        document.getElementById('purchasesList').innerHTML = '<div class="empty-message">Ошибка загрузки покупок</div>';
+        console.error(e);
+      }
     }
 
     function openRefundModal(certId, rewardName, cost) {
-      pendingCertId = certId;
-      pendingAction = 'refund';
-      document.getElementById('confirmText').textContent = `Вернуть "${rewardName}" и получить ${cost} кармиков на баланс?`;
-      document.getElementById('confirmModal').classList.add('active');
-    }
-    function openUseModal(certId, rewardName) {
-      pendingCertId = certId;
-      pendingAction = 'use';
-      document.getElementById('useModalReward').textContent = `Вы используете сертификат «${rewardName}». Укажите комментарий для руководителя:`;
-      document.getElementById('useComment').value = '';
-      document.getElementById('useModal').classList.add('active');
-    }
-    function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('active'); }
-    function closeUseModal() { document.getElementById('useModal').classList.remove('active'); }
-
-    async function executeAction() {
-      const login = localStorage.getItem('karmabank_login');
-      closeConfirmModal();
-      closeUseModal();
-
-      let url = '';
-      if (pendingAction === 'refund') {
-        url = `${API_URL}?action=refundPurchase&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}`;
-      } else if (pendingAction === 'use') {
-        const comment = document.getElementById('useComment').value.trim();
-        url = `${API_URL}?action=useCertificate&login=${encodeURIComponent(login)}&certId=${encodeURIComponent(pendingCertId)}&comment=${encodeURIComponent(comment)}`;
-      }
-      if (!url) return;
-      showLoading();
-      try {
-        const res = await fetch(url);
+      const modal = document.createElement('div'); modal.className='modal active';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <p>Вернуть «${rewardName}» и получить ${cost} кармиков на баланс?</p>
+          <button class="btn" id="confirmYesBtn">Да</button>
+          <button class="modal-close-btn" id="confirmNoBtn">Отмена</button>
+        </div>`;
+      document.body.appendChild(modal);
+      document.getElementById('confirmYesBtn').onclick = async () => {
+        modal.remove();
+        showLoading();
+        const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}`);
         const result = await res.json();
         hideLoading();
         showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
-        if (result.success) loadPurchases();
-      } catch (e) {
-        hideLoading();
-        showModal('❌ Ошибка соединения');
-      }
+        loadPurchases();
+      };
+      document.getElementById('confirmNoBtn').onclick = () => modal.remove();
     }
 
-    document.getElementById('confirmYesBtn').addEventListener('click', executeAction);
-    document.getElementById('useYesBtn').addEventListener('click', executeAction);
-
-    function showModal(message) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+    function openUseModal(certId, rewardName) {
+      const modal = document.createElement('div'); modal.className='modal active';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <p>Использовать «${rewardName}»</p>
+          <textarea id="useComment" placeholder="Комментарий для руководителя"></textarea>
+          <button class="btn use" id="useYesBtn">Отправить</button>
+          <button class="modal-close-btn" id="useNoBtn">Отмена</button>
+        </div>`;
       document.body.appendChild(modal);
+      document.getElementById('useYesBtn').onclick = async () => {
+        const comment = document.getElementById('useComment').value.trim();
+        modal.remove();
+        showLoading();
+        const res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}&comment=${encodeURIComponent(comment)}`);
+        const result = await res.json();
+        hideLoading();
+        showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+        loadPurchases();
+      };
+      document.getElementById('useNoBtn').onclick = () => modal.remove();
     }
 
     loadPurchases();
