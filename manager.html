@@ -50,6 +50,7 @@
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
     .modal-content { background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(249,115,22,0.6); }
+    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
     .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
     .loading-arrows { display: flex; gap: 10px; }
     .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
@@ -83,7 +84,7 @@
           Уведомления
         </div>
         <div id="notificationsList">Загрузка...</div>
-        <div class="show-all-btn" id="showAllBtn" style="display:none;" onclick="openAllNotifications()">Показать все</div>
+        <div class="show-all-btn" id="showAllBtn" onclick="openAllNotifications()">Показать все</div>
       </div>
       <div class="section-title">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="8" cy="7" r="3"/><circle cx="18" cy="7" r="3"/><path d="M3 21v-2a4 4 0 0 1 4-4h2"/><path d="M21 21v-2a4 4 0 0 0-4-4h-2"/></svg>
@@ -96,6 +97,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
+    let allNotificationsCache = []; // для хранения всех уведомлений
 
     function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
     function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
@@ -135,13 +137,59 @@
               section.innerHTML = reviewTasks.map(t => `
                 <div class="review-item">
                   <span>${t.task} (${t.points} карм.) ${t.comment ? ' — ' + t.comment : ''}</span>
-                  <button class="verify-btn" onclick="openVerifyModal('${t.task}', '${emp.login}', '${t.comment || ''}')">Проверить</button>
+                  <button class="verify-btn" onclick="openVerifyModal('${t.task}', '${emp.login}', '${(t.comment || '').replace(/'/g, "\\'")}')">Проверить</button>
                 </div>
               `).join('');
             }
           });
       });
     }
+
+    // ========== ДОБАВЛЕННЫЕ ФУНКЦИИ ДЛЯ ПРОВЕРКИ ЗАДАНИЙ ==========
+    function openVerifyModal(taskName, employeeLogin, comment) {
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3>Подтверждение задания</h3>
+          <p><strong>Задание:</strong> ${taskName}</p>
+          <p><strong>Сотрудник:</strong> ${employeeLogin}</p>
+          <p><strong>Комментарий:</strong> ${comment || 'нет'}</p>
+          <button class="verify-btn" id="verifyYesBtn" style="background: var(--success); margin-right: 10px;">✅ Подтвердить</button>
+          <button class="modal-close-btn" id="verifyNoBtn">Отмена</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      document.getElementById('verifyYesBtn').onclick = async () => {
+        modal.remove();
+        showLoading();
+        try {
+          const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(employeeLogin)}&managerLogin=${encodeURIComponent(currentLogin)}`);
+          const result = await res.json();
+          hideLoading();
+          showMessage(result.message);
+          if (result.success) loadTeam(); // обновляем список команды
+        } catch (e) {
+          hideLoading();
+          showMessage('Ошибка соединения');
+        }
+      };
+      document.getElementById('verifyNoBtn').onclick = () => modal.remove();
+    }
+
+    function showMessage(msg) {
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <p>${msg}</p>
+          <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    // ============================================================
 
     function login() {
       const login = document.getElementById('loginInput').value.trim();
@@ -162,14 +210,27 @@
 
     async function loadNotifications() {
       const res = await fetch(`${API_URL}?action=getNotifications&managerLogin=${encodeURIComponent(currentLogin)}`);
-      const notifs = await res.json();
-      document.getElementById('notificationsList').innerHTML = notifs.length ? notifs.slice(0,3).map(n => `<div class="notif-item"><strong>${n.employee}</strong> использовал(а) сертификат «${n.reward}».<br><small>${n.date}</small></div>`).join('') : 'Нет уведомлений';
+      allNotificationsCache = await res.json();
+      const container = document.getElementById('notificationsList');
+      if (allNotificationsCache.length) {
+        container.innerHTML = allNotificationsCache.slice(0,3).map(n => `<div class="notif-item"><strong>${n.employee}</strong> использовал(а) сертификат «${n.reward}».<br><small>${n.date}</small></div>`).join('');
+        document.getElementById('showAllBtn').style.display = 'block';
+      } else {
+        container.innerHTML = 'Нет уведомлений';
+        document.getElementById('showAllBtn').style.display = 'none';
+      }
     }
 
     function openAllNotifications() {
       const modal = document.createElement('div');
       modal.className = 'modal active';
-      modal.innerHTML = `<div class="modal-content"><h3>Все уведомления</h3><div>${allNotifications.map(n => `<p><strong>${n.employee}</strong> — «${n.reward}»<br><small>${n.date}</small></p>`).join('')}</div><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+      let notifsHtml = '';
+      if (allNotificationsCache.length) {
+        notifsHtml = allNotificationsCache.map(n => `<p><strong>${n.employee}</strong> — «${n.reward}»<br><small>${n.date}</small></p>`).join('');
+      } else {
+        notifsHtml = '<p>Нет уведомлений</p>';
+      }
+      modal.innerHTML = `<div class="modal-content"><h3>Все уведомления</h3><div style="max-height: 400px; overflow-y: auto;">${notifsHtml}</div><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
       document.body.appendChild(modal);
     }
 
