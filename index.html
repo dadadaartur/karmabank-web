@@ -57,10 +57,20 @@
       50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
-    /* ИСПРАВЛЕННАЯ АНИМАЦИЯ ЗАГРУЗКИ (как в history.html) */
+    /* Единая анимация загрузки — стрелки, как в операции */
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 6px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); }
+    }
+    /* Анимация превращения стрелок в галочку */
+    @keyframes transformToCheck {
+      0% { opacity: 1; transform: rotate(45deg) scale(1); }
+      50% { opacity: 0.5; transform: rotate(45deg) scale(1.5); }
+      100% { opacity: 0; transform: rotate(45deg) scale(1); }
+    }
+    @keyframes checkAppear {
+      0% { opacity: 0; transform: scale(0); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     .loading-arrows { display: flex; gap: 10px; align-items: center; justify-content: center; }
@@ -72,6 +82,36 @@
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
+    }
+    /* Стили для анимации успешного перевода */
+    .success-animation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .success-animation .arrows-container {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+    .success-animation .checkmark {
+      display: none;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      clip-path: polygon(30% 50%, 15% 65%, 0% 50%, 15% 35%);
+      animation: checkAppear 0.5s forwards;
+    }
+    .success-animation .success-text {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     /* Логин */
@@ -279,10 +319,12 @@
       filter: drop-shadow(0 0 2px #f97316);
       transition: all 0.3s;
     }
-    /* Апельсин делаем чуть крупнее для визуального баланса */
+    /* Апельсин делаем заметно крупнее, чтобы был как другие */
     .action-btn .orange-svg {
-      width: 42px;
-      height: 42px;
+      width: 46px;
+      height: 46px;
+      margin-top: -4px;
+      margin-bottom: -4px;
     }
     .action-btn span {
       font-weight: 700;
@@ -299,7 +341,6 @@
       animation: softGlow 0.8s infinite;
     }
 
-    /* Широкая кнопка МОИ ПОКУПКИ */
     .wide-btn {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -429,7 +470,7 @@
       transform: translateY(-2px);
     }
 
-    /* БАЗА ЗНАНИЙ – КРАСИВАЯ КНИГА (как раньше) */
+    /* БАЗА ЗНАНИЙ – КРАСИВАЯ КНИГА (открытая книга с закладкой) */
     .knowledge-fab {
       position: fixed; bottom: 24px; right: 24px;
       background: rgba(21,38,56,0.7);
@@ -460,7 +501,7 @@
       transform: translateY(-4px);
     }
 
-    /* МОДАЛЬНОЕ ОКНО (для перевода) – премиум стиль */
+    /* МОДАЛЬНОЕ ОКНО (премиум стиль) */
     .modal {
       display: none;
       position: fixed;
@@ -607,12 +648,11 @@
           </button>
           <button class="action-btn" onclick="window.location.href='/spend.html'">
             <span class="icon-wrapper">
-              <!-- УВЕЛИЧЕННЫЙ АПЕЛЬСИН (размер 42x42 через класс) -->
-              <svg class="orange-svg" viewBox="0 0 24 24" fill="none" style="width:42px;height:42px">
+              <svg class="orange-svg" viewBox="0 0 24 24" fill="none">
                 <defs><linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
                 <path d="M12 3 C8 3 6 5.5 6 9 C6 12.5 8 15 12 15 C16 15 18 12.5 18 9 C18 5.5 16 3 12 3Z" stroke="url(#orangeGrad)" stroke-width="1.8" fill="url(#orangeGrad)" fill-opacity="0.3"/>
                 <circle cx="9" cy="7" r="0.6" fill="#fbbf24"/>
-                <circle cx="11" cy="6" r="0.6" fill="#fbbf24"/>
+                <circle cx="11" cy="6.5" r="0.6" fill="#fbbf24"/>
                 <circle cx="14" cy="7.5" r="0.6" fill="#fbbf24"/>
                 <circle cx="10" cy="9" r="0.6" fill="#fbbf24"/>
                 <circle cx="13" cy="10" r="0.6" fill="#fbbf24"/>
@@ -677,7 +717,7 @@
       </div>
     </div>
   </div>
-  <!-- КРАСИВАЯ КНИГА ДЛЯ БАЗЫ ЗНАНИЙ -->
+  <!-- КРАСИВАЯ КНИГА ДЛЯ БАЗЫ ЗНАНИЙ (открытая с закладкой) -->
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path d="M4 6h16v12H4z" stroke-width="1.8"/>
@@ -713,15 +753,55 @@
   function getLevelIconHtml() {
     return '<svg class="premium-level-icon" viewBox="0 0 24 24" fill="none" stroke="url(#starGradLocal)"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" /><circle cx="12" cy="11" r="3" fill="rgba(249,115,22,0.3)" stroke="#f97316"/></svg>';
   }
-  function showLoading() { 
-    const overlay = document.createElement('div'); 
-    overlay.className = 'loading-overlay'; 
-    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; 
-    document.body.appendChild(overlay); 
+
+  // Единая функция загрузки с правильной анимацией (как в операции)
+  function showLoading() {
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
+    document.body.appendChild(overlay);
   }
-  function hideLoading() { 
-    const overlay = document.querySelector('.loading-overlay'); 
-    if (overlay) overlay.remove(); 
+  function hideLoading() {
+    const overlay = document.querySelector('.loading-overlay');
+    if (overlay) overlay.remove();
+  }
+
+  // Функция показа премиум-уведомления об успешном переводе
+  function showSuccessNotification(message) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="success-animation">
+          <div class="arrows-container">
+            <div class="arrow"></div>
+            <div class="arrow"></div>
+            <div class="arrow"></div>
+          </div>
+          <div class="checkmark"></div>
+          <div class="success-text">${message}</div>
+        </div>
+        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    // Анимация превращения стрелок в галочку
+    setTimeout(() => {
+      const arrowsContainer = modal.querySelector('.arrows-container');
+      const checkmark = modal.querySelector('.checkmark');
+      if (arrowsContainer) {
+        arrowsContainer.style.animation = 'transformToCheck 0.8s forwards';
+        arrowsContainer.style.opacity = '0';
+      }
+      if (checkmark) {
+        checkmark.style.display = 'block';
+        checkmark.style.animation = 'checkAppear 0.5s forwards';
+      }
+    }, 100);
+    // Автоматическое закрытие через 3 секунды
+    setTimeout(() => {
+      if (modal && modal.parentNode) modal.remove();
+    }, 3000);
   }
 
   function login() {
@@ -780,16 +860,23 @@
     const comment = document.getElementById('transferComment').value.trim();
     if (!receiver || !amount) { document.getElementById('transferError').textContent = 'Заполните поля'; return; }
     showLoading();
-    const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}&comment=${encodeURIComponent(comment)}`);
-    const result = await res.json();
-    hideLoading();
-    if (result.success) {
-      closeTransferModal();
-      const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
-      const user = await userRes.json();
-      if (user) { currentPoints = user.points; document.getElementById('userPoints').textContent = currentPoints; }
-      alert('Перевод выполнен!');
-    } else { document.getElementById('transferError').textContent = result.message; }
+    try {
+      const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}&comment=${encodeURIComponent(comment)}`);
+      const result = await res.json();
+      hideLoading();
+      if (result.success) {
+        closeTransferModal();
+        const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
+        const user = await userRes.json();
+        if (user) { currentPoints = user.points; document.getElementById('userPoints').textContent = currentPoints; }
+        showSuccessNotification('Перевод выполнен успешно!');
+      } else {
+        document.getElementById('transferError').textContent = result.message;
+      }
+    } catch (e) {
+      hideLoading();
+      document.getElementById('transferError').textContent = 'Ошибка соединения';
+    }
   }
   if (currentLogin) {
     document.getElementById('loginScreen').style.display = 'none';
