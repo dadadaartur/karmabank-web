@@ -6,33 +6,155 @@
   <title>Профиль — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
-    :root { --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350; }
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); padding: 20px; user-select: none; min-height: 100vh; }
-    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; margin-bottom: 20px; }
+    :root {
+      --bg-primary: #0a1628;
+      --bg-card: #152238;
+      --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1;
+      --accent: #f97316;
+      --border: #1f3350;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary);
+      padding: 20px;
+      user-select: none;
+      min-height: 100vh;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; max-width: 500px; margin: 0 auto; text-align: left; }
+    .profile-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: left;
+    }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
-    .field input, .field textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; }
+    .field input, .field textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: inherit;
+    }
     .field input:focus, .field textarea:focus { border-color: var(--accent); outline: none; }
-    .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 14px; cursor: pointer; font-weight: 600; margin-top: 10px; transition: background 0.2s; }
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
     .btn:hover { background: #ea580c; }
     .avatar-section { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-    .avatar-preview { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; box-shadow: 0 0 15px rgba(249,115,22,0.3); }
-    .passport-display { background: var(--bg-primary); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 14px; font-weight: 600; color: var(--accent); display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .avatar-preview {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      object-fit: cover;
+      box-shadow: 0 0 15px rgba(249,115,22,0.3);
+    }
+    .passport-display {
+      background: var(--bg-primary);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
     .passport-actions { display: flex; gap: 8px; align-items: center; }
-    .copy-btn, .view-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+    .copy-btn, .view-btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
     .copy-btn svg, .view-btn svg { width: 14px; height: 14px; stroke: var(--accent); }
     .copy-btn:hover, .view-btn:hover { background: var(--accent); color: white; }
     .copy-btn:hover svg, .view-btn:hover svg { stroke: white; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
     .modal.active { display: flex; }
-    .modal-content { background: linear-gradient(135deg, #1a2940, #152238); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
-    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
-    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center; }
-    .loading-sphere { width:80px; height:80px; background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); border-radius:50%; animation: spinStar 2s linear infinite, colorShift 3s infinite; box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700; }
+    .modal-content {
+      background: linear-gradient(135deg, #1a2940, #152238);
+      border: 1px solid var(--accent);
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-close-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .loading-overlay {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.7); z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .loading-sphere {
+      width:80px; height:80px;
+      background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0);
+      border-radius:50%;
+      animation: spinStar 2s linear infinite, colorShift 3s infinite;
+      box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700;
+    }
     @keyframes spinStar { 100% { transform: rotate(360deg); } }
-    @keyframes colorShift { 0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } 50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); } 100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } }
+    @keyframes colorShift {
+      0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); }
+      50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); }
+      100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); }
+    }
   </style>
 </head>
 <body>
@@ -44,12 +166,23 @@
     const login = localStorage.getItem('karmabank_login');
     if (!login) { window.location.href = '/'; }
 
-    function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-sphere"></div>'; document.body.appendChild(overlay); }
-    function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+    function showLoading() {
+      const overlay = document.createElement('div');
+      overlay.className = 'loading-overlay';
+      overlay.innerHTML = '<div class="loading-sphere"></div>';
+      document.body.appendChild(overlay);
+    }
+    function hideLoading() {
+      const overlay = document.querySelector('.loading-overlay');
+      if (overlay) overlay.remove();
+    }
 
     async function loadProfile() {
+      showLoading();
       const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
       const user = await res.json();
+      hideLoading();
+
       const container = document.getElementById('profileContent');
       container.innerHTML = `
         <div class="profile-card">
@@ -61,7 +194,7 @@
                 Копировать
               </button>
               <button class="view-btn" onclick="window.location.href='/passport.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8Slide 26 12 2"/></svg>
                 Посмотреть
               </button>
             </div>
@@ -86,6 +219,7 @@
           <button class="btn" onclick="saveProfile()">Сохранить</button>
         </div>
       `;
+
       document.getElementById('photoFileInput').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
