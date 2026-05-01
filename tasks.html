@@ -249,22 +249,29 @@
     const res = await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
     await res.json();
     hideLoading();
-    loadTasks(); // просто обновляем список, без уведомлений
+    loadTasks();
   }
 
   async function loadTasks() {
     showLoading();
     try {
       const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
-      const tasks = await res.json();
+      const raw = await res.json();
       hideLoading();
+
+      // Если сервер вернул ошибку
+      if (raw && raw.error) {
+        document.getElementById('tasksContainer').innerHTML = `<div class="empty-message">⚠️ ${raw.error}</div>`;
+        return;
+      }
+
+      const tasks = Array.isArray(raw) ? raw : [];
       const container = document.getElementById('tasksContainer');
-      if (!Array.isArray(tasks) || tasks.length === 0) {
+      if (tasks.length === 0) {
         container.innerHTML = '<div class="empty-message">✨ Нет активных заданий</div>';
         return;
       }
 
-      // Сортировка: сначала в работе, потом новые, потом выполненные
       const inProgress = tasks.filter(t => t.status === 'В работе');
       const open = tasks.filter(t => t.status === 'Назначено' || t.status === 'Общее');
       const review = tasks.filter(t => t.status === 'На проверке');
@@ -301,7 +308,7 @@
       }).join('');
     } catch (e) {
       hideLoading();
-      document.getElementById('tasksContainer').innerHTML = '<div class="empty-message">Ошибка загрузки заданий</div>';
+      document.getElementById('tasksContainer').innerHTML = `<div class="empty-message">❌ Ошибка загрузки: ${e.message}</div>`;
     }
   }
 
