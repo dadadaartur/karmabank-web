@@ -252,6 +252,11 @@
     loadTasks();
   }
 
+  // Безопасное экранирование для data-атрибутов
+  function safeEscape(str) {
+    return String(str).replace(/"/g, '&quot;').replace(/`/g, '&#96;').replace(/\\/g, '&#92;');
+  }
+
   async function loadTasks() {
     showLoading();
     try {
@@ -259,7 +264,6 @@
       const raw = await res.json();
       hideLoading();
 
-      // Если сервер вернул ошибку
       if (raw && raw.error) {
         document.getElementById('tasksContainer').innerHTML = `<div class="empty-message">⚠️ ${raw.error}</div>`;
         return;
@@ -272,21 +276,25 @@
         return;
       }
 
-      const inProgress = tasks.filter(t => t.status === 'В работе');
-      const open = tasks.filter(t => t.status === 'Назначено' || t.status === 'Общее');
-      const review = tasks.filter(t => t.status === 'На проверке');
-      const completed = tasks.filter(t => t.status === 'Выполнено');
+      // Фильтруем повреждённые записи
+      const validTasks = tasks.filter(t => t && typeof t.task === 'string' && t.task.trim() !== '');
+
+      const inProgress = validTasks.filter(t => t.status === 'В работе');
+      const open = validTasks.filter(t => t.status === 'Назначено' || t.status === 'Общее');
+      const review = validTasks.filter(t => t.status === 'На проверке');
+      const completed = validTasks.filter(t => t.status === 'Выполнено');
       const sorted = [...inProgress, ...open, ...review, ...completed];
 
       container.innerHTML = sorted.map(t => {
         let actionHtml = '';
         let cardClass = '';
+        const taskEscaped = safeEscape(t.task);
 
         if (t.status === 'В работе') {
-          actionHtml = `<button class="btn complete" data-task="${t.task.replace(/"/g, '&quot;')}" onclick="openCommentModal(this.dataset.task)">Завершить</button>`;
+          actionHtml = `<button class="btn complete" data-task="${taskEscaped}" onclick="openCommentModal(this.dataset.task)">Завершить</button>`;
           cardClass = 'in-progress';
         } else if (t.status === 'Назначено' || t.status === 'Общее') {
-          actionHtml = `<button class="btn" data-task="${t.task.replace(/"/g, '&quot;')}" onclick="takeTask(this.dataset.task)">Взять</button>`;
+          actionHtml = `<button class="btn" data-task="${taskEscaped}" onclick="takeTask(this.dataset.task)">Взять</button>`;
         } else if (t.status === 'На проверке') {
           actionHtml = `<span class="status-badge pending">На проверке</span>`;
         } else if (t.status === 'Выполнено') {
