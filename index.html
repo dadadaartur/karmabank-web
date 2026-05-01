@@ -57,10 +57,10 @@
       50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
-    /* Единая анимация загрузки — стрелки, как в операции */
+    /* Единая анимация загрузки — стрелки, как в магазине */
     @keyframes arrowPulse {
-      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 6px var(--accent); }
-      50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); }
+      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
+      50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
     /* Анимация превращения стрелок в галочку (успешный перевод) */
     @keyframes transformToCheck {
@@ -107,7 +107,7 @@
       height: 48px;
       background: linear-gradient(135deg, #10b981, #34d399);
       clip-path: polygon(30% 50%, 15% 65%, 0% 50%, 15% 35%);
-      animation: checkAppear 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+      animation: checkAppear 0.8s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
     }
     .success-animation .success-text {
       font-size: 1.3rem;
@@ -125,19 +125,38 @@
       min-height: 100vh; padding: 20px;
     }
     .login-form {
-      background: var(--bg-card); border: 1px solid var(--border);
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--accent);
       border-radius: 24px; padding: 40px 30px;
-      box-shadow: var(--shadow); width: 100%; max-width: 400px;
+      box-shadow: 0 0 40px rgba(249,115,22,0.4), 0 15px 30px rgba(0,0,0,0.5);
+      width: 100%; max-width: 400px;
       text-align: center; animation: fadeInUp 0.6s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .login-form h2 { font-size: 2rem; margin-bottom: 8px; }
+    .login-form::before {
+      content: '';
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(16,185,129,0.1) 0%, transparent 40%);
+      background-size: 200% 200%;
+      animation: aurora 8s ease infinite;
+      pointer-events: none;
+    }
+    .login-form > * { position: relative; z-index: 1; }
+    .login-form .login-star {
+      width: 48px; height: 48px; margin: 0 auto 16px;
+      filter: drop-shadow(0 0 8px #f97316);
+      animation: starTwinkle 2s infinite;
+    }
+    .login-form h2 { font-size: 2rem; margin-bottom: 8px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
     .login-form input {
-      width: 100%; padding: 14px 16px; border: 1px solid var(--border);
+      width: 100%; padding: 14px 16px; border: 1px solid rgba(249,115,22,0.5);
       border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary);
       font-size: 1rem; margin-bottom: 16px; outline: none;
     }
-    .login-form input:focus { border-color: var(--accent); }
+    .login-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
     .login-btn {
       width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00);
       color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
@@ -325,7 +344,10 @@
       filter: drop-shadow(0 0 2px #f97316);
       transition: all 0.3s;
     }
-    /* Апельсин теперь такого же размера, как стрелки и кошелёк */
+    /* Апельсин в магазине делаем визуально крупнее */
+    .action-btn.shop-btn svg {
+      transform: scale(1.2);
+    }
     .action-btn span {
       font-weight: 700;
       font-size: 0.9rem;
@@ -578,6 +600,11 @@
 <body>
 <div id="loginScreen" class="login-screen">
   <div class="login-form">
+    <!-- Иконка звезды в стиле главной страницы -->
+    <svg class="login-star" viewBox="0 0 24 24" fill="none" stroke="url(#loginStarGradient)">
+      <polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" />
+      <circle cx="12" cy="11.5" r="2.5" fill="rgba(249,115,22,0.3)" stroke="#f97316"/>
+    </svg>
     <h2>Кармический банк</h2>
     <p>Введите ваш логин, чтобы продолжить</p>
     <input type="text" id="loginInput" placeholder="Логин (например, arthur)" />
@@ -647,8 +674,9 @@
             </span>
             <span>Перевести</span>
           </button>
-          <button class="action-btn" onclick="window.location.href='/spend.html'">
+          <button class="action-btn shop-btn" onclick="window.location.href='/spend.html'">
             <span class="icon-wrapper">
+              <!-- Апельсин, визуально увеличенный через CSS .shop-btn svg -->
               <svg viewBox="0 0 24 24" fill="none">
                 <defs><linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
                 <path d="M12 3 C8 3 6 5.5 6 9 C6 12.5 8 15 12 15 C16 15 18 12.5 18 9 C18 5.5 16 3 12 3Z" stroke="url(#orangeGrad)" stroke-width="1.8" fill="url(#orangeGrad)" fill-opacity="0.3"/>
@@ -718,12 +746,16 @@
       </div>
     </div>
   </div>
-  <!-- КРАСИВАЯ КНИГА (открытая с закладкой) -->
+  <!-- КРАСИВАЯ КНИГА (объемная с закладкой) -->
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M4 6h16v12H4z" stroke-width="1.8"/>
-      <path d="M8 4v16M16 4v16" stroke-width="1.5"/>
-      <path d="M12 8v12" stroke-width="1.5"/>
+      <path d="M4 3h16v18H4z" fill="rgba(249,115,22,0.15)" stroke-width="1.5"/>
+      <path d="M4 3v18" stroke-width="2" stroke="url(#bookGradient)"/>
+      <path d="M20 3v18" stroke-width="2" stroke="url(#bookGradient)"/>
+      <path d="M12 3v18" stroke-width="1.5" stroke="#f97316" stroke-dasharray="2,2"/>
+      <path d="M4 8h16" stroke-width="1.2" stroke="rgba(249,115,22,0.6)"/>
+      <path d="M4 13h16" stroke-width="1.2" stroke="rgba(249,115,22,0.6)"/>
+      <path d="M8 21l4-3 4 3" stroke="none" fill="#f97316" opacity="0.8"/>
     </svg>
     <span>База знаний</span>
   </div>
@@ -742,7 +774,13 @@
   </div>
 </div>
 
-<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="starGradLocal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs></svg>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="starGradLocal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+    <linearGradient id="loginStarGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+    <linearGradient id="bookGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+  </defs>
+</svg>
 
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
@@ -786,26 +824,25 @@
       </div>
     `;
     document.body.appendChild(modal);
-    // Запуск анимации превращения стрелок в галочку через 0.8 секунды (плавно)
+    // Запуск анимации превращения стрелок в галочку через 1.2 секунды (плавно)
     setTimeout(() => {
       const arrowsContainer = modal.querySelector('.arrows-container');
       const checkmark = modal.querySelector('.checkmark');
       if (arrowsContainer) {
-        arrowsContainer.style.animation = 'transformToCheck 0.8s forwards';
-        // Скрываем после анимации
+        arrowsContainer.style.animation = 'transformToCheck 1.5s forwards';
         setTimeout(() => {
           if (arrowsContainer) arrowsContainer.style.display = 'none';
-        }, 800);
+        }, 1500);
       }
       if (checkmark) {
         checkmark.style.display = 'block';
-        checkmark.style.animation = 'checkAppear 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards';
+        checkmark.style.animation = 'checkAppear 1s cubic-bezier(0.34, 1.2, 0.64, 1) forwards';
       }
-    }, 800);
-    // Автоматическое закрытие через 4 секунды (чуть дольше, чтобы успеть насладиться)
+    }, 1200);
+    // Автоматическое закрытие через 5 секунд (чуть дольше, чтобы успеть насладиться)
     setTimeout(() => {
       if (modal && modal.parentNode) modal.remove();
-    }, 4000);
+    }, 5000);
   }
 
   function login() {
