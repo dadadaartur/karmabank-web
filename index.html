@@ -20,8 +20,7 @@
       --danger: #ef4444;
       --border: #1f3350;
       --shadow: 0 20px 40px rgba(0,0,0,0.5);
-      --hologram-glow: 0 0 12px rgba(249,115,22,0.8), 0 0 25px rgba(192,132,252,0.6);
-      --premium-gradient: linear-gradient(135deg, #f97316, #c084fc, #38bdf8);
+      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -38,20 +37,15 @@
     /* Анимации */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    @keyframes glowPulse {
-      0% { filter: drop-shadow(0 0 2px rgba(249,115,22,0.5)); }
-      50% { filter: drop-shadow(0 0 12px rgba(249,115,22,0.9)) drop-shadow(0 0 6px #c084fc); }
-      100% { filter: drop-shadow(0 0 2px rgba(249,115,22,0.5)); }
+    @keyframes softGlow {
+      0% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.3)); }
+      50% { filter: drop-shadow(0 0 6px rgba(16,185,129,0.6)) drop-shadow(0 0 3px #34d399); }
+      100% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.3)); }
     }
     @keyframes starTwinkle {
       0% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px #f97316); }
+      50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 6px #f97316); }
       100% { transform: scale(1); opacity: 0.8; }
-    }
-    @keyframes hologramRotate {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
     @keyframes aurora {
       0% { background-position: 0% 50%; }
@@ -60,24 +54,19 @@
     }
     @keyframes borderShine {
       0% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0.2); }
-      50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 3px rgba(249,115,22,0.3); }
+      50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
     @keyframes arrowPulse {
-      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
-      50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
-    }
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-3px); }
-      100% { transform: translateY(0px); }
+      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 6px var(--accent); }
+      50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); }
     }
 
     .loading-arrows { display: flex; gap: 10px; align-items: center; justify-content: center; }
     .arrow {
       width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
       border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
-      transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
+      transform: rotate(45deg); box-shadow: 0 0 6px var(--accent);
     }
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -119,7 +108,7 @@
       display: flex; align-items: center; justify-content: space-between;
       gap: 12px; flex-wrap: wrap;
     }
-    .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; background: var(--premium-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .user-name-link {
@@ -160,7 +149,7 @@
     .chat-header-btn svg, .path-to-perfect svg, .health-btn svg {
       width: 20px;
       height: 20px;
-      filter: drop-shadow(0 0 3px #f97316);
+      filter: drop-shadow(0 0 2px #f97316);
       transition: all 0.3s;
     }
     .chat-header-btn:hover, .path-to-perfect:hover, .health-btn:hover {
@@ -184,7 +173,7 @@
     }
     .left-column { display: flex; flex-direction: column; gap: 20px; }
 
-    /* КАРТОЧКА БАЛАНСА */
+    /* КАРТОЧКА БАЛАНСА (ИСХОДНЫЙ ВИД) */
     .balance-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border-radius: 24px; padding: 28px 20px 20px;
@@ -200,8 +189,7 @@
       top: -50%; left: -50%;
       width: 200%; height: 200%;
       background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.1) 0%, transparent 40%),
-                  radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 40%),
-                  radial-gradient(circle at 50% 50%, rgba(249,115,22,0.06) 0%, transparent 50%);
+                  radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 40%);
       background-size: 200% 200%;
       animation: aurora 12s ease infinite;
       pointer-events: none;
@@ -214,23 +202,24 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: glowPulse 3s infinite;
+      animation: softGlow 3s infinite;
       margin-bottom: 4px;
       font-weight: 700;
     }
+    /* Цифры баланса — только зелёные оттенки, мерцание слабое */
     .balance-value {
       font-size: 3.6rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #10b981, #34d399, #f9a826, #f97316);
-      background-size: 300% 300%;
+      background: linear-gradient(135deg, #10b981, #34d399, #059669);
+      background-size: 200% 200%;
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: glowPulse 2.5s infinite, hologramRotate 4s ease infinite;
+      animation: softGlow 2s infinite;
       line-height: 1;
       margin-bottom: 4px;
-      -webkit-text-stroke: 0.6px rgba(0,0,0,0.6);
-      text-stroke: 0.6px rgba(0,0,0,0.6);
+      -webkit-text-stroke: 0.6px rgba(0,0,0,0.5);
+      text-stroke: 0.6px rgba(0,0,0,0.5);
     }
     .balance-sub {
       font-size: 1.2rem;
@@ -239,7 +228,7 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: glowPulse 3s infinite;
+      animation: softGlow 3s infinite;
       margin-bottom: 22px;
     }
     .energy-line-wide {
@@ -256,7 +245,7 @@
       border: 1px solid rgba(249,115,22,0.15);
     }
 
-    /* КНОПКИ БАЛАНСА — КВАДРАТНЫЕ РАМКИ (как в исходном варианте) */
+    /* КНОПКИ БАЛАНСА — квадратные, как было в начале */
     .balance-actions {
       display: flex;
       gap: 16px;
@@ -265,9 +254,8 @@
       margin-bottom: 16px;
     }
     .action-btn {
-      background: rgba(21,38,56,0.7);
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(249,115,22,0.6);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 20px;
       padding: 12px 18px;
       cursor: pointer;
@@ -277,6 +265,7 @@
       align-items: center;
       gap: 8px;
       min-width: 100px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
     .action-btn .icon-wrapper {
       width: 44px;
@@ -288,7 +277,7 @@
     .action-btn svg {
       width: 34px;
       height: 34px;
-      filter: drop-shadow(0 0 3px #f97316);
+      filter: drop-shadow(0 0 2px #f97316);
       transition: all 0.3s;
     }
     .action-btn span {
@@ -297,19 +286,20 @@
       color: var(--text-primary);
     }
     .action-btn:hover {
-      border-color: #c084fc;
+      border-color: var(--accent);
       box-shadow: var(--hologram-glow);
       transform: translateY(-3px);
     }
     .action-btn:hover svg {
-      animation: glowPulse 0.8s infinite;
+      filter: drop-shadow(0 0 6px #f97316);
+      animation: softGlow 0.8s infinite;
     }
 
-    /* Широкая кнопка "Мои покупки" */
+    /* Широкая кнопка МОИ ПОКУПКИ */
     .wide-btn {
-      background: rgba(21,38,56,0.8);
-      border: 1px solid rgba(249,115,22,0.6);
-      border-radius: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
       padding: 14px;
       font-weight: 600;
       cursor: pointer;
@@ -328,9 +318,9 @@
       fill: none;
     }
     .wide-btn:hover {
-      border-color: #c084fc;
+      border-color: var(--accent);
       box-shadow: var(--hologram-glow);
-      background: rgba(249,115,22,0.2);
+      background: rgba(249,115,22,0.1);
     }
 
     /* ЗАДАНИЯ И КНОПКИ ПРАВОЙ КОЛОНКИ */
@@ -342,7 +332,7 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: var(--premium-gradient);
+      background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -394,7 +384,7 @@
     }
     .status-global { background: rgba(16,185,129,0.2); color: var(--success); padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; }
 
-    /* НЕКЛИКАБЕЛЬНЫЕ КНОПКИ ПОД ЗАДАНИЯМИ */
+    /* НОВЫЕ ПРЕМИУМ КНОПКИ (некликабельные) */
     .premium-row {
       display: flex;
       flex-wrap: wrap;
@@ -421,8 +411,8 @@
     .premium-feature-btn svg {
       width: 28px;
       height: 28px;
-      filter: drop-shadow(0 0 4px #f97316);
-      animation: glowPulse 2s infinite;
+      filter: drop-shadow(0 0 3px #f97316);
+      animation: softGlow 2s infinite;
     }
     .premium-feature-btn span {
       font-weight: 600;
@@ -435,7 +425,7 @@
       transform: translateY(-2px);
     }
 
-    /* БАЗА ЗНАНИЙ — НОВАЯ ИКОНКА (книга/свиток) */
+    /* База знаний (иконка книги, чтобы не дублировать звезду) */
     .knowledge-fab {
       position: fixed; bottom: 24px; right: 24px;
       background: rgba(21,38,56,0.7);
@@ -458,7 +448,7 @@
       height: 26px;
       stroke: #f97316;
       fill: none;
-      animation: glowPulse 2s infinite;
+      animation: starTwinkle 2s infinite;
     }
     .knowledge-fab:hover {
       border-color: #c084fc;
@@ -485,8 +475,8 @@
     }
     @media (max-width: 768px) {
       .container { grid-template-columns: 1fr; padding: 16px; }
-      .balance-actions { gap: 10px; }
-      .action-btn { min-width: 80px; padding: 8px 12px; }
+      .balance-actions { gap: 12px; }
+      .action-btn { min-width: 80px; padding: 10px 12px; }
       .premium-row { flex-direction: column; }
     }
   </style>
@@ -563,15 +553,19 @@
             </span>
             <span>Перевести</span>
           </button>
-          <!-- ИКОНКА МАГАЗИН — ОБЪЁМНОЕ ЯБЛОКО С ВЕТОЧКОЙ И ЛИСТОЧКОМ (новая) -->
           <button class="action-btn" onclick="window.location.href='/spend.html'">
             <span class="icon-wrapper">
+              <!-- Объёмное яблоко с веточкой и листочком -->
               <svg viewBox="0 0 24 24" fill="none">
-                <defs><linearGradient id="gradAppleNew" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
-                <path d="M12 3 C8.5 3 7 5.5 7 8.5 C7 11.5 9 14 12 14 C15 14 17 11.5 17 8.5 C17 5.5 15.5 3 12 3Z" stroke="url(#gradAppleNew)" stroke-width="1.8" fill="rgba(249,115,22,0.2)"/>
-                <path d="M12 3 L11 1.5" stroke="url(#gradAppleNew)" stroke-width="1.8"/>
-                <path d="M15.5 6.5 C16.8 5.8 17.5 4.5 17.5 3.5" stroke="url(#gradAppleNew)" stroke-width="1.8"/>
-                <path d="M9.5 9 L11 11 L14 8" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                <defs><linearGradient id="gradAppleBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+                <!-- Яблоко -->
+                <path d="M12 3.5 C9 3.5 7.5 5.5 7.5 8.5 C7.5 11.5 9 14 12 14 C15 14 16.5 11.5 16.5 8.5 C16.5 5.5 15 3.5 12 3.5Z" stroke="url(#gradAppleBody)" stroke-width="1.8" fill="url(#gradAppleBody)" fill-opacity="0.25"/>
+                <!-- Веточка -->
+                <path d="M12 3.5 L11.5 1.5" stroke="#a0522d" stroke-width="2" stroke-linecap="round"/>
+                <!-- Листочек -->
+                <path d="M11.5 2.5 C10.5 1.5 9 1.8 9.5 3 C10 4 11 3.8 11.5 2.5Z" fill="#10b981" stroke="#10b981" stroke-width="0.5"/>
+                <!-- Блик -->
+                <ellipse cx="10" cy="7" rx="1.2" ry="1.5" fill="white" fill-opacity="0.4"/>
               </svg>
             </span>
             <span>Магазин</span>
@@ -594,6 +588,7 @@
           Мои покупки
         </button>
       </div>
+      <!-- Левые кнопки (тренировка, команда и т.д.) полностью удалены -->
     </div>
     <div class="tasks-panel">
       <h3 onclick="window.location.href='/tasks.html'">
@@ -604,7 +599,7 @@
         Задания
       </h3>
       <div id="inProgressTasks"></div>
-      <!-- ПРЕМИУМ КНОПКИ (некликабельные) -->
+      <!-- Премиум кнопки (некликабельные) -->
       <div class="premium-row">
         <div class="premium-feature-btn">
           <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#f97316" stroke-width="1.5"/><circle cx="9" cy="7" r="3" stroke="#f97316" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="#c084fc" stroke-width="1.5"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#c084fc" stroke-width="1.5"/></svg>
@@ -629,11 +624,12 @@
       </div>
     </div>
   </div>
-  <!-- НОВАЯ ИКОНКА БАЗЫ ЗНАНИЙ (книга/свиток вместо звезды) -->
+  <!-- База знаний с иконкой книги (вместо звезды) -->
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M4 6h16v12H4z M4 6 L12 11 L20 6" stroke="url(#gradArrow)" stroke-width="1.8"/>
-      <path d="M8 9h8 M8 12h6" stroke="#c084fc" stroke-width="1.5" opacity="0.8"/>
+      <path d="M4 6h16v12H4z" stroke-width="1.8"/>
+      <path d="M8 4v16M16 4v16" stroke-width="1.5"/>
+      <path d="M12 8v12" stroke-width="1.5"/>
     </svg>
     <span>База знаний</span>
   </div>
