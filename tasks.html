@@ -60,24 +60,28 @@
       margin-bottom: 24px;
       position: relative; z-index: 2;
     }
-    .tasks-container {
-      display: flex; flex-direction: column; gap: 14px;
+    .tasks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
       position: relative; z-index: 2;
+    }
+    @media (max-width: 700px) {
+      .tasks-grid { grid-template-columns: 1fr; }
     }
     .task-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px 20px;
+      border-radius: 16px;
+      padding: 14px 16px;
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
+      flex-direction: column;
+      gap: 8px;
       transition: all 0.3s;
       backdrop-filter: blur(4px);
       animation: fadeInUp 0.4s ease forwards;
       opacity: 0;
+      height: fit-content;
     }
     .task-card.in-progress {
       border-color: var(--accent);
@@ -93,36 +97,30 @@
     }
     .task-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 0 18px rgba(249,115,22,0.3);
+      box-shadow: 0 0 12px rgba(249,115,22,0.25);
       transform: translateY(-2px);
-    }
-    .task-info {
-      flex: 1 1 250px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
     }
     .task-name {
       font-weight: 600;
-      font-size: 1.05rem;
-      line-height: 1.3;
+      font-size: 0.95rem;
+      line-height: 1.2;
     }
     .task-meta {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       align-items: center;
       color: var(--text-secondary);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
     .task-meta .points { color: var(--accent); font-weight: 600; }
-    .task-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .task-actions { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
     .btn {
       background: transparent;
       border: 1px solid var(--accent);
-      border-radius: 40px;
-      padding: 8px 24px;
+      border-radius: 30px;
+      padding: 6px 18px;
       font-weight: 800;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.3s;
       background: linear-gradient(135deg, #f97316, #c084fc);
@@ -131,14 +129,14 @@
       color: transparent;
       white-space: nowrap;
     }
-    .btn:hover { border-color: #c084fc; box-shadow: 0 0 18px rgba(249,115,22,0.6); transform: scale(1.03); }
+    .btn:hover { border-color: #c084fc; box-shadow: 0 0 14px rgba(249,115,22,0.6); transform: scale(1.03); }
     .btn.complete {
       background: linear-gradient(135deg, #10b981, #34d399);
       -webkit-background-clip: text; background-clip: text; color: transparent;
       border-color: var(--success);
     }
     .status-badge {
-      padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;
       background: rgba(16,185,129,0.15); color: var(--success);
       border: 1px solid rgba(16,185,129,0.3);
     }
@@ -164,18 +162,7 @@
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
-    /* Toast-уведомления (вместо модалок) */
-    .toast {
-      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
-      border: 1px solid var(--accent); border-radius: 40px; padding: 10px 24px;
-      color: var(--text-primary); font-weight: 500; font-size: 0.9rem;
-      z-index: 9999; box-shadow: 0 0 20px rgba(249,115,22,0.5);
-      animation: toastIn 0.3s ease, toastOut 0.4s 2.2s ease forwards;
-    }
-    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-    @keyframes toastOut { to { opacity: 0; transform: translate(-50%, -10px); } }
-    /* Модалка оставляется только для отчёта (комментарий) */
+    /* Модалка только для отчёта */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -206,14 +193,13 @@
 <div class="stars" id="starsContainer"></div>
 <a class="back-btn" href="/">← Назад</a>
 <h2>Задания</h2>
-<div class="tasks-container" id="tasksContainer">Загрузка...</div>
+<div class="tasks-grid" id="tasksContainer">Загрузка...</div>
 
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   const currentLogin = localStorage.getItem('karmabank_login');
   if (!currentLogin) window.location.href = '/';
 
-  // Звёздный фон
   function createStars() {
     const container = document.getElementById('starsContainer');
     const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
@@ -236,18 +222,6 @@
   }
   function hideLoading() { const o = document.querySelector('.loading-overlay'); if (o) o.remove(); }
 
-  // Маленькое уведомление внизу (toast)
-  function showToast(text, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = text;
-    if (type === 'success') toast.style.borderColor = 'var(--success)';
-    else if (type === 'error') toast.style.borderColor = 'var(--danger)';
-    document.body.appendChild(toast);
-    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2600);
-  }
-
-  // Модальное окно остаётся только для ввода комментария при завершении
   function openCommentModal(taskName) {
     const modal = document.createElement('div'); modal.className = 'modal active';
     modal.innerHTML = `
@@ -273,20 +247,9 @@
   async function takeTask(taskName) {
     showLoading();
     const res = await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
-    const result = await res.json();
+    await res.json();
     hideLoading();
-
-    if (result && result.message) {
-      if (result.message === 'Вы уже взяли это задание.') {
-        // Просто игнорируем (можно показать нейтральный toast)
-        showToast('Задание уже у вас', 'info');
-      } else if (result.success) {
-        showToast('Задание взято!', 'success');
-      } else {
-        showToast(result.message, 'error');
-      }
-    }
-    loadTasks();
+    loadTasks(); // просто обновляем список, без уведомлений
   }
 
   async function loadTasks() {
@@ -301,18 +264,21 @@
         return;
       }
 
+      // Сортировка: сначала в работе, потом новые, потом выполненные
       const inProgress = tasks.filter(t => t.status === 'В работе');
-      const other = tasks.filter(t => t.status !== 'В работе' && t.status !== 'Выполнено');
+      const open = tasks.filter(t => t.status === 'Назначено' || t.status === 'Общее');
+      const review = tasks.filter(t => t.status === 'На проверке');
       const completed = tasks.filter(t => t.status === 'Выполнено');
-      const sorted = [...inProgress, ...other, ...completed];
+      const sorted = [...inProgress, ...open, ...review, ...completed];
 
       container.innerHTML = sorted.map(t => {
         let actionHtml = '';
         let cardClass = '';
+
         if (t.status === 'В работе') {
           actionHtml = `<button class="btn complete" data-task="${t.task.replace(/"/g, '&quot;')}" onclick="openCommentModal(this.dataset.task)">Завершить</button>`;
           cardClass = 'in-progress';
-        } else if (t.status === 'Назначено' || t.isGlobal) {
+        } else if (t.status === 'Назначено' || t.status === 'Общее') {
           actionHtml = `<button class="btn" data-task="${t.task.replace(/"/g, '&quot;')}" onclick="takeTask(this.dataset.task)">Взять</button>`;
         } else if (t.status === 'На проверке') {
           actionHtml = `<span class="status-badge pending">На проверке</span>`;
@@ -323,14 +289,12 @@
 
         return `
         <div class="task-card ${cardClass}">
-          <div class="task-info">
-            <div class="task-name">${t.task} ${t.isGlobal ? '<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:var(--success); padding:2px 8px; border-radius:10px; margin-left:8px;">Общее</span>' : ''}</div>
-            <div class="task-meta">
-              <span class="points">${t.points} карм.</span>
-              <span>•</span>
-              <span>${t.status}</span>
-              ${t.comment ? `<span>• ${t.comment}</span>` : ''}
-            </div>
+          <div class="task-name">${t.task} ${t.isGlobal ? '<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:var(--success); padding:2px 6px; border-radius:8px; margin-left:6px;">Общее</span>' : ''}</div>
+          <div class="task-meta">
+            <span class="points">${t.points} карм.</span>
+            <span>•</span>
+            <span>${t.status}</span>
+            ${t.comment ? `<span>• ${t.comment}</span>` : ''}
           </div>
           <div class="task-actions">${actionHtml}</div>
         </div>`;
