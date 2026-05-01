@@ -37,7 +37,6 @@
     /* Анимации */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    /* Плавное медленное свечение баланса */
     @keyframes softGlow {
       0% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.2)); }
       50% { filter: drop-shadow(0 0 8px rgba(16,185,129,0.5)) drop-shadow(0 0 4px #34d399); }
@@ -58,7 +57,7 @@
       50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
-    /* Исправленная анимация загрузки (стрелочки) */
+    /* ИСПРАВЛЕННАЯ АНИМАЦИЯ ЗАГРУЗКИ (как в history.html) */
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 6px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); }
@@ -175,7 +174,7 @@
     }
     .left-column { display: flex; flex-direction: column; gap: 20px; }
 
-    /* КАРТОЧКА БАЛАНСА (ИСХОДНЫЙ ВИД) */
+    /* КАРТОЧКА БАЛАНСА */
     .balance-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border-radius: 24px; padding: 28px 20px 20px;
@@ -208,7 +207,6 @@
       margin-bottom: 4px;
       font-weight: 700;
     }
-    /* Цифры баланса — только зелёные оттенки, медленное мерцание */
     .balance-value {
       font-size: 3.6rem;
       font-weight: 800;
@@ -221,7 +219,6 @@
       line-height: 1;
       margin-bottom: 4px;
       -webkit-text-stroke: 0.6px rgba(0,0,0,0.5);
-      text-stroke: 0.6px rgba(0,0,0,0.5);
     }
     .balance-sub {
       font-size: 1.2rem;
@@ -247,7 +244,7 @@
       border: 1px solid rgba(249,115,22,0.15);
     }
 
-    /* КНОПКИ БАЛАНСА — квадратные, как было в начале */
+    /* КНОПКИ БАЛАНСА */
     .balance-actions {
       display: flex;
       gap: 16px;
@@ -277,10 +274,15 @@
       justify-content: center;
     }
     .action-btn svg {
-      width: 34px;
-      height: 34px;
+      width: 38px;
+      height: 38px;
       filter: drop-shadow(0 0 2px #f97316);
       transition: all 0.3s;
+    }
+    /* Апельсин делаем чуть крупнее для визуального баланса */
+    .action-btn .orange-svg {
+      width: 42px;
+      height: 42px;
     }
     .action-btn span {
       font-weight: 700;
@@ -325,7 +327,7 @@
       background: rgba(249,115,22,0.1);
     }
 
-    /* ЗАДАНИЯ И КНОПКИ ПРАВОЙ КОЛОНКИ */
+    /* ЗАДАНИЯ И ПРАВАЯ КОЛОНКА */
     .tasks-panel h3 {
       cursor: pointer;
       font-size: 1.5rem;
@@ -386,7 +388,7 @@
     }
     .status-global { background: rgba(16,185,129,0.2); color: var(--success); padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; }
 
-    /* НОВЫЕ ПРЕМИУМ КНОПКИ (некликабельные) */
+    /* Премиум кнопки (некликабельные) */
     .premium-row {
       display: flex;
       flex-wrap: wrap;
@@ -427,7 +429,7 @@
       transform: translateY(-2px);
     }
 
-    /* База знаний — иконка книги (как было раньше) */
+    /* БАЗА ЗНАНИЙ – КРАСИВАЯ КНИГА (как раньше) */
     .knowledge-fab {
       position: fixed; bottom: 24px; right: 24px;
       background: rgba(21,38,56,0.7);
@@ -458,23 +460,71 @@
       transform: translateY(-4px);
     }
 
+    /* МОДАЛЬНОЕ ОКНО (для перевода) – премиум стиль */
     .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
     }
     .modal.active { display: flex; }
     .modal-content {
       background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
       border: 1px solid var(--accent);
-      border-radius: 28px; padding: 36px;
-      max-width: 440px; width: 90%; text-align: center;
+      border-radius: 28px;
+      padding: 36px;
+      max-width: 440px;
+      width: 90%;
+      text-align: center;
       box-shadow: 0 0 60px rgba(249,115,22,0.6);
       animation: modalPop 0.4s ease;
     }
-    .modal-close-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 12px 24px; border-radius: 24px; cursor: pointer; margin-top: 16px;
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-radius: 16px;
+      border: 1px solid rgba(249,115,22,0.5);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
     }
+    .modal-content input:focus, .modal-content textarea:focus {
+      border-color: #c084fc;
+      box-shadow: 0 0 0 2px rgba(249,115,22,0.3);
+    }
+    .modal-content .btn-task {
+      margin-top: 12px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      border: 1px solid var(--accent);
+      padding: 10px 24px;
+      font-weight: 800;
+    }
+    .modal-close-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 10px 24px;
+      border-radius: 40px;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: 0.2s;
+    }
+    .modal-close-btn:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+    }
+
     @media (max-width: 768px) {
       .container { grid-template-columns: 1fr; padding: 16px; }
       .balance-actions { gap: 12px; }
@@ -557,12 +607,10 @@
           </button>
           <button class="action-btn" onclick="window.location.href='/spend.html'">
             <span class="icon-wrapper">
-              <!-- Яркий сочный апельсин (вместо яблока) -->
-              <svg viewBox="0 0 24 24" fill="none">
+              <!-- УВЕЛИЧЕННЫЙ АПЕЛЬСИН (размер 42x42 через класс) -->
+              <svg class="orange-svg" viewBox="0 0 24 24" fill="none" style="width:42px;height:42px">
                 <defs><linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
-                <!-- Апельсин -->
                 <path d="M12 3 C8 3 6 5.5 6 9 C6 12.5 8 15 12 15 C16 15 18 12.5 18 9 C18 5.5 16 3 12 3Z" stroke="url(#orangeGrad)" stroke-width="1.8" fill="url(#orangeGrad)" fill-opacity="0.3"/>
-                <!-- Текстура апельсина (маленькие точки) -->
                 <circle cx="9" cy="7" r="0.6" fill="#fbbf24"/>
                 <circle cx="11" cy="6" r="0.6" fill="#fbbf24"/>
                 <circle cx="14" cy="7.5" r="0.6" fill="#fbbf24"/>
@@ -570,11 +618,8 @@
                 <circle cx="13" cy="10" r="0.6" fill="#fbbf24"/>
                 <circle cx="8" cy="10" r="0.6" fill="#fbbf24"/>
                 <circle cx="15" cy="9" r="0.6" fill="#fbbf24"/>
-                <!-- Листочек -->
                 <path d="M12 3.5 C12 2.5 13.5 2 14 3 C14.5 4 13 4 12 3.5Z" fill="#10b981" stroke="#10b981" stroke-width="0.5"/>
-                <!-- Веточка -->
                 <path d="M12.5 3.2 L13.5 2.5" stroke="#a0522d" stroke-width="1.2" stroke-linecap="round"/>
-                <!-- Блик -->
                 <ellipse cx="9.5" cy="7" rx="1.5" ry="2" fill="white" fill-opacity="0.35" transform="rotate(-20 9.5 7)"/>
               </svg>
             </span>
@@ -598,7 +643,6 @@
           Мои покупки
         </button>
       </div>
-      <!-- Левые кнопки (тренировка, команда и т.д.) полностью удалены -->
     </div>
     <div class="tasks-panel">
       <h3 onclick="window.location.href='/tasks.html'">
@@ -609,7 +653,6 @@
         Задания
       </h3>
       <div id="inProgressTasks"></div>
-      <!-- Премиум кнопки (некликабельные) -->
       <div class="premium-row">
         <div class="premium-feature-btn">
           <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#f97316" stroke-width="1.5"/><circle cx="9" cy="7" r="3" stroke="#f97316" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="#c084fc" stroke-width="1.5"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#c084fc" stroke-width="1.5"/></svg>
@@ -634,7 +677,7 @@
       </div>
     </div>
   </div>
-  <!-- База знаний: вернули иконку книги (как раньше) -->
+  <!-- КРАСИВАЯ КНИГА ДЛЯ БАЗЫ ЗНАНИЙ -->
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path d="M4 6h16v12H4z" stroke-width="1.8"/>
@@ -645,15 +688,16 @@
   </div>
 </div>
 
+<!-- МОДАЛЬНОЕ ОКНО ПЕРЕВОДА (премиум дизайн) -->
 <div id="transferModal" class="modal">
   <div class="modal-content">
-    <h2>Перевод кармиков</h2>
+    <h2 style="margin-bottom:16px;">Перевод кармиков</h2>
     <input type="text" id="receiverLogin" placeholder="Логин получателя">
     <input type="number" id="transferAmount" placeholder="Сумма">
     <input type="text" id="transferComment" placeholder="Комментарий (необязательно)">
     <button class="btn-task" onclick="executeTransfer()">Отправить</button>
     <button class="modal-close-btn" onclick="closeTransferModal()">Отмена</button>
-    <div id="transferError" style="color:var(--danger); margin-top:8px"></div>
+    <div id="transferError" style="color:var(--danger); margin-top:12px"></div>
   </div>
 </div>
 
@@ -669,8 +713,16 @@
   function getLevelIconHtml() {
     return '<svg class="premium-level-icon" viewBox="0 0 24 24" fill="none" stroke="url(#starGradLocal)"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" /><circle cx="12" cy="11" r="3" fill="rgba(249,115,22,0.3)" stroke="#f97316"/></svg>';
   }
-  function showLoading() { const overlay = document.createElement('div'); overlay.className = 'loading-overlay'; overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
-  function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+  function showLoading() { 
+    const overlay = document.createElement('div'); 
+    overlay.className = 'loading-overlay'; 
+    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; 
+    document.body.appendChild(overlay); 
+  }
+  function hideLoading() { 
+    const overlay = document.querySelector('.loading-overlay'); 
+    if (overlay) overlay.remove(); 
+  }
 
   function login() {
     const login = document.getElementById('loginInput').value.trim();
