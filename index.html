@@ -19,7 +19,6 @@
       --warning: #f59e0b;
       --danger: #ef4444;
       --border: #1f3350;
-      --shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -33,7 +32,6 @@
     }
     input[type="text"], input[type="number"], textarea { user-select: text; }
 
-    /* анимации */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes karmaGlow {
@@ -44,7 +42,6 @@
     @keyframes gradientShift {
       0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
     }
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
     @keyframes pulse-glow {
       0% { filter: drop-shadow(0 0 5px rgba(249,115,22,0.4)); }
       50% { filter: drop-shadow(0 0 15px rgba(249,115,22,0.8)); }
@@ -73,7 +70,6 @@
       transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
     }
     .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
-
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
@@ -87,15 +83,11 @@
       animation: checkAppear 0.4s forwards;
     }
 
-    .login-screen {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 20px;
-    }
+    .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
     .login-form {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 40px 30px;
-      box-shadow: var(--shadow); width: 100%; max-width: 400px;
-      text-align: center; animation: fadeInUp 0.6s ease;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+      padding: 40px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      width: 100%; max-width: 400px; text-align: center; animation: fadeInUp 0.6s ease;
     }
     .login-form h2 { font-size: 2rem; margin-bottom: 8px; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
@@ -146,16 +138,17 @@
     }
     .path-to-perfect {
       background: transparent; border: 1px solid rgba(249,115,22,0.5); color: var(--text-primary);
-      padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem;
-      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+      padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 0.75rem;
+      cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;
     }
-    .path-to-perfect:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(249,115,22,0.4); }
+    .path-to-perfect:hover { border-color: var(--accent); box-shadow: 0 0 12px rgba(249,115,22,0.4); }
+    .path-to-perfect svg { width: 14px; height: 14px; stroke: var(--accent); fill: none; }
     .health-btn {
-      background: transparent; border: 1px solid rgba(239,68,68,0.5); color: var(--text-secondary);
-      padding: 6px 14px; border-radius: 20px; cursor: default; font-weight: 700;
-      font-size: 0.8rem; display: flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 4px 10px; border-radius: 20px; cursor: default; font-weight: 600;
+      font-size: 0.75rem; display: flex; align-items: center; gap: 4px;
     }
-    .health-btn svg { width: 16px; height: 16px; stroke: #ef4444; }
+    .health-btn svg { width: 14px; height: 14px; stroke: #ef4444; }
     .chat-header-btn {
       background: transparent; border: 1px solid var(--accent); color: var(--accent);
       padding: 6px 12px; border-radius: 20px; cursor: pointer;
@@ -199,8 +192,7 @@
       font-size: 1.2rem; letter-spacing: 2px;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: karmaGlow 3s infinite;
-      margin-bottom: 4px; font-weight: 700;
+      animation: karmaGlow 3s infinite; margin-bottom: 4px; font-weight: 700;
     }
     .balance-value {
       font-size: 3.8rem; font-weight: 800;
@@ -214,15 +206,13 @@
       font-size: 1.2rem; font-weight: 700;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: karmaGlow 3s infinite;
-      margin-bottom: 22px;
+      animation: karmaGlow 3s infinite; margin-bottom: 22px;
     }
     .energy-line-wide {
       display: block; width: 100%; text-align: center;
       font-size: 1rem; color: var(--accent); font-weight: 600;
       margin-bottom: 20px; padding: 8px; border-radius: 12px;
-      background: rgba(249,115,22,0.05);
-      border: 1px solid rgba(249,115,22,0.15);
+      background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.15);
     }
     .balance-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
     .action-btn {
@@ -252,11 +242,7 @@
       width: 100%; margin-top: 8px;
     }
     .wide-btn svg { width: 28px; height: 28px; stroke: var(--text-secondary); }
-    .wide-btn:hover {
-      background: transparent;
-      box-shadow: 0 0 20px rgba(249,115,22,0.5);
-      border-color: var(--accent);
-    }
+    .wide-btn:hover { background: transparent; box-shadow: 0 0 20px rgba(249,115,22,0.5); border-color: var(--accent); }
     .wide-btn:hover svg { stroke: var(--accent); }
 
     .menu-grid {
@@ -385,8 +371,7 @@
         <h1 onclick="location.reload()">Кармический банк</h1>
         <button class="path-to-perfect" onclick="window.location.href='/simulator.html'">
           <svg viewBox="0 0 24 24">
-            <defs><linearGradient id="perfectStar" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs>
-            <polygon points="12,2 14,8 21,9 16,14 18,21 12,17 6,21 8,14 3,9 10,8" stroke="url(#perfectStar)" fill="none"/>
+            <polygon points="12,2 14,8 21,9 16,14 18,21 12,17 6,21 8,14 3,9 10,8" />
           </svg>
           Путь к совершенству
         </button>
@@ -566,9 +551,7 @@
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
             fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
               .then(r => r.json())
-              .then(isManager => {
-                buildMenu(isManager);
-              });
+              .then(isManager => { buildMenu(isManager); });
             loadInProgressTasks();
           } else { document.getElementById('loginError').textContent = 'Пользователь не найден'; }
         })
