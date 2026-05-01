@@ -61,7 +61,7 @@
     }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     h2 {
-      display: flex; align-items: center; gap: 10px; font-size: 1.8rem; font-weight: 800;
+      font-size: 1.8rem; font-weight: 800;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text;
       background-clip: text;
@@ -220,7 +220,7 @@
       grid.innerHTML = rewards.map((r, idx) => {
         const colors = ['#f97316','#c084fc','#38bdf8','#f59e0b','#34d399'];
         const c = colors[idx % colors.length];
-        // Вместо иконок-звездочек вставим изящную абстрактную точку или просто уберём, оставим название товара крупно
+        // Карточка без иконок
         return `
         <div class="card" style="border-color: ${c};">
           <div style="font-weight:600; font-size:1.1rem;">${r.name}</div>
