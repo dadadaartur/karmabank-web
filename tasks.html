@@ -147,6 +147,7 @@
       border-color: rgba(249,115,22,0.3);
     }
     .empty-message { text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem; }
+    /* Загрузка */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 3000;
@@ -163,6 +164,18 @@
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
+    /* Toast-уведомления (вместо модалок) */
+    .toast {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid var(--accent); border-radius: 40px; padding: 10px 24px;
+      color: var(--text-primary); font-weight: 500; font-size: 0.9rem;
+      z-index: 9999; box-shadow: 0 0 20px rgba(249,115,22,0.5);
+      animation: toastIn 0.3s ease, toastOut 0.4s 2.2s ease forwards;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    @keyframes toastOut { to { opacity: 0; transform: translate(-50%, -10px); } }
+    /* Модалка оставляется только для отчёта (комментарий) */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -200,6 +213,7 @@
   const currentLogin = localStorage.getItem('karmabank_login');
   if (!currentLogin) window.location.href = '/';
 
+  // Звёздный фон
   function createStars() {
     const container = document.getElementById('starsContainer');
     const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
@@ -222,13 +236,18 @@
   }
   function hideLoading() { const o = document.querySelector('.loading-overlay'); if (o) o.remove(); }
 
-  function showModal(message) {
-    const modal = document.createElement('div'); modal.className = 'modal active';
-    modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" id="modalCloseBtn">Закрыть</button></div>`;
-    document.body.appendChild(modal);
-    document.getElementById('modalCloseBtn').onclick = () => modal.remove();
+  // Маленькое уведомление внизу (toast)
+  function showToast(text, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = text;
+    if (type === 'success') toast.style.borderColor = 'var(--success)';
+    else if (type === 'error') toast.style.borderColor = 'var(--danger)';
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2600);
   }
 
+  // Модальное окно остаётся только для ввода комментария при завершении
   function openCommentModal(taskName) {
     const modal = document.createElement('div'); modal.className = 'modal active';
     modal.innerHTML = `
@@ -256,7 +275,17 @@
     const res = await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
     const result = await res.json();
     hideLoading();
-    if (result && result.message) showModal(result.message);
+
+    if (result && result.message) {
+      if (result.message === 'Вы уже взяли это задание.') {
+        // Просто игнорируем (можно показать нейтральный toast)
+        showToast('Задание уже у вас', 'info');
+      } else if (result.success) {
+        showToast('Задание взято!', 'success');
+      } else {
+        showToast(result.message, 'error');
+      }
+    }
     loadTasks();
   }
 
