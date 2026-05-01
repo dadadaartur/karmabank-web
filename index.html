@@ -57,15 +57,15 @@
       50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
-    /* Единая анимация загрузки — стрелки, как в операции */
+    /* Единая анимация загрузки — стрелки (как при нажатии на операции) */
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 6px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); }
     }
-    /* Анимация превращения стрелок в галочку (успешный перевод) */
+    /* Анимация для успешного перевода (превращение стрелок в галочку) */
     @keyframes transformToCheck {
       0% { opacity: 1; transform: rotate(45deg) scale(1); }
-      60% { opacity: 0.6; transform: rotate(45deg) scale(1.6); }
+      60% { opacity: 0.6; transform: rotate(45deg) scale(1.5); }
       100% { opacity: 0; transform: rotate(45deg) scale(0.8); visibility: hidden; }
     }
     @keyframes checkAppear {
@@ -289,7 +289,7 @@
       border: 1px solid rgba(249,115,22,0.15);
     }
 
-    /* КНОПКИ БАЛАНСА */
+    /* КНОПКИ БАЛАНСА (единый стиль: изящные и одинакового размера) */
     .balance-actions {
       display: flex;
       gap: 16px;
@@ -312,20 +312,26 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
     .action-btn .icon-wrapper {
-      width: 50px;
-      height: 50px;
+      width: 46px;
+      height: 46px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    /* Все иконки одинакового размера (48x48) */
+    /* Все иконки — 40x40, изящные */
     .action-btn svg {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       filter: drop-shadow(0 0 2px #f97316);
       transition: all 0.3s;
     }
-    /* Апельсин теперь такого же размера, как стрелки и кошелёк */
+    /* Апельсину даём чуть больше размера и смещаем вниз к тексту */
+    .action-btn .orange-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: -4px;
+      margin-top: -2px;
+    }
     .action-btn span {
       font-weight: 700;
       font-size: 0.9rem;
@@ -470,7 +476,7 @@
       transform: translateY(-2px);
     }
 
-    /* БАЗА ЗНАНИЙ – КРАСИВАЯ КНИГА с обложкой и закладкой */
+    /* БАЗА ЗНАНИЙ — КРАСИВАЯ ОБЪЁМНАЯ КНИГА (исправлено) */
     .knowledge-fab {
       position: fixed; bottom: 24px; right: 24px;
       background: rgba(21,38,56,0.7);
@@ -649,7 +655,7 @@
           </button>
           <button class="action-btn" onclick="window.location.href='/spend.html'">
             <span class="icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="none">
+              <svg class="orange-icon" viewBox="0 0 24 24" fill="none">
                 <defs><linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
                 <path d="M12 3 C8 3 6 5.5 6 9 C6 12.5 8 15 12 15 C16 15 18 12.5 18 9 C18 5.5 16 3 12 3Z" stroke="url(#orangeGrad)" stroke-width="1.8" fill="url(#orangeGrad)" fill-opacity="0.3"/>
                 <circle cx="9.5" cy="7" r="0.6" fill="#fbbf24"/>
@@ -718,7 +724,7 @@
       </div>
     </div>
   </div>
-  <!-- КРАСИВАЯ КНИГА (открытая с закладкой) -->
+  <!-- КРАСИВАЯ КНИГА (исправлено) -->
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path d="M4 6h16v12H4z" stroke-width="1.8"/>
@@ -755,7 +761,7 @@
     return '<svg class="premium-level-icon" viewBox="0 0 24 24" fill="none" stroke="url(#starGradLocal)"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" /><circle cx="12" cy="11" r="3" fill="rgba(249,115,22,0.3)" stroke="#f97316"/></svg>';
   }
 
-  // Единая функция загрузки с правильной анимацией (стрелки)
+  // Единая функция загрузки с правильной анимацией (как при нажатии на операции)
   function showLoading() {
     const overlay = document.createElement('div');
     overlay.className = 'loading-overlay';
@@ -767,7 +773,7 @@
     if (overlay) overlay.remove();
   }
 
-  // Функция показа премиум-уведомления об успешном переводе (красивая анимация)
+  // Функция показа премиум-уведомления об успешном переводе
   function showSuccessNotification(message) {
     const modal = document.createElement('div');
     modal.className = 'modal active';
@@ -786,13 +792,11 @@
       </div>
     `;
     document.body.appendChild(modal);
-    // Запуск анимации превращения стрелок в галочку через 0.8 секунды (плавно)
     setTimeout(() => {
       const arrowsContainer = modal.querySelector('.arrows-container');
       const checkmark = modal.querySelector('.checkmark');
       if (arrowsContainer) {
         arrowsContainer.style.animation = 'transformToCheck 0.8s forwards';
-        // Скрываем после анимации
         setTimeout(() => {
           if (arrowsContainer) arrowsContainer.style.display = 'none';
         }, 800);
@@ -802,7 +806,6 @@
         checkmark.style.animation = 'checkAppear 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards';
       }
     }, 800);
-    // Автоматическое закрытие через 4 секунды (чуть дольше, чтобы успеть насладиться)
     setTimeout(() => {
       if (modal && modal.parentNode) modal.remove();
     }, 4000);
