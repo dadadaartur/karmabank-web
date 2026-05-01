@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Профиль — Кармический банк</title>
+  <title>Цифровой паспорт — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
     :root {
@@ -12,6 +12,7 @@
       --text-primary: #eaf0fb;
       --text-secondary: #9aa9c1;
       --accent: #f97316;
+      --success: #10b981;
       --border: #1f3350;
       --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
     }
@@ -20,13 +21,14 @@
       font-family: 'Inter', sans-serif;
       background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
       color: var(--text-primary);
-      padding: 20px;
       min-height: 100vh;
-      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
       position: relative;
       overflow-x: hidden;
     }
-    /* Звёздный фон */
     .stars {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0; pointer-events: none;
@@ -42,85 +44,78 @@
       0% { opacity: 0.3; transform: scale(0.8); }
       100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
     }
+    .passport-card {
+      max-width: 600px;
+      width: 100%;
+      background: radial-gradient(circle at 20% 30%, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 32px;
+      padding: 30px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(249,115,22,0.3);
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(10px);
+    }
+    .hologram {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(249,115,22,0.03) 20px, rgba(249,115,22,0.03) 40px), repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(16,185,129,0.03) 20px, rgba(16,185,129,0.03) 40px);
+      pointer-events: none; animation: hologramMove 8s linear infinite; border-radius: 32px;
+    }
+    @keyframes hologramMove { 0% { transform: translate(0,0); opacity: 0.4; } 50% { opacity: 0.7; } 100% { transform: translate(5px,5px); opacity: 0.4; } }
+    .content { position: relative; z-index: 3; }
+    .header {
+      display: flex; align-items: center; gap: 20px; margin-bottom: 25px;
+    }
+    .avatar {
+      width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent);
+      object-fit: cover; box-shadow: 0 0 15px rgba(249,115,22,0.5);
+    }
+    .name-block h2 {
+      margin: 0; font-size: 1.6rem;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .name-block p { margin: 5px 0 0; color: var(--text-secondary); font-size: 0.9rem; }
+    .passport-number-clickable {
+      display: block; margin: 10px 0 20px; font-weight: 700; font-size: 1rem;
+      color: var(--accent); cursor: pointer; letter-spacing: 1px;
+      transition: all 0.2s; text-align: center;
+    }
+    .passport-number-clickable:hover { text-shadow: 0 0 8px #f97316; }
+    .metrics-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px;
+    }
+    .metric {
+      background: rgba(21,38,56,0.6); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px; backdrop-filter: blur(5px);
+    }
+    .metric .label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px; }
+    .metric .value { font-size: 1.2rem; font-weight: 800; }
+    .value.accent { color: var(--accent); } .value.success { color: var(--success); }
+    .attributes {
+      display: flex; flex-direction: column; gap: 12px; margin: 20px 0;
+    }
+    .attr-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .attr-name { width: 120px; font-size: 0.85rem; color: var(--text-secondary); }
+    .attr-bar {
+      flex: 1; height: 6px; background: var(--border); border-radius: 3px; margin: 0 10px;
+      overflow: hidden;
+    }
+    .attr-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent), #c084fc);
+      border-radius: 3px; transition: width 0.8s;
+    }
+    .attr-value { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); width: 40px; text-align: right; }
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      text-decoration: none; margin-bottom: 20px; position: relative; z-index: 2;
+      text-decoration: none; margin-top: 20px;
+      position: relative; z-index: 4;
     }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    h2 {
-      font-size: 1.8rem; font-weight: 800;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 24px;
-      position: relative; z-index: 2;
-    }
-    .profile-card {
-      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 24px; padding: 30px;
-      max-width: 500px; margin: 0 auto; text-align: left;
-      backdrop-filter: blur(4px); position: relative; z-index: 2;
-    }
-    .passport-display {
-      background: var(--bg-primary);
-      border: 1px solid var(--accent);
-      border-radius: 14px;
-      padding: 12px 18px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      gap: 8px;
-      flex-wrap: wrap;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: rgba(249,115,22,0.05);
-      text-decoration: none;
-    }
-    .passport-display:hover {
-      border-color: #c084fc;
-      box-shadow: var(--hologram-glow);
-    }
-    .passport-number {
-      font-weight: 700;
-      font-size: 1rem;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      animation: softGlow 3s infinite;
-    }
-    @keyframes softGlow {
-      0% { filter: drop-shadow(0 0 2px rgba(16,185,129,0.2)); }
-      50% { filter: drop-shadow(0 0 8px rgba(16,185,129,0.5)) drop-shadow(0 0 4px #34d399); }
-      100% { filter: drop-shadow(0 0 2px rgba(16,185,129,0.2)); }
-    }
-    .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
-    .field input, .field textarea {
-      width: 100%; padding: 10px; border-radius: 14px;
-      border: 1px solid var(--border);
-      background: var(--bg-primary); color: var(--text-primary);
-      font-family: inherit; font-size: 1rem; outline: none;
-    }
-    .field input:focus, .field textarea:focus { border-color: var(--accent); }
-    .btn {
-      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
-      padding: 10px 20px; font-weight: 800; font-size: 0.85rem; cursor: pointer;
-      transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      display: inline-block; width: 100%; text-align: center; margin-top: 10px;
-    }
-    .btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02); }
-    .avatar-section { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-    .avatar-preview {
-      width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent);
-      object-fit: cover; box-shadow: 0 0 15px rgba(249,115,22,0.3);
-    }
     .toast {
       position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
       background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
@@ -131,139 +126,128 @@
     }
     @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
     @keyframes fadeOut { to { opacity: 0; transform: translate(-50%, -10px); } }
-    /* Загрузка */
-    .loading-overlay {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;
-    }
-    .loading-arrows { display: flex; gap: 10px; }
-    .arrow {
-      width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
-      border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
-      transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
-    }
-    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes arrowPulse {
-      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
-      50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
-    }
   </style>
 </head>
 <body>
 <div class="stars" id="starsContainer"></div>
-<a class="back-btn" href="/">← На главную</a>
-<h2>Мой профиль</h2>
-<div class="profile-card">
-  <!-- При клике открывает паспорт -->
-  <div class="passport-display" id="passportBlock" title="Открыть цифровой паспорт">
-    <span class="passport-number" id="passportNumber">—</span>
-    <span style="color:var(--text-secondary); font-size:0.8rem;">ЦПС</span>
-  </div>
-  <div class="field" style="text-align: center;">
-    <div class="avatar-section">
-      <img src="belchonok.png" class="avatar-preview" id="avatarImg" alt="Аватар">
-      <div style="flex:1;">
-        <label>Загрузить фото</label>
-        <input type="file" id="photoFileInput" accept="image/*" style="display:none;">
-        <button class="btn" onclick="document.getElementById('photoFileInput').click()" style="width:auto; margin-top:0;">Выбрать файл</button>
+<div class="passport-card">
+  <div class="hologram"></div>
+  <div class="content">
+    <div class="header">
+      <img src="belchonok.png" class="avatar" id="avatarImg" alt="Фото">
+      <div class="name-block">
+        <h2 id="userName">Имя</h2>
+        <p id="userDept">Отдел</p>
       </div>
     </div>
+    <div class="passport-number-clickable" id="passportNumber" title="Нажмите, чтобы скопировать номер ЦПС">CPS-XXXXXXXX</div>
+    <div class="metrics-grid">
+      <div class="metric"><div class="label">Энергия</div><div class="value accent" id="energyValue">0</div></div>
+      <div class="metric"><div class="label">Рейтинг</div><div class="value success" id="ratingValue">0</div></div>
+      <div class="metric"><div class="label">Кармики</div><div class="value" style="color: #fbbf24;" id="pointsValue">0</div></div>
+      <div class="metric"><div class="label">Компания</div><div class="value" id="companyValue" style="color: #c084fc;">—</div></div>
+    </div>
+    <div class="attributes">
+      <div class="attr-row"><span class="attr-name">Дисциплина</span><div class="attr-bar"><div class="attr-fill" id="disciplineFill" style="width:0%"></div></div><span class="attr-value" id="disciplineVal">0</span></div>
+      <div class="attr-row"><span class="attr-name">Обучаемость</span><div class="attr-bar"><div class="attr-fill" id="learningFill" style="width:0%"></div></div><span class="attr-value" id="learningVal">0</span></div>
+      <div class="attr-row"><span class="attr-name">Стресс</span><div class="attr-bar"><div class="attr-fill" id="stressFill" style="width:0%"></div></div><span class="attr-value" id="stressVal">0</span></div>
+      <div class="attr-row"><span class="attr-name">Команда</span><div class="attr-bar"><div class="attr-fill" id="teamFill" style="width:0%"></div></div><span class="attr-value" id="teamVal">0</span></div>
+      <div class="attr-row"><span class="attr-name">Лидерство</span><div class="attr-bar"><div class="attr-fill" id="leaderFill" style="width:0%"></div></div><span class="attr-value" id="leaderVal">0</span></div>
+      <div class="attr-row"><span class="attr-name">Креативность</span><div class="attr-bar"><div class="attr-fill" id="creativeFill" style="width:0%"></div></div><span class="attr-value" id="creativeVal">0</span></div>
+      <div class="attr-row"><span class="attr-name">Коммуникация</span><div class="attr-bar"><div class="attr-fill" id="commFill" style="width:0%"></div></div><span class="attr-value" id="commVal">0</span></div>
+    </div>
+    <a class="back-btn" href="/profile.html">← Назад в профиль</a>
   </div>
-  <div class="field"><label>Имя</label><input type="text" id="nameInput" disabled></div>
-  <div class="field"><label>Фамилия</label><input type="text" id="surnameInput"></div>
-  <div class="field"><label>Дата рождения</label><input type="date" id="birthdateInput"></div>
-  <div class="field"><label>Компания</label><input type="text" id="companyInput"></div>
-  <div class="field"><label>Должность</label><input type="text" id="positionInput"></div>
-  <div class="field"><label>Обо мне</label><textarea id="aboutInput" rows="3"></textarea></div>
-  <div class="field"><label>Соцсети</label><input type="text" id="linksInput"></div>
-  <button class="btn" onclick="saveProfile()">Сохранить</button>
 </div>
-
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   const login = localStorage.getItem('karmabank_login');
-  if (!login) { window.location.href = '/'; }
+  if (!login) window.location.href = '/';
 
-  function showLoading() {
-    const overlay = document.createElement('div'); overlay.className = 'loading-overlay';
-    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
-    document.body.appendChild(overlay);
-  }
-  function hideLoading() { const o = document.querySelector('.loading-overlay'); if (o) o.remove(); }
-
-  function showToast(msg) {
-    const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2200);
-  }
-
-  // Звёздное небо
+  // Звёзды
   function createStars() {
     const container = document.getElementById('starsContainer');
-    const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
-    for (let i = 0; i < 80; i++) {
+    const colors = ['#ffffff','#e0f0ff','#fbbf24','#c084fc'];
+    for (let i=0; i<80; i++) {
       const star = document.createElement('div'); star.className = 'star';
-      const size = Math.random() * 3 + 1;
-      star.style.width = size + 'px'; star.style.height = size + 'px';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.background = colors[Math.floor(Math.random() * colors.length)];
-      star.style.animationDelay = Math.random() * 3 + 's';
+      const size = Math.random()*3+1;
+      star.style.width = size+'px'; star.style.height = size+'px';
+      star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+      star.style.background = colors[Math.floor(Math.random()*colors.length)];
+      star.style.animationDelay = Math.random()*3+'s';
       container.appendChild(star);
     }
   }
   createStars();
 
-  async function loadProfile() {
-    showLoading();
-    const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
-    const user = await res.json();
-    hideLoading();
-    if (!user) return;
-    document.getElementById('passportNumber').textContent = user.passport || 'не назначен';
-    document.getElementById('nameInput').value = user.name || '';
-    document.getElementById('surnameInput').value = user.surname || '';
-    document.getElementById('birthdateInput').value = user.birthdate || '';
-    document.getElementById('companyInput').value = user.company || '';
-    document.getElementById('positionInput').value = user.position || '';
-    document.getElementById('aboutInput').value = user.about || '';
-    document.getElementById('linksInput').value = user.links || '';
-    if (user.photo) document.getElementById('avatarImg').src = user.photo;
-
-    // Теперь клик открывает паспорт
-    document.getElementById('passportBlock').onclick = () => {
-      window.location.href = '/passport.html';
-    };
-
-    // Загрузка фото
-    document.getElementById('photoFileInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = ev => { document.getElementById('avatarImg').src = ev.target.result; };
-        reader.readAsDataURL(file);
-      }
-    });
+  function showToast(msg) {
+    const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => { if(toast.parentNode) toast.remove(); }, 2200);
   }
 
-  async function saveProfile() {
-    const data = {
-      surname: document.getElementById('surnameInput').value,
-      birthdate: document.getElementById('birthdateInput').value,
-      company: document.getElementById('companyInput').value,
-      position: document.getElementById('positionInput').value,
-      about: document.getElementById('aboutInput').value,
-      links: document.getElementById('linksInput').value,
-      photo: document.getElementById('avatarImg').src
-    };
-    showLoading();
-    const res = await fetch(`${API_URL}?action=updateProfile&login=${encodeURIComponent(login)}&data=${encodeURIComponent(JSON.stringify(data))}`);
-    const result = await res.json();
-    hideLoading();
-    showToast(result.success ? '✅ ' + result.message : '⚠️ ' + result.message);
+  async function loadPassport() {
+    try {
+      const [profileRes, levelsRes] = await Promise.all([
+        fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`),
+        fetch(`${API_URL}?action=getLevels`)
+      ]);
+      const user = await profileRes.json();
+      const levels = await levelsRes.json();
+
+      if (!user) { alert('Пользователь не найден'); return; }
+
+      document.getElementById('userName').textContent = user.name || '—';
+      document.getElementById('userDept').textContent = user.department || '—';
+      document.getElementById('passportNumber').textContent = user.passport || 'CPS-XXXXXXXX';
+      document.getElementById('energyValue').textContent = user.energy || 0;
+      document.getElementById('pointsValue').textContent = user.points || 0;
+      document.getElementById('companyValue').textContent = user.company || '—';
+      if (user.photo) document.getElementById('avatarImg').src = user.photo;
+
+      // Рейтинг (просто пример — можно доработать формулу)
+      const rating = Math.min(1000, Math.floor((user.energy||0)/10 + (user.points||0)/100));
+      document.getElementById('ratingValue').textContent = rating;
+
+      // Генерация псевдо-характеристик (можно позже привязать к реальным данным)
+      const attrs = {
+        discipline: Math.floor(Math.random()*200)+100,
+        learning: Math.floor(Math.random()*250)+50,
+        stress: Math.floor(Math.random()*150)+50,
+        team: Math.floor(Math.random()*200)+50,
+        leader: Math.floor(Math.random()*180)+20,
+        creative: Math.floor(Math.random()*220)+30,
+        comm: Math.floor(Math.random()*190)+60
+      };
+
+      const maxAttr = 300;
+      const setAttr = (idVal, idFill, value) => {
+        document.getElementById(idVal).textContent = value;
+        document.getElementById(idFill).style.width = Math.min((value/maxAttr)*100, 100)+'%';
+      };
+
+      setAttr('disciplineVal', 'disciplineFill', attrs.discipline);
+      setAttr('learningVal', 'learningFill', attrs.learning);
+      setAttr('stressVal', 'stressFill', attrs.stress);
+      setAttr('teamVal', 'teamFill', attrs.team);
+      setAttr('leaderVal', 'leaderFill', attrs.leader);
+      setAttr('creativeVal', 'creativeFill', attrs.creative);
+      setAttr('commVal', 'commFill', attrs.comm);
+
+      // Копирование паспорта по клику
+      document.getElementById('passportNumber').onclick = () => {
+        const pn = document.getElementById('passportNumber').textContent;
+        if (pn) {
+          navigator.clipboard.writeText(pn).then(() => showToast('Номер ЦПС скопирован'));
+        }
+      };
+
+    } catch(e) {
+      console.error(e);
+    }
   }
 
-  loadProfile();
+  loadPassport();
 </script>
 </body>
 </html>
