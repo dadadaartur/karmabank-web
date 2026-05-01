@@ -59,6 +59,61 @@
       margin-bottom: 24px;
       position: relative; z-index: 2;
     }
+
+    /* Дашборд аналитики */
+    .dashboard {
+      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+      position: relative; z-index: 2;
+    }
+    .dashboard-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px 20px;
+      flex: 1; min-width: 130px;
+      backdrop-filter: blur(4px);
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+    .dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+    .dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+    .dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+    .dashboard-label {
+      font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .dashboard-value {
+      font-size: 1.4rem; font-weight: 700;
+    }
+    .dashboard-value.income { color: var(--success); }
+    .dashboard-value.expense { color: var(--danger); }
+    .dashboard-value.transfer { color: var(--accent); }
+
+    /* Фильтры */
+    .filters {
+      display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+      position: relative; z-index: 2;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 6px 16px; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+      box-shadow: var(--hologram-glow);
+    }
+    .filter-btn.active {
+      background: rgba(249,115,22,0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
     .history-list {
       display: flex; flex-direction: column; gap: 12px;
       position: relative; z-index: 2;
@@ -116,6 +171,7 @@
     .empty-message {
       text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem;
     }
+    /* Загрузка */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 3000;
@@ -143,10 +199,23 @@
   <div class="stars" id="starsContainer"></div>
   <a class="back-btn" href="/">← Назад</a>
   <h2>История операций</h2>
+
+  <!-- Дашборд аналитики -->
+  <div class="dashboard" id="dashboard"></div>
+
+  <!-- Кнопки фильтрации -->
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">Все</button>
+    <button class="filter-btn" data-filter="income">Начисления</button>
+    <button class="filter-btn" data-filter="expense">Покупки</button>
+    <button class="filter-btn" data-filter="transfer">Переводы</button>
+  </div>
+
   <div class="history-list" id="historyList"></div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    let allHistory = []; // храним все операции
 
     function showLoading() {
       const overlay = document.createElement('div');
@@ -177,6 +246,68 @@
     }
     createStars();
 
+    // Обновление дашборда
+    function updateDashboard(historyData) {
+      let totalIncome = 0, totalExpense = 0, totalTransfer = 0;
+      historyData.forEach(h => {
+        if (h.type === 'income') totalIncome += h.amount;
+        else if (h.type === 'expense') totalExpense += h.amount;
+        if (h.type === 'transfer') totalTransfer += h.amount;
+      });
+      document.getElementById('dashboard').innerHTML = `
+        <div class="dashboard-card">
+          <div class="dashboard-label">Всего доходов</div>
+          <div class="dashboard-value income">+${totalIncome} карм.</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-label">Всего расходов</div>
+          <div class="dashboard-value expense">-${totalExpense} карм.</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-label">Переводов</div>
+          <div class="dashboard-value transfer">${totalTransfer} карм.</div>
+        </div>
+      `;
+    }
+
+    // Отрисовка списка по фильтру
+    function renderHistory(filter = 'all') {
+      const container = document.getElementById('historyList');
+      const empMap = {};
+      // empMap заполняется при получении данных
+
+      let filtered = allHistory;
+      if (filter === 'income') filtered = allHistory.filter(h => h.type === 'income' && !h.description?.startsWith('Перевод'));
+      else if (filter === 'expense') filtered = allHistory.filter(h => h.type === 'expense' && !h.description?.startsWith('Перевод'));
+      else if (filter === 'transfer') filtered = allHistory.filter(h => h.type === 'transfer');
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-message">Нет операций по выбранному фильтру</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(h => {
+        let typeClass = h.type === 'income' ? 'income' : 'expense';
+        let prefix = h.type === 'income' ? '+' : '-';
+        if (h.type === 'transfer') typeClass = 'transfer';
+
+        const dateStr = h.date || '';
+        const timeStr = h.time || '';
+        const dateTime = [dateStr, timeStr].filter(Boolean).join(' ');
+
+        return `
+          <div class="history-item">
+            <div class="history-left">
+              <span class="history-amount ${typeClass}">${prefix}${h.amount} кармиков</span>
+              <span class="history-desc">${h.description || ''}</span>
+            </div>
+            <div class="history-date">${dateTime}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Загрузка данных
     async function loadHistory() {
       const login = localStorage.getItem('karmabank_login');
       if (!login) {
@@ -209,44 +340,44 @@
           employees.forEach(e => { empMap[e.login] = e.name; });
         }
 
-        const container = document.getElementById('historyList');
-        if (historyData.length === 0) {
-          container.innerHTML = '<div class="empty-message">Операций пока нет</div>';
-          return;
-        }
+        // Подготовка данных с типом transfer
+        allHistory = historyData.map(h => {
+          let type = h.type;
+          let description = String(h.comment || '');
+          let amount = h.amount || 0;
 
-        container.innerHTML = historyData.map(h => {
-          let typeClass = h.type === 'income' ? 'income' : 'expense';
-          let prefix = h.type === 'income' ? '+' : '-';
-          let rawComment = h.comment || '';
-          let description = String(rawComment); // Явно приводим к строке
-
+          // Определяем переводы
           if (h.type === 'expense' && description.startsWith('Перевод пользователю ')) {
             const loginTarget = description.replace('Перевод пользователю ', '');
-            const displayName = empMap[loginTarget] || loginTarget;
-            description = `→ ${displayName}`;
-            typeClass = 'transfer';
+            description = `→ ${empMap[loginTarget] || loginTarget}`;
+            type = 'transfer';
           } else if (h.type === 'income' && description.startsWith('Перевод от пользователя ')) {
             const loginSender = description.replace('Перевод от пользователя ', '');
-            const displayName = empMap[loginSender] || loginSender;
-            description = `← ${displayName}`;
-            typeClass = 'transfer';
+            description = `← ${empMap[loginSender] || loginSender}`;
+            type = 'transfer';
           }
 
-          const dateStr = h.date || '';
-          const timeStr = h.time || '';
-          const dateTime = [dateStr, timeStr].filter(Boolean).join(' ');
+          return {
+            type: type,
+            amount: amount,
+            description: description,
+            date: h.date || '',
+            time: h.time || ''
+          };
+        });
 
-          return `
-            <div class="history-item">
-              <div class="history-left">
-                <span class="history-amount ${typeClass}">${prefix}${h.amount} кармиков</span>
-                <span class="history-desc">${description}</span>
-              </div>
-              <div class="history-date">${dateTime}</div>
-            </div>
-          `;
-        }).join('');
+        updateDashboard(allHistory);
+        renderHistory('all'); // по умолчанию всё
+
+        // Обработчики фильтров
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderHistory(btn.dataset.filter);
+          });
+        });
+
       } catch (e) {
         hideLoading();
         document.getElementById('historyList').innerHTML = `<div class="empty-message">Ошибка загрузки: ${e.message}</div>`;
