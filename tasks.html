@@ -80,6 +80,14 @@
       animation: fadeInUp 0.4s ease forwards;
       opacity: 0;
     }
+    .task-card.in-progress {
+      border-color: var(--accent);
+      order: -1; /* всегда наверху */
+    }
+    .task-card.completed {
+      opacity: 0.7;
+      order: 1;
+    }
     .task-card:nth-child(1) { animation-delay: 0.05s; }
     .task-card:nth-child(2) { animation-delay: 0.1s; }
     .task-card:nth-child(3) { animation-delay: 0.15s; }
@@ -280,7 +288,7 @@
         <div class="modal-content">
           <h3>Отчёт о выполнении</h3>
           <textarea id="commentInput" placeholder="Опишите результат..."></textarea>
-          <button class="btn complete" id="submitCommentBtn">Отправить</button>
+          <button class="btn complete" id="submitCommentBtn">Завершить</button>
           <button class="modal-close-btn" id="cancelCommentBtn">Отмена</button>
         </div>
       `;
@@ -320,22 +328,32 @@
           return;
         }
 
-        container.innerHTML = tasks.map(t => {
+        // Сортируем: сначала "В работе", затем остальные, общие в основной части
+        const inProgress = tasks.filter(t => t.status === 'В работе');
+        const other = tasks.filter(t => t.status !== 'В работе' && t.status !== 'Выполнено');
+        const completed = tasks.filter(t => t.status === 'Выполнено');
+
+        const sorted = [...inProgress, ...other, ...completed];
+
+        container.innerHTML = sorted.map(t => {
           let actionHtml = '';
-          if (t.isGlobal && t.status !== 'В работе' && t.status !== 'На проверке' && t.status !== 'Выполнено') {
-            actionHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
+          let cardClass = '';
+          if (t.status === 'В работе') {
+            actionHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Завершить</button>`;
+            cardClass = 'in-progress';
           } else if (t.status === 'Назначено') {
             actionHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
-          } else if (t.status === 'В работе') {
-            actionHtml = `<button class="btn complete" onclick="openCommentModal('${t.task}')">Выполнить</button>`;
+          } else if (t.isGlobal && !t.status || t.status === 'Общее') {
+            actionHtml = `<button class="btn" onclick="takeTask('${t.task}')">Взять</button>`;
           } else if (t.status === 'На проверке') {
             actionHtml = `<span class="status-badge pending">На проверке</span>`;
           } else if (t.status === 'Выполнено') {
             actionHtml = `<span class="status-badge">Выполнено</span>`;
+            cardClass = 'completed';
           }
 
           return `
-            <div class="task-card">
+            <div class="task-card ${cardClass}">
               <div class="task-info">
                 <div class="task-name">${t.task} ${t.isGlobal ? '<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:var(--success); padding:2px 8px; border-radius:10px; margin-left:8px;">Общее</span>' : ''}</div>
                 <div class="task-meta">
