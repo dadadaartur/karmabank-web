@@ -77,7 +77,6 @@
       background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
     }
 
-    /* Звёздный фон */
     .stars-bg {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0; pointer-events: none;
@@ -94,7 +93,6 @@
       100% { opacity: 0.9; transform: scale(1.2); }
     }
 
-    /* Успешный перевод */
     @keyframes checkDraw {
       0% { stroke-dashoffset: 50; }
       100% { stroke-dashoffset: 0; }
@@ -126,7 +124,6 @@
       opacity: 0; letter-spacing: 1px;
     }
 
-    /* Логин */
     .login-screen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
@@ -165,7 +162,6 @@
     .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); transform: scale(1.02); }
     .login-error { color: var(--danger); margin-top: 12px; }
 
-    /* Основной экран */
     .main-screen { display: none; flex-direction: column; flex: 1; position: relative; z-index: 1; }
     .header {
       background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
@@ -185,6 +181,7 @@
       background: rgba(139, 92, 246, 0.1); padding: 4px 12px; border-radius: 20px;
       border: 1px solid rgba(139, 92, 246, 0.3);
     }
+
     .chat-header-btn, .path-to-perfect, .health-btn {
       background: rgba(21,38,56,0.6); border: 1px solid rgba(249,115,22,0.8); border-radius: 40px;
       padding: 6px 18px; font-weight: 600; font-size: 0.85rem; display: inline-flex;
@@ -284,6 +281,27 @@
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
+    /* Блок аналитики заданий */
+    .analytics-mini {
+      display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .analytics-mini .metric-item {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px 16px; flex: 1 1 100px;
+      backdrop-filter: blur(4px); transition: all 0.2s;
+    }
+    .metric-item .metric-label {
+      font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .metric-item .metric-value {
+      font-size: 1.3rem; font-weight: 700;
+    }
+    .metric-value.active { color: var(--accent); }
+    .metric-value.work { color: #fbbf24; }
+    .metric-value.review { color: #c084fc; }
+
     .premium-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 20px; justify-content: space-between; }
     .premium-feature-btn {
       flex: 1; min-width: 160px; background: rgba(21,38,56,0.5); backdrop-filter: blur(4px);
@@ -441,13 +459,17 @@
     </div>
     <div class="tasks-panel">
       <h3 onclick="window.location.href='/tasks.html'">Задания</h3>
-      <!-- Вместо списка заданий теперь кнопка перехода -->
-      <div id="inProgressTasks" style="margin-bottom: 18px;">
-        <button class="wide-btn" onclick="window.location.href='/tasks.html'" style="max-width: 300px;">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Перейти к заданиям
-        </button>
+      <!-- Аналитика заданий -->
+      <div class="analytics-mini" id="tasksAnalytics">
+        <div class="metric-item"><div class="metric-label">Активных</div><div class="metric-value active" id="activeCount">0</div></div>
+        <div class="metric-item"><div class="metric-label">В работе</div><div class="metric-value work" id="workCount">0</div></div>
+        <div class="metric-item"><div class="metric-label">На проверке</div><div class="metric-value review" id="reviewCount">0</div></div>
       </div>
+      <button class="wide-btn" onclick="window.location.href='/tasks.html'" style="max-width: 300px; margin-bottom: 20px;">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Перейти к заданиям
+      </button>
+
       <div class="premium-row">
         <div class="premium-feature-btn">
           <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#f97316" stroke-width="1.5"/><circle cx="9" cy="7" r="3" stroke="#f97316" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="#c084fc" stroke-width="1.5"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#c084fc" stroke-width="1.5"/></svg>
@@ -514,9 +536,8 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   let currentLogin = localStorage.getItem('karmabank_login') || '';
   let currentPoints = 0, currentEnergy = 0;
-  let levelsCache = [];
 
-  async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
+  async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); } catch(e) {} }
 
   function showLoading() {
     const overlay = document.createElement('div'); overlay.className = 'loading-overlay';
@@ -532,6 +553,21 @@
       </svg>
       ${energy} энергии
     `;
+  }
+
+  async function updateTasksAnalytics() {
+    if (!currentLogin) return;
+    try {
+      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
+      const tasks = await res.json();
+      if (!Array.isArray(tasks)) return;
+      const active = tasks.filter(t => t.status !== 'Выполнено').length;
+      const work = tasks.filter(t => t.status === 'В работе').length;
+      const review = tasks.filter(t => t.status === 'На проверке').length;
+      document.getElementById('activeCount').textContent = active;
+      document.getElementById('workCount').textContent = work;
+      document.getElementById('reviewCount').textContent = review;
+    } catch(e) {}
   }
 
   function showSuccessNotification(message) {
@@ -570,7 +606,7 @@
           document.getElementById('userDept').textContent = user.department || '';
           document.getElementById('userPoints').textContent = currentPoints;
           updateEnergyDisplay(currentEnergy);
-          // Задания на главной больше не загружаются
+          updateTasksAnalytics();
         } else { document.getElementById('loginError').textContent = 'Пользователь не найден'; }
       })
       .catch(() => { hideLoading(); document.getElementById('loginError').textContent = 'Ошибка соединения'; });
@@ -607,7 +643,6 @@
     } catch (e) { hideLoading(); document.getElementById('transferError').textContent = 'Ошибка соединения'; }
   }
 
-  // Инициализация звёзд
   (function initStars() {
     const container = document.getElementById('starsBackground');
     const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc', '#38bdf8'];
@@ -638,6 +673,7 @@
           await loadLevels();
           document.getElementById('userPoints').textContent = currentPoints;
           updateEnergyDisplay(currentEnergy);
+          updateTasksAnalytics();
         }
       }).catch(() => hideLoading());
   }
