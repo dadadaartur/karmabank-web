@@ -6,240 +6,416 @@
   <title>Панель руководителя — Кармический банк</title>
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
-    :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; }
+    :root {
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350;
+      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; user-select: none; }
-    input[type="text"] { user-select: text; }
-    .header { background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
-    .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
-    .header-actions { display: flex; gap: 12px; align-items: center; }
-    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
+      color: var(--text-primary); min-height: 100vh; padding: 20px;
+      position: relative; overflow-x: hidden; user-select: none;
+    }
+    /* Звёзды */
+    .stars {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    .star {
+      position: absolute; background: white; border-radius: 50%;
+      animation: twinkle 2s infinite alternate; opacity: 0.7;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
+    }
+    .header {
+      background: rgba(21,38,56,0.7); backdrop-filter: blur(10px);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 16px 24px; margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; position: relative; z-index: 2;
+    }
+    .header h2 {
+      font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+      text-decoration: none;
+    }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    .logout-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
-    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; width: 100%; display: flex; flex-direction: column; gap: 24px; }
-    .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
-    .employee-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 28px; transition: all 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
-    .employee-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
-    .employee-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .employee-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; }
-    .employee-name { font-size: 1.2rem; font-weight: 700; }
-    .employee-dept { font-size: 0.85rem; color: var(--text-secondary); }
-    .metrics-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
-    .metric { text-align: center; } .metric .value { font-size: 1.5rem; font-weight: 800; } .metric .label { font-size: 0.75rem; color: var(--text-secondary); }
-    .value.success { color: var(--success); } .value.warning { color: var(--warning); } .value.accent { color: var(--accent); }
-    .ai-tip { background: rgba(249, 115, 22, 0.1); border: 1px solid var(--accent); border-radius: 16px; padding: 14px; margin-top: 16px; font-size: 0.9rem; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px; }
-    .task-review-section { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
-    .review-item { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-    .verify-btn { background: var(--success); color: white; border: none; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-    .verify-btn:hover { transform: scale(1.05); }
-    .loading { text-align: center; color: var(--text-secondary); padding: 40px; }
-    .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-    .login-form { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 40px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; }
-    .login-form h2 { font-size: 2rem; margin-bottom: 8px; } .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
-    .login-form input[type="text"] { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; margin-bottom: 16px; outline: none; }
-    .login-form input[type="text"]:focus { border-color: var(--accent); }
-    .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00); color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-    .login-btn:hover { background: linear-gradient(135deg, #ea580c, #cc5200); }
-    .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
-    .notifications-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; max-height: 250px; overflow-y: auto; }
-    .notif-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .show-all-btn { display: block; text-align: center; margin-top: 12px; color: var(--accent); cursor: pointer; font-weight: 600; }
-    .show-all-btn:hover { text-decoration: underline; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+    .main-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;
+      position: relative; z-index: 2;
+    }
+    .action-btn {
+      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
+      padding: 10px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .action-btn:hover {
+      border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02);
+    }
+    .section-title {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;
+      color: var(--text-primary); position: relative; z-index: 2;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px; position: relative; z-index: 2;
+    }
+    .employee-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border); border-radius: 20px; padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: all 0.3s; backdrop-filter: blur(4px);
+    }
+    .employee-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .emp-header { display: flex; align-items: center; gap: 10px; }
+    .emp-avatar {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 800; color: white;
+    }
+    .emp-name { font-weight: 700; }
+    .emp-dept { font-size: 0.8rem; color: var(--text-secondary); }
+    .metrics-row { display: flex; gap: 12px; }
+    .metric { text-align: center; }
+    .metric .val { font-weight: 700; font-size: 1.1rem; }
+    .val.success { color: var(--success); } .val.accent { color: var(--accent); } .val.warning { color: var(--warning); }
+    .metric .lbl { font-size: 0.7rem; color: var(--text-secondary); }
+    .task-review { border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .review-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+    .verify-btn {
+      background: transparent; border: 1px solid var(--success); border-radius: 12px;
+      color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .verify-btn:hover { background: var(--success); color: white; }
+    .notifications-panel {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border); border-radius: 20px; padding: 16px;
+      margin-bottom: 24px; backdrop-filter: blur(4px);
+      position: relative; z-index: 2;
+    }
+    .notif-list {
+      max-height: 200px; overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary);
+    }
+    .notif-list::-webkit-scrollbar { width: 4px; }
+    .notif-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+    .notif-item { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; color: var(--text-secondary); }
+    .show-all { display: block; text-align: center; margin-top: 8px; color: var(--accent); cursor: pointer; font-size: 0.8rem; }
+    .show-all:hover { text-decoration: underline; }
+    /* Модалки */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+    }
     .modal.active { display: flex; }
-    .modal-content { background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(249,115,22,0.6); }
-    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
-    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .modal-content {
+      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
+      max-width: 420px; width: 90%; text-align: left;
+      box-shadow: 0 0 60px rgba(249,115,22,0.6);
+      color: var(--text-primary);
+    }
+    .modal-content input, .modal-content select, .modal-content textarea {
+      width: 100%; padding: 10px; margin: 8px 0 16px;
+      border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-primary); color: var(--text-primary);
+      font-size: 0.95rem; outline: none;
+    }
+    .modal-content select { color: var(--text-primary); }
+    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-buttons .btn {
+      background: transparent; border: 1px solid var(--accent); border-radius: 30px;
+      padding: 8px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+      transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .modal-buttons .btn.cancel {
+      background: transparent; border-color: var(--border);
+      -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary);
+    }
+    .loading-overlay {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.5); z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+    }
     .loading-arrows { display: flex; gap: 10px; }
-    .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
+    .arrow {
+      width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
+      border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
+      transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
+    }
     .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
+    @keyframes arrowPulse {
+      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
+      50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
+    }
   </style>
 </head>
 <body>
-  <div id="loginScreen" class="login-screen">
-    <div class="login-form">
-      <h2>Панель руководителя</h2>
-      <p>Войдите, чтобы увидеть свою команду</p>
-      <input type="text" id="loginInput" placeholder="Ваш логин (например, arthur)" />
-      <button class="login-btn" onclick="login()">Смотреть команду</button>
-      <div id="loginError" class="login-error"></div>
+<div class="stars" id="starsContainer"></div>
+
+<!-- Шапка -->
+<div class="header">
+  <h2>Моя команда</h2>
+  <div style="display: flex; gap: 10px;">
+    <a href="/" class="back-btn">← На главную</a>
+    <button class="action-btn" onclick="logout()" style="border-color:var(--danger); -webkit-background-clip:unset; background:var(--danger); color:white; padding:8px 16px;">Выйти</button>
+  </div>
+</div>
+
+<!-- Панель действий -->
+<div class="main-bar">
+  <button class="action-btn" onclick="openCreateTaskModal()">➕ Создать задание</button>
+  <button class="action-btn" onclick="openAwardModal()">💰 Начислить кармики</button>
+</div>
+
+<!-- Уведомления -->
+<div class="notifications-panel">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <span style="font-weight:600;">Уведомления</span>
+    <span class="show-all" id="showAllBtn" onclick="openAllNotifications()" style="display:none;">Показать все</span>
+  </div>
+  <div class="notif-list" id="notificationsList">Нет новых уведомлений</div>
+</div>
+
+<!-- Сотрудники -->
+<div class="section-title">Сотрудники</div>
+<div class="grid" id="teamGrid">Загрузка...</div>
+
+<!-- Модальное окно Создать задание -->
+<div id="createTaskModal" class="modal">
+  <div class="modal-content">
+    <h3 style="margin-bottom:12px;">Новое задание</h3>
+    <label>Тип задания</label>
+    <select id="taskType" onchange="toggleEmployeeSelect()">
+      <option value="personal">Персональное</option>
+      <option value="global">Общее</option>
+    </select>
+    <label>Сотрудник</label>
+    <select id="taskEmployeeSelect"></select>
+    <label>Название (до 45 символов)</label>
+    <input type="text" id="taskName" maxlength="45" placeholder="Название задания">
+    <label>Баллы</label>
+    <input type="number" id="taskPoints" placeholder="50">
+    <div class="modal-buttons">
+      <button class="btn cancel" onclick="closeModal('createTaskModal')">Отмена</button>
+      <button class="btn" onclick="createTask()">Создать</button>
     </div>
   </div>
+</div>
 
-  <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
-    <div class="header">
-      <h1 onclick="window.location.reload()">Моя команда</h1>
-      <div class="header-actions">
-        <a href="/" class="back-btn">← На главную</a>
-        <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
-      </div>
-    </div>
-    <div class="container">
-      <div class="notifications-panel" id="notificationsPanel">
-        <div class="section-title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Уведомления
-        </div>
-        <div id="notificationsList">Загрузка...</div>
-        <div class="show-all-btn" id="showAllBtn" onclick="openAllNotifications()">Показать все</div>
-      </div>
-      <div class="section-title">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="8" cy="7" r="3"/><circle cx="18" cy="7" r="3"/><path d="M3 21v-2a4 4 0 0 1 4-4h2"/><path d="M21 21v-2a4 4 0 0 0-4-4h-2"/></svg>
-        Мои сотрудники
-      </div>
-      <div class="team-grid" id="teamGrid"><div class="loading">Загрузка...</div></div>
+<!-- Модальное окно Начислить кармики -->
+<div id="awardModal" class="modal">
+  <div class="modal-content">
+    <h3 style="margin-bottom:12px;">Начислить кармики</h3>
+    <label>Сотрудник</label>
+    <select id="awardEmployeeSelect"></select>
+    <label>Сумма</label>
+    <input type="number" id="awardAmount" placeholder="100">
+    <label>Комментарий (обязательно)</label>
+    <input type="text" id="awardComment" placeholder="За что">
+    <div class="modal-buttons">
+      <button class="btn cancel" onclick="closeModal('awardModal')">Отмена</button>
+      <button class="btn" onclick="awardPoints()">Начислить</button>
     </div>
   </div>
+</div>
 
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
-    let allNotificationsCache = []; // для хранения всех уведомлений
+<!-- Модалка для подтверждения проверки задания -->
+<div id="verifyModal" class="modal">
+  <div class="modal-content" id="verifyModalContent"></div>
+</div>
 
-    function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
-    function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+  let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
+  let allNotificationsCache = [];
 
-    async function loadTeam() {
-      showLoading();
-      const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
-      const team = await res.json();
-      hideLoading();
-      const grid = document.getElementById('teamGrid');
-      if (!team || team.length === 0) {
-        grid.innerHTML = '<div class="loading">Нет подчинённых.</div>';
-        return;
-      }
-      grid.innerHTML = team.map(emp => `
-        <div class="employee-card" id="card-${emp.login}">
-          <div class="employee-header"><div class="employee-avatar">${emp.name.charAt(0)}</div><div><div class="employee-name">${emp.name}</div><div class="employee-dept">${emp.department || '—'}</div></div></div>
-          <div class="metrics-row">
-            <div class="metric"><div class="value success">${emp.points}</div><div class="label">кармиков</div></div>
-            <div class="metric"><div class="value accent">${emp.energy}</div><div class="label">энергии</div></div>
-            <div class="metric"><div class="value warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="label">заданий</div></div>
+  // Звёзды
+  function createStars() {
+    const container = document.getElementById('starsContainer');
+    const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div'); star.className = 'star';
+      const size = Math.random()*3+1;
+      star.style.width = size+'px'; star.style.height = size+'px';
+      star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+      star.style.background = colors[Math.floor(Math.random()*colors.length)];
+      star.style.animationDelay = Math.random()*3+'s';
+      container.appendChild(star);
+    }
+  }
+  createStars();
+
+  function showLoading() {
+    const overlay = document.createElement('div'); overlay.className='loading-overlay';
+    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
+    document.body.appendChild(overlay);
+  }
+  function hideLoading() { const o = document.querySelector('.loading-overlay'); if(o) o.remove(); }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+  function openCreateTaskModal() {
+    document.getElementById('createTaskModal').classList.add('active');
+    loadEmployeeSelects();
+    toggleEmployeeSelect();
+  }
+  function openAwardModal() {
+    document.getElementById('awardModal').classList.add('active');
+    loadEmployeeSelects();
+  }
+
+  function toggleEmployeeSelect() {
+    const type = document.getElementById('taskType').value;
+    document.getElementById('taskEmployeeSelect').style.display = type === 'personal' ? 'block' : 'none';
+  }
+
+  async function loadEmployeeSelects() {
+    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
+    const team = await res.json();
+    const options = team.map(e => `<option value="${e.login}">${e.name} (${e.department || '—'})</option>`).join('');
+    document.getElementById('taskEmployeeSelect').innerHTML = options;
+    document.getElementById('awardEmployeeSelect').innerHTML = options;
+  }
+
+  async function createTask() {
+    const type = document.getElementById('taskType').value;
+    const employee = type === 'personal' ? document.getElementById('taskEmployeeSelect').value : 'all';
+    const taskName = document.getElementById('taskName').value.trim();
+    const points = parseInt(document.getElementById('taskPoints').value) || 0;
+    if (!taskName) return alert('Введите название');
+    showLoading();
+    const res = await fetch(`${API_URL}?action=createTask&managerLogin=${encodeURIComponent(currentLogin)}&taskName=${encodeURIComponent(taskName)}&points=${points}&employeeLogin=${encodeURIComponent(employee)}`);
+    const result = await res.json();
+    hideLoading();
+    alert(result.message);
+    closeModal('createTaskModal');
+    loadTeam();
+  }
+
+  async function awardPoints() {
+    const employee = document.getElementById('awardEmployeeSelect').value;
+    const amount = parseInt(document.getElementById('awardAmount').value) || 0;
+    const comment = document.getElementById('awardComment').value.trim();
+    if (!employee || amount <= 0 || !comment) return alert('Заполните все поля');
+    showLoading();
+    const res = await fetch(`${API_URL}?action=awardPoints&managerLogin=${encodeURIComponent(currentLogin)}&employeeLogin=${encodeURIComponent(employee)}&amount=${amount}&comment=${encodeURIComponent(comment)}`);
+    const result = await res.json();
+    hideLoading();
+    alert(result.message);
+    closeModal('awardModal');
+    loadTeam();
+  }
+
+  // Загрузка команды
+  async function loadTeam() {
+    showLoading();
+    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
+    const team = await res.json();
+    hideLoading();
+    const grid = document.getElementById('teamGrid');
+    if (!team.length) { grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>'; return; }
+    grid.innerHTML = team.map(emp => `
+      <div class="employee-card">
+        <div class="emp-header">
+          <div class="emp-avatar">${emp.name.charAt(0)}</div>
+          <div>
+            <div class="emp-name">${emp.name}</div>
+            <div class="emp-dept">${emp.department || '—'}</div>
           </div>
-          <div class="ai-tip" id="tip-${emp.login}">🤖 Анализ данных...</div>
-          <div class="task-review-section" id="review-${emp.login}">Загрузка...</div>
         </div>
-      `).join('');
-
-      team.forEach(emp => {
-        fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
-          .then(r => r.json())
-          .then(tasks => {
-            const reviewTasks = tasks.filter(t => t.status === 'На проверке');
-            const section = document.getElementById('review-' + emp.login);
-            if (reviewTasks.length === 0) {
-              section.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.85rem;">Нет заданий на проверке</div>';
-            } else {
-              section.innerHTML = reviewTasks.map(t => `
-                <div class="review-item">
-                  <span>${t.task} (${t.points} карм.) ${t.comment ? ' — ' + t.comment : ''}</span>
-                  <button class="verify-btn" onclick="openVerifyModal('${t.task}', '${emp.login}', '${(t.comment || '').replace(/'/g, "\\'")}')">Проверить</button>
-                </div>
-              `).join('');
-            }
-          });
-      });
-    }
-
-    // ========== ДОБАВЛЕННЫЕ ФУНКЦИИ ДЛЯ ПРОВЕРКИ ЗАДАНИЙ ==========
-    function openVerifyModal(taskName, employeeLogin, comment) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <h3>Подтверждение задания</h3>
-          <p><strong>Задание:</strong> ${taskName}</p>
-          <p><strong>Сотрудник:</strong> ${employeeLogin}</p>
-          <p><strong>Комментарий:</strong> ${comment || 'нет'}</p>
-          <button class="verify-btn" id="verifyYesBtn" style="background: var(--success); margin-right: 10px;">✅ Подтвердить</button>
-          <button class="modal-close-btn" id="verifyNoBtn">Отмена</button>
+        <div class="metrics-row">
+          <div class="metric"><div class="val success">${emp.points}</div><div class="lbl">кармиков</div></div>
+          <div class="metric"><div class="val accent">${emp.energy}</div><div class="lbl">энергии</div></div>
+          <div class="metric"><div class="val warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="lbl">заданий</div></div>
         </div>
-      `;
-      document.body.appendChild(modal);
-      
-      document.getElementById('verifyYesBtn').onclick = async () => {
-        modal.remove();
-        showLoading();
-        try {
-          const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(employeeLogin)}&managerLogin=${encodeURIComponent(currentLogin)}`);
-          const result = await res.json();
-          hideLoading();
-          showMessage(result.message);
-          if (result.success) loadTeam(); // обновляем список команды
-        } catch (e) {
-          hideLoading();
-          showMessage('Ошибка соединения');
-        }
-      };
-      document.getElementById('verifyNoBtn').onclick = () => modal.remove();
-    }
+        <div class="task-review" id="review-${emp.login}">Загрузка...</div>
+      </div>
+    `).join('');
+    team.forEach(emp => {
+      fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
+        .then(r => r.json()).then(tasks => {
+          const review = tasks.filter(t => t.status === 'На проверке');
+          const section = document.getElementById('review-' + emp.login);
+          if (!review.length) { section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Нет заданий на проверке</span>'; return; }
+          section.innerHTML = review.map(t => `
+            <div class="review-item">
+              <span>${t.task} (${t.points} карм.) ${t.comment ? '— ' + t.comment : ''}</span>
+              <button class="verify-btn" onclick="openVerifyModal('${t.task}', '${emp.login}', '${(t.comment||'').replace(/'/g, "\\'")}')">✓</button>
+            </div>
+          `).join('');
+        });
+    });
+  }
 
-    function showMessage(msg) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <p>${msg}</p>
-          <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-    // ============================================================
+  function openVerifyModal(taskName, login, comment) {
+    const modal = document.getElementById('verifyModal');
+    modal.classList.add('active');
+    document.getElementById('verifyModalContent').innerHTML = `
+      <h3>Подтверждение</h3>
+      <p style="margin:12px 0;"><b>Задание:</b> ${taskName}</p>
+      <p style="margin:12px 0;"><b>Комментарий:</b> ${comment || 'нет'}</p>
+      <div class="modal-buttons">
+        <button class="btn cancel" onclick="closeModal('verifyModal')">Отмена</button>
+        <button class="btn" onclick="verifyTask('${taskName}', '${login}')">Подтвердить</button>
+      </div>
+    `;
+  }
 
-    function login() {
-      const login = document.getElementById('loginInput').value.trim();
-      if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
-      localStorage.setItem('karmabank_manager_login', login);
-      currentLogin = login;
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'flex';
-      loadTeam();
-      loadNotifications();
-    }
-    function logout() {
-      localStorage.removeItem('karmabank_manager_login');
-      document.getElementById('mainScreen').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'flex';
-      document.getElementById('loginInput').value = '';
-    }
+  async function verifyTask(taskName, login) {
+    showLoading();
+    const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
+    const result = await res.json();
+    hideLoading();
+    alert(result.message);
+    closeModal('verifyModal');
+    loadTeam();
+  }
 
-    async function loadNotifications() {
-      const res = await fetch(`${API_URL}?action=getNotifications&managerLogin=${encodeURIComponent(currentLogin)}`);
-      allNotificationsCache = await res.json();
-      const container = document.getElementById('notificationsList');
-      if (allNotificationsCache.length) {
-        container.innerHTML = allNotificationsCache.slice(0,3).map(n => `<div class="notif-item"><strong>${n.employee}</strong> использовал(а) сертификат «${n.reward}».<br><small>${n.date}</small></div>`).join('');
-        document.getElementById('showAllBtn').style.display = 'block';
-      } else {
-        container.innerHTML = 'Нет уведомлений';
-        document.getElementById('showAllBtn').style.display = 'none';
-      }
+  async function loadNotifications() {
+    const res = await fetch(`${API_URL}?action=getNotifications&managerLogin=${encodeURIComponent(currentLogin)}`);
+    allNotificationsCache = await res.json();
+    const container = document.getElementById('notificationsList');
+    if (allNotificationsCache.length) {
+      container.innerHTML = allNotificationsCache.slice(0,3).map(n => `<div class="notif-item">${n.employee} — «${n.reward}» • ${n.date}</div>`).join('');
+      document.getElementById('showAllBtn').style.display = 'block';
+    } else {
+      container.innerHTML = 'Нет новых уведомлений';
+      document.getElementById('showAllBtn').style.display = 'none';
     }
+  }
 
-    function openAllNotifications() {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      let notifsHtml = '';
-      if (allNotificationsCache.length) {
-        notifsHtml = allNotificationsCache.map(n => `<p><strong>${n.employee}</strong> — «${n.reward}»<br><small>${n.date}</small></p>`).join('');
-      } else {
-        notifsHtml = '<p>Нет уведомлений</p>';
-      }
-      modal.innerHTML = `<div class="modal-content"><h3>Все уведомления</h3><div style="max-height: 400px; overflow-y: auto;">${notifsHtml}</div><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
-      document.body.appendChild(modal);
-    }
+  function openAllNotifications() {
+    const modal = document.createElement('div'); modal.className = 'modal active';
+    let html = '<div class="modal-content"><h3>Все уведомления</h3><div style="max-height: 300px; overflow-y: auto; margin: 12px 0;">';
+    html += allNotificationsCache.map(n => `<p style="margin:4px 0;">${n.employee} — «${n.reward}» • ${n.date}</p>`).join('');
+    html += '</div><button class="btn cancel" onclick="this.closest(\'.modal\').remove()">Закрыть</button></div>';
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+  }
 
-    if (currentLogin) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'flex';
-      loadTeam();
-      loadNotifications();
-    }
-  </script>
+  function logout() { localStorage.removeItem('karmabank_manager_login'); location.reload(); }
+
+  if (currentLogin) {
+    loadTeam();
+    loadNotifications();
+  } else {
+    window.location.href = '/';
+  }
+</script>
 </body>
 </html>
