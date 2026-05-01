@@ -29,7 +29,6 @@
       overflow-x: hidden;
       user-select: none;
     }
-    /* Звёздный фон */
     .stars {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0; pointer-events: none;
@@ -88,16 +87,6 @@
       opacity: 0.7;
       order: 1;
     }
-    .task-card:nth-child(1) { animation-delay: 0.05s; }
-    .task-card:nth-child(2) { animation-delay: 0.1s; }
-    .task-card:nth-child(3) { animation-delay: 0.15s; }
-    .task-card:nth-child(4) { animation-delay: 0.2s; }
-    .task-card:nth-child(5) { animation-delay: 0.25s; }
-    .task-card:nth-child(6) { animation-delay: 0.3s; }
-    .task-card:nth-child(7) { animation-delay: 0.35s; }
-    .task-card:nth-child(8) { animation-delay: 0.4s; }
-    .task-card:nth-child(9) { animation-delay: 0.45s; }
-    .task-card:nth-child(10) { animation-delay: 0.5s; }
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
@@ -125,16 +114,8 @@
       color: var(--text-secondary);
       font-size: 0.85rem;
     }
-    .task-meta .points {
-      color: var(--accent);
-      font-weight: 600;
-    }
-    .task-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
+    .task-meta .points { color: var(--accent); font-weight: 600; }
+    .task-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .btn {
       background: transparent;
       border: 1px solid var(--accent);
@@ -150,36 +131,22 @@
       color: transparent;
       white-space: nowrap;
     }
-    .btn:hover {
-      border-color: #c084fc;
-      box-shadow: 0 0 18px rgba(249,115,22,0.6);
-      transform: scale(1.03);
-    }
+    .btn:hover { border-color: #c084fc; box-shadow: 0 0 18px rgba(249,115,22,0.6); transform: scale(1.03); }
     .btn.complete {
       background: linear-gradient(135deg, #10b981, #34d399);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
       border-color: var(--success);
     }
     .status-badge {
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: rgba(16,185,129,0.15);
-      color: var(--success);
+      padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+      background: rgba(16,185,129,0.15); color: var(--success);
       border: 1px solid rgba(16,185,129,0.3);
     }
     .status-badge.pending {
-      background: rgba(249,115,22,0.15);
-      color: var(--accent);
+      background: rgba(249,115,22,0.15); color: var(--accent);
       border-color: rgba(249,115,22,0.3);
     }
-    .empty-message {
-      text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem;
-    }
-    /* Загрузка */
+    .empty-message { text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem; }
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 3000;
@@ -187,21 +154,15 @@
     }
     .loading-arrows { display: flex; gap: 10px; }
     .arrow {
-      width: 12px; height: 12px;
-      background: linear-gradient(135deg, #f97316, #fbbf24);
-      border-radius: 2px;
-      animation: arrowPulse 1.2s infinite ease-in-out both;
-      transform: rotate(45deg);
-      box-shadow: 0 0 10px var(--accent);
+      width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
+      border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
+      transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
     }
-    .arrow:nth-child(1) { animation-delay: 0s; }
-    .arrow:nth-child(2) { animation-delay: 0.15s; }
-    .arrow:nth-child(3) { animation-delay: 0.3s; }
+    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
-    /* Модалка */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -212,8 +173,7 @@
       border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
       max-width: 400px; width: 90%; text-align: center;
       box-shadow: 0 0 60px rgba(249,115,22,0.6);
-      animation: modalPop 0.4s ease;
-      color: var(--text-primary);
+      animation: modalPop 0.4s ease; color: var(--text-primary);
     }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .modal-content textarea {
@@ -240,7 +200,6 @@
   const currentLogin = localStorage.getItem('karmabank_login');
   if (!currentLogin) window.location.href = '/';
 
-  // Звёзды
   function createStars() {
     const container = document.getElementById('starsContainer');
     const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
@@ -297,9 +256,7 @@
     const res = await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`);
     const result = await res.json();
     hideLoading();
-    if (result && result.message) {
-      showModal(result.message);
-    }
+    if (result && result.message) showModal(result.message);
     loadTasks();
   }
 
@@ -334,6 +291,7 @@
           actionHtml = `<span class="status-badge">Выполнено</span>`;
           cardClass = 'completed';
         }
+
         return `
         <div class="task-card ${cardClass}">
           <div class="task-info">
