@@ -252,7 +252,6 @@
     loadTasks();
   }
 
-  // Безопасное экранирование для data-атрибутов
   function safeEscape(str) {
     return String(str).replace(/"/g, '&quot;').replace(/`/g, '&#96;').replace(/\\/g, '&#92;');
   }
@@ -276,7 +275,6 @@
         return;
       }
 
-      // Фильтруем повреждённые записи
       const validTasks = tasks.filter(t => t && typeof t.task === 'string' && t.task.trim() !== '');
 
       const inProgress = validTasks.filter(t => t.status === 'В работе');
