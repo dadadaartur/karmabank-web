@@ -160,7 +160,6 @@
       if (overlay) overlay.remove();
     }
 
-    // Звёздный фон
     function createStars() {
       const container = document.getElementById('starsContainer');
       for (let i = 0; i < 80; i++) {
@@ -191,17 +190,12 @@
           fetch(`${API_URL}?action=getAllEmployees`)
         ]);
 
-        // Проверяем, что ответы успешны
-        if (!histRes.ok || !empRes.ok) {
-          throw new Error('Ошибка сети или сервера');
-        }
+        if (!histRes.ok || !empRes.ok) throw new Error('Сетевая ошибка');
 
         const historyData = await histRes.json();
         const employees = await empRes.json();
 
-        // Проверяем, что historyData — массив
         if (!Array.isArray(historyData)) {
-          console.warn('История не массив:', historyData);
           document.getElementById('historyList').innerHTML = '<div class="empty-message">Некорректные данные от сервера.</div>';
           hideLoading();
           return;
@@ -237,7 +231,6 @@
             typeClass = 'transfer';
           }
 
-          // Безопасное отображение даты и времени
           const dateStr = h.date || '';
           const timeStr = h.time || '';
           const dateTime = [dateStr, timeStr].filter(Boolean).join(' ');
