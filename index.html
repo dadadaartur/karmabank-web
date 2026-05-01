@@ -57,16 +57,16 @@
       50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
       100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
     }
-    /* Единая анимация загрузки — стрелки, как в магазине */
+    /* Единая анимация загрузки — стрелки */
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
-    /* Анимация превращения стрелок в галочку (успешный перевод) */
-    @keyframes transformToCheck {
-      0% { opacity: 1; transform: rotate(45deg) scale(1); }
-      60% { opacity: 0.6; transform: rotate(45deg) scale(1.6); }
-      100% { opacity: 0; transform: rotate(45deg) scale(0.8); visibility: hidden; }
+    /* Анимация успешного перевода — частицы и галочка */
+    @keyframes particleFly {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
     }
     @keyframes checkAppear {
       0% { opacity: 0; transform: scale(0) rotate(-180deg); }
@@ -94,12 +94,21 @@
       align-items: center;
       justify-content: center;
       gap: 24px;
+      position: relative;
+      height: 120px;
     }
-    .success-animation .arrows-container {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      align-items: center;
+    .particles-container {
+      position: relative;
+      width: 60px; height: 60px;
+    }
+    .particle {
+      position: absolute;
+      width: 6px; height: 6px;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      border-radius: 50%;
+      animation: particleFly 1.2s ease-out forwards;
+      opacity: 0;
+      left: 27px; top: 27px;
     }
     .success-animation .checkmark {
       display: none;
@@ -187,7 +196,7 @@
       padding: 4px 12px; border-radius: 40px;
     }
     .premium-level-icon {
-      width: 28px; height: 28px;
+      width: 18px; height: 18px;
       animation: starTwinkle 2.5s infinite ease-in-out;
     }
     .user-dept {
@@ -337,16 +346,11 @@
       align-items: center;
       justify-content: center;
     }
-    /* Все иконки одинакового размера (48x48) */
     .action-btn svg {
       width: 48px;
       height: 48px;
-      filter: drop-shadow(0 0 2px #f97316);
+      filter: drop-shadow(0 0 2px var(--accent));
       transition: all 0.3s;
-    }
-    /* Апельсин в магазине делаем визуально крупнее */
-    .action-btn.shop-btn svg {
-      transform: scale(1.2);
     }
     .action-btn span {
       font-weight: 700;
@@ -492,7 +496,7 @@
       transform: translateY(-2px);
     }
 
-    /* БАЗА ЗНАНИЙ – КРАСИВАЯ КНИГА с обложкой и закладкой */
+    /* БАЗА ЗНАНИЙ – КНИГА */
     .knowledge-fab {
       position: fixed; bottom: 24px; right: 24px;
       background: rgba(21,38,56,0.7);
@@ -600,7 +604,6 @@
 <body>
 <div id="loginScreen" class="login-screen">
   <div class="login-form">
-    <!-- Иконка звезды в стиле главной страницы -->
     <svg class="login-star" viewBox="0 0 24 24" fill="none" stroke="url(#loginStarGradient)">
       <polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" />
       <circle cx="12" cy="11.5" r="2.5" fill="rgba(249,115,22,0.3)" stroke="#f97316"/>
@@ -665,50 +668,45 @@
         <div class="balance-sub">кармиков</div>
         <div class="energy-line-wide" id="energyDisplay">⚡ 0 энергии</div>
         <div class="balance-actions">
+          <!-- Перевести -->
           <button class="action-btn" onclick="openTransferModal()">
             <span class="icon-wrapper">
               <svg viewBox="0 0 24 24" fill="none">
-                <defs><linearGradient id="gradArrow" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs>
-                <path d="M2 7 L22 7 M15 2 L22 7 L15 12 M22 17 L2 17 M9 12 L2 17 L9 22" stroke="url(#gradArrow)" stroke-width="2"/>
+                <defs><linearGradient id="gradTransfer" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs>
+                <path d="M7 16 L17 8 M17 8 L13 8 M17 8 L17 12" stroke="url(#gradTransfer)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M17 16 L7 8 M7 8 L11 8 M7 8 L7 12" stroke="url(#gradTransfer)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </span>
             <span>Перевести</span>
           </button>
-          <button class="action-btn shop-btn" onclick="window.location.href='/spend.html'">
+          <!-- Магазин -->
+          <button class="action-btn" onclick="window.location.href='/spend.html'">
             <span class="icon-wrapper">
-              <!-- Апельсин, визуально увеличенный через CSS .shop-btn svg -->
               <svg viewBox="0 0 24 24" fill="none">
-                <defs><linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
-                <path d="M12 3 C8 3 6 5.5 6 9 C6 12.5 8 15 12 15 C16 15 18 12.5 18 9 C18 5.5 16 3 12 3Z" stroke="url(#orangeGrad)" stroke-width="1.8" fill="url(#orangeGrad)" fill-opacity="0.3"/>
-                <circle cx="9.5" cy="7" r="0.6" fill="#fbbf24"/>
-                <circle cx="11.5" cy="6.5" r="0.6" fill="#fbbf24"/>
-                <circle cx="14" cy="7.5" r="0.6" fill="#fbbf24"/>
-                <circle cx="10" cy="9" r="0.6" fill="#fbbf24"/>
-                <circle cx="13" cy="10" r="0.6" fill="#fbbf24"/>
-                <circle cx="8.5" cy="10" r="0.6" fill="#fbbf24"/>
-                <circle cx="15" cy="9" r="0.6" fill="#fbbf24"/>
-                <path d="M12 3.5 C12 2.5 13.5 2 14 3 C14.5 4 13 4 12 3.5Z" fill="#10b981" stroke="#10b981" stroke-width="0.5"/>
-                <path d="M12.5 3.2 L13.5 2.5" stroke="#a0522d" stroke-width="1.2" stroke-linecap="round"/>
-                <ellipse cx="9.5" cy="7" rx="1.5" ry="2" fill="white" fill-opacity="0.35" transform="rotate(-20 9.5 7)"/>
+                <defs><linearGradient id="gradShop" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+                <path d="M6 7 L18 7 L17 20 L7 20 Z" stroke="url(#gradShop)" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M9 7 L9 5 C9 3.5 10.5 2 12 2 C13.5 2 15 3.5 15 5 L15 7" stroke="url(#gradShop)" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="10" cy="12" r="0.8" fill="url(#gradShop)"/>
+                <circle cx="14" cy="12" r="0.8" fill="url(#gradShop)"/>
               </svg>
             </span>
             <span>Магазин</span>
           </button>
+          <!-- Операции -->
           <button class="action-btn" onclick="window.location.href='/history.html'">
             <span class="icon-wrapper">
               <svg viewBox="0 0 24 24" fill="none">
-                <defs><linearGradient id="gradWallet" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs>
-                <rect x="3" y="7" width="18" height="14" rx="2" stroke="url(#gradWallet)" stroke-width="1.8" fill="rgba(16,185,129,0.1)"/>
-                <path d="M19 12h-3" stroke="url(#gradWallet)" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" stroke="url(#gradWallet)" stroke-width="1.8"/>
-                <circle cx="8" cy="14" r="1.2" fill="#34d399"/>
+                <defs><linearGradient id="gradHistory" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs>
+                <rect x="4" y="5" width="16" height="15" rx="2" stroke="url(#gradHistory)" stroke-width="1.8"/>
+                <path d="M8 10 L16 10 M8 14 L14 14" stroke="url(#gradHistory)" stroke-width="1.8" stroke-linecap="round"/>
+                <polyline points="16 8 10 13 7 11" stroke="url(#gradHistory)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </span>
             <span>Операции</span>
           </button>
         </div>
         <button class="wide-btn" onclick="window.location.href='/purchases.html'">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1 13H6L5 7z" stroke="url(#gradWallet)"/><path d="M9 7V5a2 2 0 0 1 4 0v2" stroke="url(#gradWallet)"/></svg>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1 13H6L5 7z" stroke="#f97316"/><path d="M9 7V5a2 2 0 0 1 4 0v2" stroke="#f97316"/></svg>
           Мои покупки
         </button>
       </div>
@@ -746,16 +744,13 @@
       </div>
     </div>
   </div>
-  <!-- КРАСИВАЯ КНИГА (объемная с закладкой) -->
+  <!-- КНИГА базы знаний -->
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M4 3h16v18H4z" fill="rgba(249,115,22,0.15)" stroke-width="1.5"/>
-      <path d="M4 3v18" stroke-width="2" stroke="url(#bookGradient)"/>
-      <path d="M20 3v18" stroke-width="2" stroke="url(#bookGradient)"/>
-      <path d="M12 3v18" stroke-width="1.5" stroke="#f97316" stroke-dasharray="2,2"/>
-      <path d="M4 8h16" stroke-width="1.2" stroke="rgba(249,115,22,0.6)"/>
-      <path d="M4 13h16" stroke-width="1.2" stroke="rgba(249,115,22,0.6)"/>
-      <path d="M8 21l4-3 4 3" stroke="none" fill="#f97316" opacity="0.8"/>
+    <svg viewBox="0 0 24 24" fill="none">
+      <defs><linearGradient id="bookGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs>
+      <path d="M4 3.5 L12 7 L20 3.5 L20 19.5 L12 23 L4 19.5 Z" stroke="url(#bookGrad)" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M12 7 L12 23" stroke="url(#bookGrad)" stroke-width="1.5"/>
+      <path d="M8 10 L12 12 L8 14" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" fill="none"/>
     </svg>
     <span>База знаний</span>
   </div>
@@ -778,7 +773,6 @@
   <defs>
     <linearGradient id="starGradLocal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
     <linearGradient id="loginStarGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
-    <linearGradient id="bookGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
   </defs>
 </svg>
 
@@ -793,7 +787,6 @@
     return '<svg class="premium-level-icon" viewBox="0 0 24 24" fill="none" stroke="url(#starGradLocal)"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" /><circle cx="12" cy="11" r="3" fill="rgba(249,115,22,0.3)" stroke="#f97316"/></svg>';
   }
 
-  // Единая функция загрузки с правильной анимацией (стрелки)
   function showLoading() {
     const overlay = document.createElement('div');
     overlay.className = 'loading-overlay';
@@ -805,17 +798,14 @@
     if (overlay) overlay.remove();
   }
 
-  // Функция показа премиум-уведомления об успешном переводе (красивая анимация)
   function showSuccessNotification(message) {
     const modal = document.createElement('div');
     modal.className = 'modal active';
     modal.innerHTML = `
       <div class="modal-content">
         <div class="success-animation">
-          <div class="arrows-container">
-            <div class="arrow"></div>
-            <div class="arrow"></div>
-            <div class="arrow"></div>
+          <div class="particles-container" id="particlesContainer">
+            <!-- частицы добавятся динамически -->
           </div>
           <div class="checkmark"></div>
           <div class="success-text">${message}</div>
@@ -824,25 +814,28 @@
       </div>
     `;
     document.body.appendChild(modal);
-    // Запуск анимации превращения стрелок в галочку через 1.2 секунды (плавно)
+    const container = modal.querySelector('#particlesContainer');
+    const colors = ['#10b981', '#34d399', '#f97316', '#fbbf24'];
+    for (let i = 0; i < 12; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      const angle = (i / 12) * 360;
+      const x = Math.cos(angle * Math.PI / 180) * 30 + 'px';
+      const y = Math.sin(angle * Math.PI / 180) * 30 + 'px';
+      particle.style.setProperty('--x', x);
+      particle.style.setProperty('--y', y);
+      particle.style.background = colors[i % colors.length];
+      particle.style.animation = `particleFly 1s ${i * 0.08}s ease-out forwards`;
+      container.appendChild(particle);
+    }
     setTimeout(() => {
-      const arrowsContainer = modal.querySelector('.arrows-container');
       const checkmark = modal.querySelector('.checkmark');
-      if (arrowsContainer) {
-        arrowsContainer.style.animation = 'transformToCheck 1.5s forwards';
-        setTimeout(() => {
-          if (arrowsContainer) arrowsContainer.style.display = 'none';
-        }, 1500);
-      }
-      if (checkmark) {
-        checkmark.style.display = 'block';
-        checkmark.style.animation = 'checkAppear 1s cubic-bezier(0.34, 1.2, 0.64, 1) forwards';
-      }
-    }, 1200);
-    // Автоматическое закрытие через 5 секунд (чуть дольше, чтобы успеть насладиться)
+      checkmark.style.display = 'block';
+      checkmark.style.animation = 'checkAppear 1s cubic-bezier(0.34, 1.2, 0.64, 1) forwards';
+    }, 1000);
     setTimeout(() => {
       if (modal && modal.parentNode) modal.remove();
-    }, 5000);
+    }, 4000);
   }
 
   function login() {
@@ -873,19 +866,24 @@
   }
   function logout() { localStorage.removeItem('karmabank_login'); location.reload(); }
   async function loadInProgressTasks() {
-    const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
-    const tasks = await res.json();
-    const activeTasks = tasks.filter(t => t.status === 'Назначено' || t.status === 'В работе');
-    const container = document.getElementById('inProgressTasks');
-    if (!activeTasks.length) { container.innerHTML = `<div class="empty-tasks">✨ Новых заданий пока нет ✨</div>`; return; }
-    container.innerHTML = activeTasks.slice(0,3).map(t => {
-      let btnHtml = '';
-      if (t.status === 'Назначено') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); takeTask('${t.task}')">Взять</button>`;
-      else if (t.status === 'В работе') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); openCommentModal('${t.task}')">Выполнить</button>`;
-      return `<div class="task-card" onclick="window.location.href='/tasks.html'"><span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status-global">Общее</span>' : ''}</span>${btnHtml}</div>`;
-    }).join('');
+    showLoading();
+    try {
+      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
+      const tasks = await res.json();
+      const activeTasks = tasks.filter(t => t.status === 'Назначено' || t.status === 'В работе');
+      const container = document.getElementById('inProgressTasks');
+      if (!activeTasks.length) { container.innerHTML = `<div class="empty-tasks">✨ Новых заданий пока нет ✨</div>`; return; }
+      container.innerHTML = activeTasks.slice(0,3).map(t => {
+        let btnHtml = '';
+        if (t.status === 'Назначено') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); takeTask('${t.task}')">Взять</button>`;
+        else if (t.status === 'В работе') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); openCommentModal('${t.task}')">Выполнить</button>`;
+        return `<div class="task-card" onclick="window.location.href='/tasks.html'"><span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status-global">Общее</span>' : ''}</span>${btnHtml}</div>`;
+      }).join('');
+    } finally {
+      hideLoading();
+    }
   }
-  async function takeTask(taskName) { await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`); loadInProgressTasks(); }
+  async function takeTask(taskName) { showLoading(); await fetch(`${API_URL}?action=takeTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(currentLogin)}`); hideLoading(); loadInProgressTasks(); }
   function openCommentModal(taskName) {
     const modal = document.createElement('div'); modal.className='modal active';
     modal.innerHTML=`<div class="modal-content"><h3>Отчёт</h3><textarea id="commentInput" placeholder="Опишите результат..."></textarea><button class="btn-task" id="submitCommentBtn">Отправить</button><button class="modal-close-btn" id="cancelCommentBtn">Отмена</button></div>`;
