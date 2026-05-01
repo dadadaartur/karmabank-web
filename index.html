@@ -33,6 +33,7 @@
     }
     input[type="text"], input[type="number"], textarea { user-select: text; }
 
+    /* анимации */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes karmaGlow {
@@ -41,9 +42,7 @@
       100% { text-shadow: 0 0 10px #10b981, 0 0 20px #10b981; }
     }
     @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
     }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
     @keyframes pulse-glow {
@@ -52,9 +51,7 @@
       100% { filter: drop-shadow(0 0 5px rgba(249,115,22,0.4)); }
     }
     @keyframes aurora {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
     }
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
@@ -66,26 +63,20 @@
       100% { opacity: 0; transform: scale(1) rotate(45deg); }
     }
     @keyframes checkAppear {
-      0% { opacity: 0; transform: scale(0); }
-      100% { opacity: 1; transform: scale(1); }
+      0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); }
     }
 
     .loading-arrows { display: flex; gap: 10px; align-items: center; justify-content: center; }
     .arrow {
-      width: 12px; height: 12px;
-      background: linear-gradient(135deg, #f97316, #fbbf24);
-      border-radius: 2px;
-      animation: arrowPulse 1.2s infinite ease-in-out both;
-      transform: rotate(45deg);
-      box-shadow: 0 0 10px var(--accent);
+      width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
+      border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
+      transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
     }
-    .arrow:nth-child(1) { animation-delay: 0s; }
-    .arrow:nth-child(2) { animation-delay: 0.15s; }
-    .arrow:nth-child(3) { animation-delay: 0.3s; }
+    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
+
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
     }
     .success-animation { display: flex; align-items: center; justify-content: center; gap: 8px; }
     .success-animation .arrows { display: flex; gap: 6px; animation: transformToCheck 0.8s forwards; }
@@ -96,7 +87,10 @@
       animation: checkAppear 0.4s forwards;
     }
 
-    .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .login-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
     .login-form {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 24px; padding: 40px 30px;
@@ -127,7 +121,7 @@
       gap: 12px;
     }
     .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
-    .header-left-group { display: flex; align-items: center; gap: 16px; }
+    .header-left-group { display: flex; align-items: center; gap: 12px; }
     .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .user-name-link {
       font-weight: 700; font-size: 1rem; cursor: pointer;
@@ -136,13 +130,14 @@
     }
     .user-level-badge {
       display: flex; align-items: center; gap: 4px;
-      background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3);
+      background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.4);
       padding: 4px 10px; border-radius: 20px;
     }
     .user-level-badge .level-icon {
       font-size: 1.5rem;
       background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 6px #f97316);
     }
     .user-dept {
       color: #c084fc; font-weight: 500; font-size: 0.85rem;
@@ -150,26 +145,24 @@
       border: 1px solid rgba(139, 92, 246, 0.3);
     }
     .path-to-perfect {
-      background: transparent; border: 1px solid var(--border); color: var(--text-primary);
-      padding: 6px 14px; border-radius: 20px;
-      font-weight: 700; font-size: 0.8rem; cursor: pointer;
-      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+      background: transparent; border: 1px solid rgba(249,115,22,0.5); color: var(--text-primary);
+      padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem;
+      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
     }
-    .path-to-perfect svg { width: 16px; height: 16px; stroke: url(#perfectStar); fill: none; }
-    .path-to-perfect:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(249,115,22,0.5); }
+    .path-to-perfect:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(249,115,22,0.4); }
     .health-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 6px 14px; border-radius: 20px; cursor: default;
-      font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid rgba(239,68,68,0.5); color: var(--text-secondary);
+      padding: 6px 14px; border-radius: 20px; cursor: default; font-weight: 700;
+      font-size: 0.8rem; display: flex; align-items: center; gap: 6px;
     }
     .health-btn svg { width: 16px; height: 16px; stroke: #ef4444; }
     .chat-header-btn {
       background: transparent; border: 1px solid var(--accent); color: var(--accent);
       padding: 6px 12px; border-radius: 20px; cursor: pointer;
       font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;
+      transition: all 0.2s;
     }
-    .chat-header-btn svg { width: 16px; height: 16px; stroke: currentColor; }
-    .chat-header-btn:hover { background: var(--accent); color: white; }
+    .chat-header-btn:hover { background: rgba(249,115,22,0.1); box-shadow: 0 0 15px rgba(249,115,22,0.4); }
     .logout-btn {
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
       padding: 8px 16px; border-radius: 20px; cursor: pointer;
@@ -266,6 +259,27 @@
     }
     .wide-btn:hover svg { stroke: var(--accent); }
 
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .menu-card {
+      background: var(--bg-card); border-radius: 18px; padding: 16px 10px; text-align: center;
+      border: 1px solid var(--border); transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      cursor: pointer;
+    }
+    .menu-card .menu-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+    .menu-card svg { width: 32px; height: 32px; fill: none; stroke: var(--text-secondary); stroke-width: 1.5; transition: all 0.3s; }
+    .menu-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(249,115,22,0.2);
+    }
+    .menu-card:hover svg { stroke: var(--accent); animation: pulse-glow 1.5s infinite; }
+    .menu-card.disabled { opacity: 0.5; cursor: default; pointer-events: none; }
+
     .tasks-panel h3 {
       cursor: pointer; font-size: 1.4rem; font-weight: 800; margin-bottom: 18px;
       background: linear-gradient(135deg, #f97316, #c084fc);
@@ -321,12 +335,12 @@
     .knowledge-fab img { height: 28px; }
     .knowledge-fab:hover { border-color: var(--accent); box-shadow: 0 0 25px rgba(249,115,22,0.6); transform: translateY(-3px); }
 
-    .btn {
+    .btn-task {
       background: transparent; color: var(--accent); border: 1px solid var(--accent);
       padding: 8px 18px; border-radius: 14px; font-weight: 600; cursor: pointer;
       transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .btn:hover { background: rgba(249,115,22,0.1); box-shadow: 0 0 15px rgba(249,115,22,0.4); }
+    .btn-task:hover { background: rgba(249,115,22,0.1); box-shadow: 0 0 15px rgba(249,115,22,0.4); }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -350,6 +364,7 @@
       .container { grid-template-columns: 1fr; padding: 16px; }
       .balance-value { font-size: 2.8rem; }
       .header { flex-wrap: wrap; }
+      .menu-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -442,21 +457,24 @@
             Мои покупки
           </button>
         </div>
+        <div class="menu-grid" id="menuGrid">
+          <!-- Динамически заполняется JS -->
+        </div>
       </div>
       <div class="tasks-panel">
         <h3 onclick="window.location.href='/tasks.html'">Задания</h3>
         <div id="inProgressTasks">Нет активных заданий</div>
         <div class="fancy-buttons-row">
           <div class="fancy-btn-disabled">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 9 L22 10 L17 16 L19 22 L12 17 L5 22 L7 16 L2 10 L9 9 Z" stroke="currentColor"/><line x1="12" y1="14" x2="12" y2="20" stroke="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 9 L22 10 L17 16 L19 22 L12 17 L5 22 L7 16 L2 10 L9 9 Z"/><line x1="12" y1="14" x2="12" y2="20" stroke="currentColor"/></svg>
             Задания от партнёров
           </div>
           <div class="fancy-btn-disabled">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 17 L6 21 L7 14 L2 9 L9 8 Z" stroke="currentColor"/><circle cx="12" cy="14" r="5" fill="none" stroke="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 17 L6 21 L7 14 L2 9 L9 8 Z"/><circle cx="12" cy="14" r="5" fill="none" stroke="currentColor"/></svg>
             Турниры
           </div>
           <div class="fancy-btn-disabled">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 9 L22 10 L17 16 L19 22 L12 17 L5 22 L7 16 L2 10 L9 9 Z" stroke="currentColor"/><circle cx="12" cy="14" r="3" fill="none" stroke="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L15 9 L22 10 L17 16 L19 22 L12 17 L5 22 L7 16 L2 10 L9 9 Z"/><circle cx="12" cy="14" r="3" fill="none" stroke="currentColor"/></svg>
             Бизнес конференции
           </div>
         </div>
@@ -473,7 +491,7 @@
       <input type="text" id="receiverLogin" placeholder="Логин получателя">
       <input type="number" id="transferAmount" placeholder="Сумма">
       <input type="text" id="transferComment" placeholder="Комментарий (необязательно)">
-      <button class="btn" onclick="executeTransfer()">Отправить</button>
+      <button class="btn-task" onclick="executeTransfer()">Отправить</button>
       <button class="modal-close-btn" onclick="closeTransferModal()">Отмена</button>
       <div id="transferError" style="color:var(--danger); margin-top:8px"></div>
     </div>
@@ -502,6 +520,29 @@
     }
     function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
 
+    function buildMenu(isManager) {
+      const menu = document.getElementById('menuGrid');
+      const items = [
+        { label: 'Тренировка', icon: 'M12 2 L15 9 L22 10 L17 16 L19 22 L12 17 L5 22 L7 16 L2 10 L9 9 Z', link: '/simulator.html', disabled: false },
+        { label: 'Команда', icon: 'M8 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0z M3 21v-2a4 4 0 0 1 4-4h2 M21 21v-2a4 4 0 0 0-4-4h-2', link: '/manager.html', disabled: !isManager },
+        { label: 'Забота о здоровье', icon: 'M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z M16 12h-4V8m0 0v8m0-8h4', link: '#', disabled: true },
+        { label: 'Новости', icon: 'M12 2 L15 8 L22 9 L17 14 L18 21 L12 17 L6 21 L7 14 L2 9 L9 8 Z', link: '#', disabled: true },
+        { label: 'Гороскоп', icon: 'M12 2 L15 9 L22 10 L17 16 L19 22 L12 17 L5 22 L7 16 L2 10 L9 9 Z M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z', link: '#', disabled: true },
+        { label: 'Обучение', icon: 'M4 6h16v12H4z M9 6V4a1 1 0 0 1 2 0v2 M15 6V4a1 1 0 0 1 2 0v2', link: '#', disabled: true }
+      ];
+      menu.innerHTML = items.map(item => `
+        <div class="menu-card ${item.disabled ? 'disabled' : ''}" onclick="${item.disabled ? '' : `window.location.href='${item.link}'`}">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <defs><linearGradient id="mg${item.label}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs>
+              <path d="${item.icon}" stroke="url(#mg${item.label})"/>
+            </svg>
+          </span>
+          ${item.label}
+        </div>
+      `).join('');
+    }
+
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
@@ -523,6 +564,11 @@
             document.querySelector('#userLevelBadge .level-icon').textContent = getLevelIcon(currentEnergy);
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
+            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(login)}`)
+              .then(r => r.json())
+              .then(isManager => {
+                buildMenu(isManager);
+              });
             loadInProgressTasks();
           } else { document.getElementById('loginError').textContent = 'Пользователь не найден'; }
         })
@@ -549,8 +595,8 @@
       }
       container.innerHTML = activeTasks.slice(0, 3).map(t => {
         let btnHtml = '';
-        if (t.status === 'Назначено') btnHtml = `<button class="btn" onclick="event.stopPropagation(); takeTask('${t.task}')">Взять</button>`;
-        else if (t.status === 'В работе') btnHtml = `<button class="btn" onclick="event.stopPropagation(); openCommentModal('${t.task}')">Выполнить</button>`;
+        if (t.status === 'Назначено') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); takeTask('${t.task}')">Взять</button>`;
+        else if (t.status === 'В работе') btnHtml = `<button class="btn-task" onclick="event.stopPropagation(); openCommentModal('${t.task}')">Выполнить</button>`;
         return `<div class="task-card" onclick="window.location.href='/tasks.html'"><span>${t.task} (${t.points} карм.) ${t.isGlobal ? '<span class="status-global">Общее</span>' : ''}</span>${btnHtml}</div>`;
       }).join('');
     }
@@ -569,7 +615,7 @@
       modal.innerHTML = `<div class="modal-content">
         <h3>Отчёт о выполнении</h3>
         <textarea id="commentInput" placeholder="Опишите, что было сделано..."></textarea>
-        <button class="btn" id="submitCommentBtn">Отправить на проверку</button>
+        <button class="btn-task" id="submitCommentBtn">Отправить на проверку</button>
         <button class="modal-close-btn" id="cancelCommentBtn">Отмена</button>
       </div>`;
       document.body.appendChild(modal);
@@ -644,6 +690,9 @@
             document.querySelector('#userLevelBadge .level-icon').textContent = getLevelIcon(currentEnergy);
             document.getElementById('userPoints').textContent = currentPoints;
             document.getElementById('energyDisplay').textContent = `⚡ ${currentEnergy} энергии`;
+            fetch(`${API_URL}?action=isManager&login=${encodeURIComponent(currentLogin)}`)
+              .then(r => r.json())
+              .then(isManager => buildMenu(isManager));
             loadInProgressTasks();
           }
         })
