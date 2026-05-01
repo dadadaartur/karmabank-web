@@ -7,12 +7,13 @@
   <link rel="icon" type="image/png" href="belchonok.png">
   <link rel="apple-touch-icon" href="belchonok.png">
   <style>
-    :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; }
+    :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --accent-hover: #ea580c; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; user-select: none; }
     input[type="text"] { user-select: text; }
     .header { background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
-    .header h1 { font-size: 1.4rem; font-weight: 800; }
+    .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .header h1 img { height: 1.8rem; vertical-align: middle; }
     .logout-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
     .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
     .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; width: 100%; display: grid; gap: 24px; }
@@ -45,16 +46,17 @@
     .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00); color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; }
     .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); }
     .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
-    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center; }
-    .loading-sphere { width:80px; height:80px; background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); border-radius:50%; animation: spinStar 2s linear infinite, colorShift 3s infinite; box-shadow: 0 0 40px #ff9f00, 0 0 80px #ff6600, 0 0 120px #ffd700; }
-    @keyframes spinStar { 100% { transform: rotate(360deg); } }
-    @keyframes colorShift { 0% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } 50% { background: radial-gradient(circle at 70% 70%, #ffcc00, #e65c00, #e0e0e0); } 100% { background: radial-gradient(circle at 30% 30%, #ffd700, #ff6600, #c0c0c0); } }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .loading-arrows { display: flex; gap: 10px; }
+    .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
+    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
   </style>
 </head>
 <body>
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
-      <h2>Командный центр</h2>
+      <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Командный центр</h2>
       <p>Введите логин администратора</p>
       <input type="text" id="loginInput" placeholder="Логин" />
       <button class="login-btn" onclick="login()">Войти</button>
@@ -64,7 +66,7 @@
 
   <div id="mainScreen" style="display:none; flex-direction: column; flex: 1;">
     <div class="header">
-      <h1>Кармический банк — Командный центр</h1>
+      <h1><img src="belchonok.png" alt="Бельчонок"> Кармический банк — Командный центр</h1>
       <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
     </div>
     <div class="container">
@@ -77,7 +79,7 @@
       </div>
       <div class="panel">
         <h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Рейтинг</h2>
-        <table class="rating-table"><thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th><th>Энергия</th></tr></thead><tbody id="ratingBody"></tbody></table>
+        <table class="rating-table"><thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th><th>Энергия</th></tr></thead><tbody id="ratingBody"><tr><td colspan="5">Загрузка...</td></tr></tbody></table>
       </div>
       <div class="panel"><h2>📋 Последние задания</h2><div id="taskList"></div></div>
       <div class="panel"><h2>🎁 Витрина наград</h2><div id="rewardList"></div></div>
@@ -85,10 +87,15 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxL3R6HvzYVt0yzuxZmx26E88tAV2rYNcrA1K3-k1tvW26fzQT-eLeKHVaep2yf_pL0Uw/exec';
+    const API_URL_ADMIN = 'https://script.google.com/macros/s/AKfycbxL3R6HvzYVt0yzuxZmx26E88tAV2rYNcrA1K3-k1tvW26fzQT-eLeKHVaep2yf_pL0Uw/exec';
     const ADMIN_LOGIN = 'adminboss';
     let levelsCache = [];
-    async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
+
+    function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
+    function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+
+    async function loadLevels() { try { const res = await fetch(`${API_URL_ADMIN}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
+
     function login() {
       const login = document.getElementById('loginInput').value.trim();
       if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
@@ -98,18 +105,22 @@
       document.getElementById('mainScreen').style.display = 'flex';
       loadLevels().then(() => { fetchData(); setInterval(fetchData, 30000); });
     }
+
     function logout() {
       localStorage.removeItem('karmabank_admin_login');
       document.getElementById('mainScreen').style.display = 'none';
       document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('loginInput').value = '';
+      document.getElementById('loginError').textContent = '';
     }
+
     async function fetchData() {
       showLoading();
       try {
         const [employees, tasks, rewards] = await Promise.all([
-          fetch(`${API_URL}?action=getAllEmployees`).then(r => r.json()),
-          fetch(`${API_URL}?action=getAllTasks`).then(r => r.json()),
-          fetch(`${API_URL}?action=getRewards`).then(r => r.json())
+          fetch(`${API_URL_ADMIN}?action=getAllEmployees`).then(r => r.json()),
+          fetch(`${API_URL_ADMIN}?action=getAllTasks`).then(r => r.json()),
+          fetch(`${API_URL_ADMIN}?action=getRewards`).then(r => r.json())
         ]);
         updateMetrics(employees, tasks);
         updateRating(employees);
@@ -118,8 +129,7 @@
       } catch(e) {}
       hideLoading();
     }
-    function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-sphere"></div>'; document.body.appendChild(overlay); }
-    function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+
     function updateMetrics(employees, tasks) {
       document.getElementById('totalEmployees').textContent = employees.length;
       document.getElementById('totalPoints').textContent = employees.reduce((s,e) => s + (e.points||0), 0);
@@ -127,19 +137,23 @@
       document.getElementById('completedTasks').textContent = tasks.filter(t => t.status === 'Выполнено').length;
       document.getElementById('activeTasks').textContent = tasks.filter(t => t.status !== 'Выполнено').length;
     }
+
     function updateRating(employees) {
       const sorted = [...employees].sort((a,b) => (b.points||0) - (a.points||0));
       document.getElementById('ratingBody').innerHTML = sorted.map((e,i) => `<tr><td class="position">${i+1}</td><td>${e.name}</td><td>${e.department}</td><td class="points">${e.points}</td><td class="energy">${e.energy}</td></tr>`).join('');
     }
+
     function updateTaskList(tasks) {
       document.getElementById('taskList').innerHTML = tasks.slice(0,5).map(t => {
         let cls = t.status === 'В работе' ? 'in-progress' : (t.status === 'Выполнено' ? 'done' : 'pending');
         return `<div class="task-item"><span>${t.task} (${t.employee})</span><span class="status ${cls}">${t.status}</span></div>`;
       }).join('');
     }
+
     function updateRewardList(rewards) {
       document.getElementById('rewardList').innerHTML = rewards.map(r => `<div class="reward-item"><span>${r.name}</span><span>${r.cost} карм.</span></div>`).join('');
     }
+
     if (localStorage.getItem('karmabank_admin_login') === ADMIN_LOGIN) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainScreen').style.display = 'flex';
