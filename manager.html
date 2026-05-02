@@ -19,25 +19,17 @@
       color: var(--text-primary); min-height: 100vh; padding: 20px;
       position: relative; overflow-x: hidden; user-select: none;
     }
-    /* Звёзды */
-    .stars {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 0; pointer-events: none;
-    }
-    .star {
-      position: absolute; background: white; border-radius: 50%;
-      animation: twinkle 2s infinite alternate; opacity: 0.7;
-    }
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
     @keyframes twinkle {
       0% { opacity: 0.3; transform: scale(0.8); }
       100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
     }
     .header {
       background: rgba(21,38,56,0.7); backdrop-filter: blur(10px);
-      border: 1px solid var(--border); border-radius: 20px;
-      padding: 16px 24px; margin-bottom: 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px; position: relative; z-index: 2;
+      border: 1px solid var(--border); border-radius: 20px; padding: 16px 24px; margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      position: relative; z-index: 2;
     }
     .header h2 {
       font-size: 1.4rem; font-weight: 800;
@@ -47,14 +39,10 @@
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
       background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      text-decoration: none;
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none;
     }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    .main-bar {
-      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;
-      position: relative; z-index: 2;
-    }
+    .main-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; position: relative; z-index: 2; }
     .action-btn {
       background: transparent; border: 1px solid var(--accent); border-radius: 40px;
       padding: 10px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
@@ -62,27 +50,18 @@
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     .action-btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02); }
-    .section-title {
-      font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;
-      color: var(--text-primary); position: relative; z-index: 2;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px; position: relative; z-index: 2;
-    }
+    .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; position: relative; z-index: 2; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; position: relative; z-index: 2; }
     .employee-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border: 1px solid var(--border); border-radius: 20px; padding: 20px;
-      display: flex; flex-direction: column; gap: 12px;
-      transition: all 0.3s; backdrop-filter: blur(4px);
+      display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px);
     }
     .employee-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .emp-header { display: flex; align-items: center; gap: 10px; }
     .emp-avatar {
       width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; font-weight: 800; color: white;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white;
     }
     .emp-name { font-weight: 700; }
     .emp-dept { font-size: 0.8rem; color: var(--text-secondary); }
@@ -95,45 +74,32 @@
     .review-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
     .verify-btn {
       background: transparent; border: 1px solid var(--success); border-radius: 12px;
-      color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600;
-      cursor: pointer; transition: all 0.2s;
+      color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
     .verify-btn:hover { background: var(--success); color: white; }
     .notifications-panel {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 20px; padding: 16px;
-      margin-bottom: 24px; backdrop-filter: blur(4px);
-      position: relative; z-index: 2;
+      border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 24px;
+      backdrop-filter: blur(4px); position: relative; z-index: 2;
     }
-    .notif-list {
-      max-height: 200px; overflow-y: auto;
-      scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary);
-    }
+    .notif-list { max-height: 200px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary); }
     .notif-list::-webkit-scrollbar { width: 4px; }
     .notif-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
     .notif-item { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; color: var(--text-secondary); }
     .show-all { display: block; text-align: center; margin-top: 8px; color: var(--accent); cursor: pointer; font-size: 0.8rem; }
     .show-all:hover { text-decoration: underline; }
-    /* Модалки */
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
     .modal-content {
       background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
       border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-      max-width: 420px; width: 90%; text-align: left;
-      box-shadow: 0 0 60px rgba(249,115,22,0.6);
-      color: var(--text-primary);
+      max-width: 420px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6); color: var(--text-primary);
     }
     .modal-content input, .modal-content select, .modal-content textarea {
       width: 100%; padding: 10px; margin: 8px 0 16px;
       border-radius: 12px; border: 1px solid var(--border);
-      background: var(--bg-primary); color: var(--text-primary);
-      font-size: 0.95rem; outline: none;
+      background: var(--bg-primary); color: var(--text-primary); font-size: 0.95rem; outline: none;
     }
-    .modal-content select { color: var(--text-primary); }
     .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
     .modal-buttons .btn {
       background: transparent; border: 1px solid var(--accent); border-radius: 30px;
@@ -141,32 +107,17 @@
       transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    .modal-buttons .btn.cancel {
-      background: transparent; border-color: var(--border);
-      -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary);
-    }
-    .loading-overlay {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.5); z-index:9999;
-      display:flex; align-items:center; justify-content:center;
-    }
+    .modal-buttons .btn.cancel { background: transparent; border-color: var(--border); -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary); }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
     .loading-arrows { display: flex; gap: 10px; }
-    .arrow {
-      width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
-      border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
-      transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
-    }
+    .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
     .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes arrowPulse {
-      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
-      50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
-    }
+    @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
   </style>
 </head>
 <body>
 <div class="stars" id="starsContainer"></div>
 
-<!-- Шапка -->
 <div class="header">
   <h2>Моя команда</h2>
   <div style="display: flex; gap: 10px;">
@@ -175,13 +126,11 @@
   </div>
 </div>
 
-<!-- Панель действий -->
 <div class="main-bar">
   <button class="action-btn" onclick="openCreateTaskModal()">➕ Создать задание</button>
   <button class="action-btn" onclick="openAwardModal()">💰 Начислить кармики</button>
 </div>
 
-<!-- Уведомления -->
 <div class="notifications-panel">
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <span style="font-weight:600;">Уведомления</span>
@@ -190,7 +139,6 @@
   <div class="notif-list" id="notificationsList">Нет новых уведомлений</div>
 </div>
 
-<!-- Сотрудники -->
 <div class="section-title">Сотрудники</div>
 <div class="grid" id="teamGrid">Загрузка...</div>
 
@@ -243,7 +191,6 @@
   let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
   let allNotificationsCache = [];
 
-  // Звёзды
   function createStars() {
     const container = document.getElementById('starsContainer');
     const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
@@ -319,7 +266,7 @@
     loadTeam();
   }
 
-  // Загрузка команды (с исправленной загрузкой заданий на проверку)
+  // Исправленная загрузка команды с гарантированным отображением заданий на проверке
   async function loadTeam() {
     showLoading();
     const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
@@ -351,13 +298,19 @@
       </div>
     `).join('');
 
-    // Загружаем задания для каждого сотрудника отдельно
+    // Загружаем задания для каждого сотрудника
     team.forEach(emp => {
       fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
         .then(r => r.json())
         .then(tasks => {
-          const reviewTasks = tasks.filter(t => t.status === 'На проверке');
           const section = document.getElementById('review-' + emp.login);
+          if (!section) return;
+          // Убедимся, что tasks — массив
+          if (!Array.isArray(tasks)) {
+            section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Ошибка данных</span>';
+            return;
+          }
+          const reviewTasks = tasks.filter(t => t.status === 'На проверке');
           if (reviewTasks.length === 0) {
             section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Нет заданий на проверке</span>';
           } else {
@@ -368,6 +321,10 @@
               </div>
             `).join('');
           }
+        })
+        .catch(() => {
+          const section = document.getElementById('review-' + emp.login);
+          if (section) section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Ошибка загрузки</span>';
         });
     });
   }
