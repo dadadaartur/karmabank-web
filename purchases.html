@@ -1,361 +1,236 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Мои покупки — Кармический банк</title>
-    <link rel="icon" type="image/png" href="astralsk.png">
-    <style>
-        :root {
-            --bg-primary: #0a1628;
-            --bg-card: #152238;
-            --text-primary: #eaf0fb;
-            --text-secondary: #9aa9c1;
-            --accent: #f97316;
-            --success: #10b981;
-            --danger: #ef4444;
-            --border: #1f3350;
-            --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-        .stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; pointer-events: none;
-        }
-        .star {
-            position: absolute; background: white; border-radius: 50%;
-            animation: twinkle 2s infinite alternate; opacity: 0.7;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
-        }
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-            padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-            text-decoration: none; margin-bottom: 20px; position: relative; z-index: 2;
-        }
-        .back-btn:hover { background: var(--border); color: var(--text-primary); }
-        h2 {
-            font-size: 2rem; font-weight: 800;
-            background: linear-gradient(135deg, #f97316, #c084fc);
-            -webkit-background-clip: text; background-clip: text;
-            color: transparent; margin-bottom: 24px; position: relative; z-index: 2;
-            filter: drop-shadow(0 0 6px rgba(249,115,22,0.5));
-        }
-        .filter-bar {
-            display: flex; gap: 12px; align-items: center; margin-bottom: 24px;
-            position: relative; z-index: 2; flex-wrap: wrap;
-        }
-        .filter-label {
-            font-size: 0.85rem; color: var(--text-secondary);
-        }
-        .custom-select {
-            position: relative;
-            background: rgba(21,38,56,0.6); border: 1px solid var(--border);
-            border-radius: 14px; padding: 10px 14px; color: var(--text-primary);
-            font-size: 0.9rem; backdrop-filter: blur(4px); cursor: pointer;
-            transition: all 0.2s; min-width: 120px;
-        }
-        .custom-select:hover { border-color: var(--accent); }
-        .custom-select select {
-            background: transparent; border: none; color: inherit; font-size: inherit;
-            font-family: inherit; outline: none; width: 100%; appearance: none;
-            cursor: pointer; padding-right: 20px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 4px center;
-        }
-        .purchases-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px; position: relative; z-index: 2;
-        }
-        .purchase-card {
-            background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-            border: 1px solid var(--border); border-radius: 20px;
-            padding: 20px 16px; text-align: center;
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
-            transition: all 0.3s; backdrop-filter: blur(5px);
-            animation: fadeInUp 0.4s ease forwards; opacity: 0;
-        }
-        .purchase-card:hover {
-            border-color: var(--accent); transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(249,115,22,0.3);
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .purchase-card .reward-name {
-            font-weight: 600; font-size: 1rem;
-        }
-        .purchase-card .reward-cost {
-            color: var(--accent); font-weight: 700; font-size: 0.9rem;
-        }
-        .purchase-card .reward-date {
-            font-size: 0.8rem; color: var(--text-secondary);
-        }
-        .used-badge {
-            display: inline-block; background: rgba(16,185,129,0.15); color: var(--success);
-            padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;
-            border: 1px solid rgba(16,185,129,0.3);
-        }
-        .purchase-actions {
-            display: flex; gap: 8px; margin-top: auto; flex-wrap: wrap; justify-content: center;
-        }
-        .btn {
-            background: transparent; border: 1px solid var(--accent); border-radius: 30px;
-            padding: 6px 16px; font-weight: 800; font-size: 0.8rem; cursor: pointer;
-            transition: all 0.3s;
-            background: linear-gradient(135deg, #f97316, #c084fc);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            white-space: nowrap;
-        }
-        .btn:hover { border-color: #c084fc; box-shadow: 0 0 14px rgba(249,115,22,0.6); transform: scale(1.03); }
-        .btn.use {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            border-color: var(--success);
-        }
-        .btn.refund {
-            background: linear-gradient(135deg, #f97316, #e65c00);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            border-color: var(--danger);
-        }
-        .empty-message {
-            text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem;
-        }
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 3000;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .loading-arrows { display: flex; gap: 10px; }
-        .arrow {
-            width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
-            border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
-            transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
-        }
-        .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
-        @keyframes arrowPulse {
-            0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
-            50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
-        }
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
-            border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-            max-width: 400px; width: 90%; text-align: center;
-            box-shadow: 0 0 60px rgba(249,115,22,0.6);
-            animation: modalPop 0.4s ease; color: var(--text-primary);
-        }
-        @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .modal-content textarea {
-            width: 100%; padding: 12px; margin: 16px 0; border-radius: 16px;
-            border: 1px solid rgba(249,115,22,0.5); background: var(--bg-secondary);
-            color: var(--text-primary); font-size: 1rem; outline: none; resize: vertical;
-        }
-        .modal-close-btn {
-            background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-            padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
-        }
-        .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Мои покупки — Кармический банк</title>
+  <link rel="icon" type="image/png" href="astralsk.png">
+  <style>
+    :root { --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --danger: #ef4444; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; }
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
+    @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; } }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; margin-bottom: 20px; position: relative; z-index: 2; }
+    .back-btn:hover { background: var(--border); color: var(--text-primary); }
+    h2 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 24px; position: relative; z-index: 2; filter: drop-shadow(0 0 6px rgba(249,115,22,0.5)); }
+    .filter-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; position: relative; z-index: 2; flex-wrap: wrap; }
+    .filter-label { font-size: 0.85rem; color: var(--text-secondary); }
+    .custom-select { position: relative; background: rgba(21,38,56,0.6); border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px; color: var(--text-primary); font-size: 0.9rem; backdrop-filter: blur(4px); cursor: pointer; transition: all 0.2s; min-width: 120px; }
+    .custom-select:hover { border-color: var(--accent); }
+    .custom-select select { background: transparent; border: none; color: inherit; font-size: inherit; font-family: inherit; outline: none; width: 100%; appearance: none; cursor: pointer; padding-right: 20px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 4px center; }
+    .purchases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; position: relative; z-index: 2; }
+    .purchase-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 20px; padding: 20px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: all 0.3s; backdrop-filter: blur(5px); animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+    .purchase-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(249,115,22,0.3); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .purchase-card .reward-name { font-weight: 600; font-size: 1rem; }
+    .purchase-card .reward-cost { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+    .purchase-card .reward-date { font-size: 0.8rem; color: var(--text-secondary); }
+    .used-badge { display: inline-block; background: rgba(16,185,129,0.15); color: var(--success); padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(16,185,129,0.3); }
+    .purchase-actions { display: flex; gap: 8px; margin-top: auto; flex-wrap: wrap; justify-content: center; }
+    .btn { background: transparent; border: 1px solid var(--accent); border-radius: 30px; padding: 6px 16px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+    .btn:hover { border-color: #c084fc; box-shadow: 0 0 14px rgba(249,115,22,0.6); transform: scale(1.03); }
+    .btn.use { background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: var(--success); }
+    .btn.refund { background: linear-gradient(135deg, #f97316, #e65c00); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: var(--danger); }
+    .empty-message { text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem; }
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; display: flex; align-items: center; justify-content: center; }
+    .loading-arrows { display: flex; gap: 10px; }
+    .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
+    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(249,115,22,0.6); animation: modalPop 0.4s ease; color: var(--text-primary); }
+    @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .modal-content textarea { width: 100%; padding: 12px; margin: 16px 0; border-radius: 16px; border: 1px solid rgba(249,115,22,0.5); background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; outline: none; resize: vertical; }
+    .modal-close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px; }
+    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+  </style>
 </head>
 <body>
-    <div class="stars" id="starsContainer"></div>
-    <a class="back-btn" href="/">← Назад</a>
-    <h2>Мои покупки</h2>
+  <div class="stars" id="starsContainer"></div>
+  <a class="back-btn" href="/">← Назад</a>
+  <h2>Мои покупки v.4 — Космическая витрина</h2>
 
-    <div class="filter-bar">
-        <span class="filter-label">📅 Период:</span>
-        <div class="custom-select">
-            <select id="monthSelect">
-                <option value="all">Любой месяц</option>
-                <option value="1">Январь</option>
-                <option value="2">Февраль</option>
-                <option value="3">Март</option>
-                <option value="4">Апрель</option>
-                <option value="5">Май</option>
-                <option value="6">Июнь</option>
-                <option value="7">Июль</option>
-                <option value="8">Август</option>
-                <option value="9">Сентябрь</option>
-                <option value="10">Октябрь</option>
-                <option value="11">Ноябрь</option>
-                <option value="12">Декабрь</option>
-            </select>
-        </div>
-        <div class="custom-select">
-            <select id="yearSelect">
-                <option value="all">Любой год</option>
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-            </select>
-        </div>
-        <button class="btn" onclick="applyFilter()">Показать</button>
+  <div class="filter-bar">
+    <span class="filter-label">📅 Период:</span>
+    <div class="custom-select">
+      <select id="monthSelect">
+        <option value="all">Любой месяц</option>
+        <option value="1">Январь</option>
+        <option value="2">Февраль</option>
+        <option value="3">Март</option>
+        <option value="4">Апрель</option>
+        <option value="5">Май</option>
+        <option value="6">Июнь</option>
+        <option value="7">Июль</option>
+        <option value="8">Август</option>
+        <option value="9">Сентябрь</option>
+        <option value="10">Октябрь</option>
+        <option value="11">Ноябрь</option>
+        <option value="12">Декабрь</option>
+      </select>
     </div>
+    <div class="custom-select">
+      <select id="yearSelect">
+        <option value="all">Любой год</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+      </select>
+    </div>
+    <button class="btn" onclick="applyFilter()" style="padding: 10px 24px;">Показать</button>
+  </div>
 
-    <div class="purchases-grid" id="purchasesList">Загрузка...</div>
+  <div class="purchases-grid" id="purchasesList">Загрузка...</div>
 
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-        const currentLogin = localStorage.getItem('karmabank_login');
-        if (!currentLogin) window.location.href = '/';
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    const currentLogin = localStorage.getItem('karmabank_login');
+    if (!currentLogin) window.location.href = '/';
 
-        let allPurchases = [];
+    let allPurchases = [];
 
-        function createStars() {
-            const container = document.getElementById('starsContainer');
-            const colors = ['#ffffff','#e0f0ff','#fbbf24','#c084fc'];
-            for (let i=0; i<80; i++) {
-                const star = document.createElement('div'); star.className='star';
-                const size = Math.random()*3+1;
-                star.style.width = size+'px'; star.style.height = size+'px';
-                star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
-                star.style.background = colors[Math.floor(Math.random()*colors.length)];
-                star.style.animationDelay = Math.random()*3+'s';
-                container.appendChild(star);
-            }
+    function createStars() {
+      const container = document.getElementById('starsContainer');
+      const colors = ['#ffffff','#e0f0ff','#fbbf24','#c084fc'];
+      for (let i=0; i<80; i++) {
+        const star = document.createElement('div'); star.className='star';
+        const size = Math.random()*3+1;
+        star.style.width = size+'px'; star.style.height = size+'px';
+        star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+        star.style.background = colors[Math.floor(Math.random()*colors.length)];
+        star.style.animationDelay = Math.random()*3+'s';
+        container.appendChild(star);
+      }
+    }
+    createStars();
+
+    function showLoading() {
+      const overlay = document.createElement('div'); overlay.className='loading-overlay';
+      overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
+      document.body.appendChild(overlay);
+    }
+    function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
+
+    function showModal(message) {
+      const modal = document.createElement('div'); modal.className='modal active';
+      modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button></div>`;
+      document.body.appendChild(modal);
+    }
+
+    // Загрузка всех покупок при старте
+    async function loadPurchases() {
+      showLoading();
+      try {
+        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}&t=${Date.now()}`);
+        if (!res.ok) throw new Error('Ошибка сервера');
+        const data = await res.json();
+        console.log('Ответ API:', data);
+        hideLoading();
+
+        allPurchases = Array.isArray(data) ? data : [];
+        // Применяем пустой фильтр по умолчанию (показываем все)
+        renderPurchases(allPurchases);
+      } catch(e) {
+        hideLoading();
+        document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ ${e.message}</div>`;
+        console.error(e);
+      }
+    }
+
+    // Функция фильтрации по кнопке "Показать"
+    function applyFilter() {
+      const month = document.getElementById('monthSelect').value;
+      const year = document.getElementById('yearSelect').value;
+
+      let filtered = allPurchases;
+
+      if (month !== 'all' || year !== 'all') {
+        filtered = allPurchases.filter(p => {
+          const dateStr = p.date || '';
+          const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+          if (!match) return false; // если дата не соответствует формату, исключаем
+
+          const purchaseMonth = match[2];
+          const purchaseYear = match[3];
+
+          let keep = true;
+          if (month !== 'all') keep = keep && (purchaseMonth === month);
+          if (year !== 'all') keep = keep && (purchaseYear === year);
+          return keep;
+        });
+      }
+
+      renderPurchases(filtered);
+    }
+
+    function renderPurchases(purchases) {
+      const container = document.getElementById('purchasesList');
+      if (purchases.length === 0) {
+        container.innerHTML = '<div class="empty-message">Нет покупок, соответствующих фильтру</div>';
+        return;
+      }
+
+      container.innerHTML = purchases.map(p => {
+        const isUsed = p.usedDate ? true : false;
+        const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
+        let buttonsHtml = '';
+        if (!isUsed && p.canUse) {
+          buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}','${p.rewardName.replace(/'/g, "\\'")}')">Использовать</button>`;
+        } else if (isUsed && p.canRefund) {
+          buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName.replace(/'/g, "\\'")}',${p.cost})">Вернуть</button>`;
         }
-        createStars();
+        return `<div class="purchase-card">
+          <div class="reward-name">${p.rewardName}${usedHtml}</div>
+          <div class="reward-cost">${p.cost} карм.</div>
+          <div class="reward-date">${p.date}</div>
+          <div class="purchase-actions">${buttonsHtml}</div>
+        </div>`;
+      }).join('');
+    }
 
-        function showLoading() {
-            const overlay = document.createElement('div'); overlay.className='loading-overlay';
-            overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
-            document.body.appendChild(overlay);
-        }
-        function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
+    // Модальные окна для возврата и использования
+    function openRefundModal(certId, rewardName, cost) {
+      const modal = document.createElement('div'); modal.className='modal active';
+      modal.innerHTML = `<div class="modal-content"><p>Вернуть «${rewardName}» и получить ${cost} кармиков?</p><button class="btn refund" id="confirmYesBtn">Да</button><button class="modal-close-btn" id="confirmNoBtn">Отмена</button></div>`;
+      document.body.appendChild(modal);
+      document.getElementById('confirmYesBtn').onclick = async () => {
+        modal.remove();
+        showLoading();
+        try {
+          const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}`);
+          const result = await res.json();
+          hideLoading();
+          showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+          loadPurchases();
+        } catch(e) { hideLoading(); showModal('Ошибка соединения'); }
+      };
+      document.getElementById('confirmNoBtn').onclick = () => modal.remove();
+    }
 
-        function showModal(message) {
-            const modal = document.createElement('div'); modal.className='modal active';
-            modal.innerHTML = `<div class="modal-content"><p>${message}</p><button class="modal-close-btn" id="modalCloseBtn">Закрыть</button></div>`;
-            document.body.appendChild(modal);
-            document.getElementById('modalCloseBtn').onclick = () => modal.remove();
-        }
+    function openUseModal(certId, rewardName) {
+      const modal = document.createElement('div'); modal.className='modal active';
+      modal.innerHTML = `<div class="modal-content"><p>Использовать «${rewardName}»</p><textarea id="useComment" placeholder="Комментарий для руководителя"></textarea><button class="btn use" id="useYesBtn">Отправить</button><button class="modal-close-btn" id="useNoBtn">Отмена</button></div>`;
+      document.body.appendChild(modal);
+      document.getElementById('useYesBtn').onclick = async () => {
+        const comment = document.getElementById('useComment').value.trim();
+        modal.remove();
+        showLoading();
+        try {
+          const res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}&comment=${encodeURIComponent(comment)}`);
+          const result = await res.json();
+          hideLoading();
+          showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+          loadPurchases();
+        } catch(e) { hideLoading(); showModal('Ошибка соединения'); }
+      };
+      document.getElementById('useNoBtn').onclick = () => modal.remove();
+    }
 
-        // При загрузке показываем все покупки
-        async function loadPurchases() {
-            showLoading();
-            try {
-                const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}`);
-                if (!res.ok) throw new Error('Сетевая ошибка');
-                const data = await res.json();
-                hideLoading();
-                allPurchases = Array.isArray(data) ? data : [];
-                // По умолчанию фильтр "Любой месяц" и "Любой год"
-                document.getElementById('monthSelect').value = 'all';
-                document.getElementById('yearSelect').value = 'all';
-                renderPurchases(allPurchases);
-            } catch(e) {
-                hideLoading();
-                document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ Ошибка: ${e.message}</div>`;
-            }
-        }
-
-        function applyFilter() {
-            const month = document.getElementById('monthSelect').value;
-            const year = document.getElementById('yearSelect').value;
-            let filtered = allPurchases;
-
-            if (month !== 'all') {
-                filtered = filtered.filter(p => {
-                    const dateStr = p.date || '';
-                    // Ищем месяц в формате "01.05.2025, 12:00:00" или просто "01.05.2025"
-                    const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-                    return match && match[2] === month;
-                });
-            }
-            if (year !== 'all') {
-                filtered = filtered.filter(p => {
-                    const dateStr = p.date || '';
-                    const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-                    return match && match[3] === year;
-                });
-            }
-
-            renderPurchases(filtered);
-        }
-
-        function renderPurchases(purchases) {
-            const container = document.getElementById('purchasesList');
-            if (purchases.length === 0) {
-                container.innerHTML = '<div class="empty-message">Нет покупок за выбранный период</div>';
-                return;
-            }
-
-            container.innerHTML = purchases.map(p => {
-                const isUsed = p.usedDate ? true : false;
-                const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
-                let buttonsHtml = '';
-                if (!isUsed && p.canUse) {
-                    buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}','${p.rewardName}')">Использовать</button>`;
-                } else if (isUsed && p.canRefund) {
-                    buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName}',${p.cost})">Вернуть</button>`;
-                }
-                return `<div class="purchase-card">
-                    <div class="reward-name">${p.rewardName}${usedHtml}</div>
-                    <div class="reward-cost">${p.cost} карм.</div>
-                    <div class="reward-date">${p.date}</div>
-                    <div class="purchase-actions">${buttonsHtml}</div>
-                </div>`;
-            }).join('');
-        }
-
-        function openRefundModal(certId, rewardName, cost) {
-            const modal = document.createElement('div'); modal.className='modal active';
-            modal.innerHTML = `<div class="modal-content"><p>Вернуть «${rewardName}» и получить ${cost} кармиков на баланс?</p><button class="btn refund" id="confirmYesBtn">Да</button><button class="modal-close-btn" id="confirmNoBtn">Отмена</button></div>`;
-            document.body.appendChild(modal);
-            document.getElementById('confirmYesBtn').onclick = async () => {
-                modal.remove();
-                showLoading();
-                try {
-                    const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}`);
-                    const result = await res.json();
-                    hideLoading();
-                    showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
-                    loadPurchases();
-                } catch(e) { hideLoading(); showModal('Ошибка соединения'); }
-            };
-            document.getElementById('confirmNoBtn').onclick = () => modal.remove();
-        }
-
-        function openUseModal(certId, rewardName) {
-            const modal = document.createElement('div'); modal.className='modal active';
-            modal.innerHTML = `<div class="modal-content"><p>Использовать «${rewardName}»</p><textarea id="useComment" placeholder="Комментарий для руководителя"></textarea><button class="btn use" id="useYesBtn">Отправить</button><button class="modal-close-btn" id="useNoBtn">Отмена</button></div>`;
-            document.body.appendChild(modal);
-            document.getElementById('useYesBtn').onclick = async () => {
-                const comment = document.getElementById('useComment').value.trim();
-                modal.remove();
-                showLoading();
-                try {
-                    const res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}&comment=${encodeURIComponent(comment)}`);
-                    const result = await res.json();
-                    hideLoading();
-                    showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
-                    loadPurchases();
-                } catch(e) { hideLoading(); showModal('Ошибка соединения'); }
-            };
-            document.getElementById('useNoBtn').onclick = () => modal.remove();
-        }
-
-        // Первый запуск
-        loadPurchases();
-    </script>
+    // Старт
+    loadPurchases();
+  </script>
 </body>
 </html>
