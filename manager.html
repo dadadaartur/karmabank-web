@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="astralsk.png">
   <style>
     :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
-    * { box-sizing: border-box; margin: 0; padding: 0; cursor: default; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; cursor: default; }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
@@ -21,13 +21,13 @@
     .action-btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02); }
     .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; position: relative; z-index: 2; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; position: relative; z-index: 2; }
-    .employee-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px); }
+    .employee-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px); cursor: pointer; }
     .employee-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .emp-header { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .emp-header { display: flex; align-items: center; gap: 10px; }
     .emp-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white; }
     .emp-name { font-weight: 700; }
     .emp-dept { font-size: 0.8rem; color: var(--text-secondary); }
-    .metrics-row { display: flex; gap: 12px; cursor: pointer; }
+    .metrics-row { display: flex; gap: 12px; }
     .metric { text-align: center; }
     .metric .val { font-weight: 700; font-size: 1.1rem; }
     .val.success { color: var(--success); } .val.accent { color: var(--accent); } .val.warning { color: var(--warning); }
@@ -62,7 +62,9 @@
     .profile-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
     .profile-row b { color: var(--text-secondary); font-weight: 500; }
     .profile-row span { color: var(--text-primary); }
-    .notif-scroll { max-height: 300px; overflow-y: auto; margin: 12px 0; }
+    .notif-scroll { max-height: 300px; overflow-y: auto; margin: 12px 0; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary); }
+    .notif-scroll::-webkit-scrollbar { width: 4px; }
+    .notif-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
     .notif-item { padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 0.85rem; }
     .crm-link { color: var(--accent); text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
     .crm-link:hover { color: #c084fc; }
@@ -74,6 +76,8 @@
     .rating-table { width: 100%; border-collapse: collapse; margin-top: 10px; position: relative; z-index: 2; }
     .rating-table th, .rating-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
     .rating-table th { color: var(--text-secondary); font-size: 0.8rem; }
+    /* Убираем системные курсоры для всех элементов */
+    button, select, input, textarea, .btn, .action-btn, .back-btn, .verify-btn, .delete-employee-btn, .crm-link, .notif-badge { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -103,7 +107,7 @@
 <div class="section-title" style="margin-top: 24px;">Сотрудники</div>
 <div class="grid" id="teamGrid"></div>
 
-<!-- Модалки -->
+<!-- Модальные окна -->
 <div id="addEmployeeModal" class="modal">
   <div class="modal-content">
     <h3>Новый сотрудник</h3>
@@ -128,7 +132,7 @@
     <input type="text" id="deleteReason" placeholder="Обязательно укажите причину">
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('deleteEmployeeModal')">Отмена</button>
-      <button class="btn" onclick="confirmDeleteEmployee()">Удалить</button>
+      <button class="btn" onclick="confirmDeleteEmployee()" style="background: linear-gradient(135deg, #ef4444, #e65c00); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: #ef4444;">Удалить</button>
     </div>
   </div>
 </div>
@@ -376,8 +380,10 @@
             <div class="profile-row"><b>Энергия:</b> <span>${user.energy}</span></div>
             <div class="profile-row"><b>Паспорт:</b> <span>${user.passport}</span></div>
           </div>
-          <button class="btn cancel" onclick="closeModal('profileModal')" style="margin-right: 8px;">Закрыть</button>
-          <button class="btn" style="background: linear-gradient(135deg, #ef4444, #e65c00); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: #ef4444;" onclick="closeModal('profileModal'); openDeleteModal('${login}','${user.name}')">Удалить</button>
+          <div class="modal-buttons">
+            <button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>
+            <button class="btn" style="background: linear-gradient(135deg, #ef4444, #e65c00); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: #ef4444;" onclick="closeModal('profileModal'); openDeleteModal('${login}','${user.name}')">Удалить</button>
+          </div>
         `;
       }).catch(() => { hideLoading(); showToast('Ошибка', false); });
   }
