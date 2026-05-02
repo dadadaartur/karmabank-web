@@ -69,6 +69,13 @@
     .metric .val { font-weight: 700; font-size: 1.1rem; }
     .val.success { color: var(--success); } .val.accent { color: var(--accent); } .val.warning { color: var(--warning); }
     .metric .lbl { font-size: 0.7rem; color: var(--text-secondary); }
+    .card-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    .delete-employee-btn {
+      background: transparent; border: 1px solid var(--danger); color: var(--danger);
+      padding: 2px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; opacity: 0.7;
+    }
+    .delete-employee-btn:hover { opacity: 1; background: rgba(239,68,68,0.1); }
     .task-review { border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .review-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
     .verify-btn {
@@ -76,11 +83,6 @@
       color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
     .verify-btn:hover { background: var(--success); color: white; }
-    .delete-btn {
-      background: transparent; border: 1px solid var(--danger); border-radius: 12px;
-      color: var(--danger); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
-    .delete-btn:hover { background: var(--danger); color: white; }
     .notif-icon { position: relative; cursor: pointer; margin-left: auto; display: flex; align-items: center; }
     .notif-icon svg { width: 24px; height: 24px; stroke: var(--text-secondary); transition: 0.2s; }
     .notif-icon:hover svg { stroke: var(--accent); }
@@ -102,9 +104,24 @@
       width: 100%; padding: 10px; margin: 8px 0 16px;
       border-radius: 12px; border: 1px solid var(--border);
       background: var(--bg-primary); color: var(--text-primary); font-size: 0.95rem; outline: none;
+      cursor: text;
     }
-    .modal-content select[multiple] { height: 120px; }
-    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-content select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    .modal-content select[multiple] {
+      height: auto;
+      background-image: none;
+      padding-right: 10px;
+    }
+    .modal-content label {
+      font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 8px; display: block;
+    }
+    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
     .modal-buttons .btn {
       background: transparent; border: 1px solid var(--accent); border-radius: 30px;
       padding: 8px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.3s;
@@ -134,11 +151,15 @@
     .rating-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     .rating-table th, .rating-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
     .rating-table th { color: var(--text-secondary); font-size: 0.8rem; }
-    /* Уведомления с прокруткой */
     .notif-scroll { max-height: 300px; overflow-y: auto; margin: 12px 0; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary); }
     .notif-scroll::-webkit-scrollbar { width: 4px; }
     .notif-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
     .notif-item { padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 0.85rem; }
+    .profile-field { margin-bottom: 12px; }
+    .profile-field b { color: var(--text-secondary); display: inline-block; width: 100px; }
+    .profile-field span { color: var(--text-primary); }
+    .crm-link { color: var(--accent); text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
+    .crm-link:hover { color: #c084fc; }
   </style>
 </head>
 <body>
@@ -168,12 +189,15 @@
 <div class="section-title" style="margin-top: 24px;">Сотрудники</div>
 <div class="grid" id="teamGrid">Загрузка...</div>
 
-<!-- Модалка "Добавить сотрудника" -->
+<!-- Модалки -->
 <div id="addEmployeeModal" class="modal">
   <div class="modal-content">
     <h3>Новый сотрудник</h3>
-    <input type="text" id="newName" placeholder="Имя">
+    <label>Имя</label>
+    <input type="text" id="newName" placeholder="Введите имя">
+    <label>Отдел</label>
     <select id="newDepartment"></select>
+    <label>Должность</label>
     <select id="newPosition"></select>
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('addEmployeeModal')">Отмена</button>
@@ -182,12 +206,12 @@
   </div>
 </div>
 
-<!-- Модалка "Удалить сотрудника" -->
 <div id="deleteEmployeeModal" class="modal">
   <div class="modal-content">
     <h3>Удалить сотрудника</h3>
-    <p id="deleteEmployeeName"></p>
-    <input type="text" id="deleteReason" placeholder="Причина удаления">
+    <p id="deleteEmployeeName" style="margin-bottom: 12px;"></p>
+    <label>Причина</label>
+    <input type="text" id="deleteReason" placeholder="Обязательно укажите причину">
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('deleteEmployeeModal')">Отмена</button>
       <button class="btn" onclick="confirmDeleteEmployee()">Удалить</button>
@@ -195,17 +219,24 @@
   </div>
 </div>
 
-<!-- Модалка "Создать задание" -->
 <div id="createTaskModal" class="modal">
   <div class="modal-content">
     <h3>Новое задание</h3>
-    <select id="taskType" onchange="toggleEmployeeSelect()">
-      <option value="personal">Персональное</option>
-      <option value="global">Общее</option>
+    <label>Для кого</label>
+    <select id="taskTarget" onchange="toggleTaskTarget()">
+      <option value="all">Всем</option>
+      <option value="newcomers">Новичкам</option>
+      <option value="experienced">Опытным</option>
+      <option value="personal">Конкретному сотруднику</option>
     </select>
-    <select id="taskEmployeeSelect"></select>
-    <input type="text" id="taskName" maxlength="45" placeholder="Название">
-    <input type="number" id="taskPoints" placeholder="Кармики">
+    <div id="taskPersonalSelect" style="display:none;">
+      <label>Сотрудник</label>
+      <select id="taskEmployeeSelect"></select>
+    </div>
+    <label>Название</label>
+    <input type="text" id="taskName" maxlength="45" placeholder="Название задания">
+    <label>Кармики</label>
+    <input type="number" id="taskPoints" placeholder="Сумма">
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('createTaskModal')">Отмена</button>
       <button class="btn" onclick="createTask()">Создать</button>
@@ -213,23 +244,24 @@
   </div>
 </div>
 
-<!-- Модалка "Начислить кармики" -->
 <div id="awardModal" class="modal">
   <div class="modal-content">
     <h3>Начислить кармики</h3>
     <label>Кому</label>
-    <select id="awardTarget" onchange="toggleAwardSelect()">
+    <select id="awardTarget" onchange="toggleAwardTarget()">
       <option value="all">Всем</option>
       <option value="newcomers">Новичкам (энергия < 100)</option>
       <option value="experienced">Опытным (энергия >= 500)</option>
-      <option value="specific">Выбрать</option>
+      <option value="specific">Выбрать сотрудников</option>
     </select>
-    <div id="awardSpecific" class="hidden">
+    <div id="awardSpecificPanel" style="display:none;">
       <label>Сотрудники</label>
       <select id="awardEmployeeSelect" multiple></select>
     </div>
-    <input type="number" id="awardAmount" placeholder="Сумма">
-    <input type="text" id="awardComment" placeholder="Комментарий">
+    <label>Сумма</label>
+    <input type="number" id="awardAmount" placeholder="Сумма кармиков">
+    <label>Комментарий</label>
+    <input type="text" id="awardComment" placeholder="За что начисление">
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('awardModal')">Отмена</button>
       <button class="btn" onclick="awardPoints()">Начислить</button>
@@ -237,19 +269,24 @@
   </div>
 </div>
 
-<!-- Модалка "Добавить товар" -->
 <div id="addRewardModal" class="modal">
   <div class="modal-content">
     <h3>Новый товар</h3>
-    <input type="text" id="rewardName" placeholder="Название">
-    <input type="number" id="rewardCost" placeholder="Стоимость (кармики)">
+    <label>Название</label>
+    <input type="text" id="rewardName" placeholder="Название товара">
+    <label>Стоимость (кармики)</label>
+    <input type="number" id="rewardCost" placeholder="Стоимость">
     <label>Для кого</label>
-    <select id="rewardTarget">
+    <select id="rewardTarget" onchange="toggleRewardTarget()">
       <option value="all">Все</option>
       <option value="newcomers">Новички</option>
       <option value="experienced">Опытные</option>
-      <option value="specific">Конкретные</option>
+      <option value="specific">Конкретные сотрудники</option>
     </select>
+    <div id="rewardSpecificPanel" style="display:none;">
+      <label>Логины (через запятую)</label>
+      <input type="text" id="rewardEmployeeLogins" placeholder="login1, login2">
+    </div>
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('addRewardModal')">Отмена</button>
       <button class="btn" onclick="addReward()">Добавить</button>
@@ -257,20 +294,21 @@
   </div>
 </div>
 
-<!-- Модалка "Создать AI тест" -->
 <div id="addLmsModuleModal" class="modal">
   <div class="modal-content">
     <h3>Создать AI тест</h3>
-    <input type="text" id="lmsTitle" placeholder="Название модуля">
-    <input type="text" id="lmsDescription" placeholder="Описание">
+    <label>Название модуля</label>
+    <input type="text" id="lmsTitle" placeholder="Название">
+    <label>Описание</label>
+    <input type="text" id="lmsDescription" placeholder="Краткое описание">
     <label>Для кого</label>
     <select id="lmsTarget">
       <option value="all">Все</option>
       <option value="newcomers">Новички</option>
       <option value="experienced">Опытные</option>
-      <option value="specific">Конкретные логины</option>
     </select>
-    <textarea id="lmsAiPrompt" rows="3" placeholder="Инструкция для AI (промпт)"></textarea>
+    <label>Инструкция для AI</label>
+    <textarea id="lmsAiPrompt" rows="3" placeholder="Опишите, как должен вести себя AI-тренер..."></textarea>
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('addLmsModuleModal')">Отмена</button>
       <button class="btn" onclick="addLmsModule()">Создать</button>
@@ -278,21 +316,20 @@
   </div>
 </div>
 
-<!-- Модалка "Профиль сотрудника" -->
 <div id="profileModal" class="modal">
   <div class="modal-content" id="profileModalContent"></div>
 </div>
 
-<!-- Модалка "Уведомления" -->
 <div id="notificationsModal" class="modal">
   <div class="modal-content">
     <h3>Уведомления</h3>
     <div class="notif-scroll" id="notificationsList"></div>
-    <button class="btn cancel" onclick="closeModal('notificationsModal')" style="margin-top:12px;">Закрыть</button>
+    <div class="modal-buttons">
+      <button class="btn cancel" onclick="closeModal('notificationsModal')">Закрыть</button>
+    </div>
   </div>
 </div>
 
-<!-- Модалка проверки задания (галочка) -->
 <div id="verifyModal" class="modal">
   <div class="modal-content" id="verifyModalContent"></div>
 </div>
@@ -301,12 +338,10 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
   if (!currentLogin) window.location.href = '/';
-
   let currentDeleteLogin = '';
 
   function createStars() { const container = document.getElementById('starsContainer'); for (let i=0; i<80; i++) { const star = document.createElement('div'); star.className='star'; star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px'; star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%'; star.style.animationDelay = Math.random()*3+'s'; container.appendChild(star); } }
   createStars();
-
   function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
   function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
   function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -322,12 +357,14 @@
     const res = await fetch(`${API_URL}?action=getAllEmployees`);
     const employees = await res.json();
     const departments = [...new Set(employees.map(e => e.department).filter(Boolean))];
-    const positions = [...new Set(employees.map(e => e.position || e.department).filter(Boolean))];
+    const positions = [...new Set(employees.map(e => e.position).filter(Boolean))];
     document.getElementById('newDepartment').innerHTML = departments.map(d => `<option value="${d}">${d}</option>`).join('');
     document.getElementById('newPosition').innerHTML = positions.map(p => `<option value="${p}">${p}</option>`).join('');
-    const awardSelect = document.getElementById('awardEmployeeSelect');
-    const team = await (await fetch(`${API_URL}?action=getTeam&managerLogin=${currentLogin}`)).json();
-    awardSelect.innerHTML = team.map(e => `<option value="${e.login}">${e.name}</option>`).join('');
+    const teamRes = await fetch(`${API_URL}?action=getTeam&managerLogin=${currentLogin}`);
+    const team = await teamRes.json();
+    const opts = team.map(e => `<option value="${e.login}">${e.name}</option>`).join('');
+    document.getElementById('taskEmployeeSelect').innerHTML = opts;
+    document.getElementById('awardEmployeeSelect').innerHTML = opts;
   }
   loadFormData();
 
@@ -348,15 +385,17 @@
     const grid = document.getElementById('teamGrid');
     if (!team || team.length === 0) { grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>'; return; }
     grid.innerHTML = team.map(emp => `
-      <div class="employee-card" onclick="openProfile('${emp.login}')">
-        <div class="emp-header"><div class="emp-avatar">${emp.name.charAt(0)}</div><div><div class="emp-name">${emp.name}</div><div class="emp-dept">${emp.department || '—'}</div></div></div>
-        <div class="metrics-row">
+      <div class="employee-card">
+        <div class="emp-header" onclick="openProfile('${emp.login}')"><div class="emp-avatar">${emp.name.charAt(0)}</div><div><div class="emp-name">${emp.name}</div><div class="emp-dept">${emp.department || '—'}</div></div></div>
+        <div class="metrics-row" onclick="openProfile('${emp.login}')">
           <div class="metric"><div class="val success">${emp.points}</div><div class="lbl">кармиков</div></div>
           <div class="metric"><div class="val accent">${emp.energy}</div><div class="lbl">энергии</div></div>
           <div class="metric"><div class="val warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="lbl">заданий</div></div>
         </div>
         <div class="task-review" id="review-${emp.login}">Загрузка...</div>
-        <button class="delete-btn" onclick="event.stopPropagation(); openDeleteModal('${emp.login}','${emp.name}')">Удалить</button>
+        <div class="card-actions">
+          <button class="delete-employee-btn" onclick="event.stopPropagation(); openDeleteModal('${emp.login}','${emp.name}')">Удалить</button>
+        </div>
       </div>
     `).join('');
     team.forEach(emp => {
@@ -376,7 +415,7 @@
 
   function openDeleteModal(login, name) {
     currentDeleteLogin = login;
-    document.getElementById('deleteEmployeeName').textContent = name;
+    document.getElementById('deleteEmployeeName').textContent = `Сотрудник: ${name}`;
     openModal('deleteEmployeeModal');
   }
   async function confirmDeleteEmployee() {
@@ -397,7 +436,7 @@
       <h3>Подтверждение задания</h3>
       <p>${task} (${login})</p>
       <p style="color:var(--text-secondary);">Комментарий: ${comment || 'нет'}</p>
-      <a href="#" onclick="event.preventDefault(); showToast('Ссылка на сделку (заглушка)')" style="color:var(--accent); text-decoration:underline;">Ссылка на сделку в CRM</a>
+      <p class="crm-link" onclick="showToast('Ссылка на сделку (заглушка)')">Ссылка на сделку в CRM</p>
       <div class="modal-buttons" style="margin-top:16px;">
         <button class="btn cancel" onclick="closeModal('verifyModal')">Отмена</button>
         <button class="btn" onclick="verifyTask('${task}','${login}')">Подтвердить</button>
@@ -454,12 +493,14 @@
     document.getElementById('profileModal').classList.add('active');
     document.getElementById('profileModalContent').innerHTML = `
       <h3>${user.name}</h3>
-      <p><b>Отдел:</b> ${user.department || '—'}</p>
-      <p><b>Должность:</b> ${user.position || '—'}</p>
-      <p><b>Кармики:</b> ${user.points}</p>
-      <p><b>Энергия:</b> ${user.energy}</p>
-      <p><b>Паспорт:</b> ${user.passport}</p>
-      <button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>
+      <div class="profile-field"><b>Отдел:</b> <span>${user.department || '—'}</span></div>
+      <div class="profile-field"><b>Должность:</b> <span>${user.position || '—'}</span></div>
+      <div class="profile-field"><b>Кармики:</b> <span>${user.points}</span></div>
+      <div class="profile-field"><b>Энергия:</b> <span>${user.energy}</span></div>
+      <div class="profile-field"><b>Паспорт:</b> <span>${user.passport}</span></div>
+      <div class="modal-buttons">
+        <button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>
+      </div>
     `;
   }
 
@@ -476,30 +517,33 @@
     if (result.success) { closeModal('addEmployeeModal'); loadTeam(); }
   }
 
-  function toggleEmployeeSelect() {
-    document.getElementById('taskEmployeeSelect').style.display = document.getElementById('taskType').value === 'personal' ? 'block' : 'none';
-  }
-  async function loadEmployeeSelects() {
-    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${currentLogin}`);
-    const team = await res.json();
-    document.getElementById('taskEmployeeSelect').innerHTML = team.map(e => `<option value="${e.login}">${e.name}</option>`).join('');
+  function toggleTaskTarget() {
+    const val = document.getElementById('taskTarget').value;
+    document.getElementById('taskPersonalSelect').style.display = (val === 'personal') ? 'block' : 'none';
   }
   async function createTask() {
-    const type = document.getElementById('taskType').value;
-    const employee = type === 'personal' ? document.getElementById('taskEmployeeSelect').value : 'all';
+    const target = document.getElementById('taskTarget').value;
+    let employee = 'all';
+    if (target === 'personal') {
+      employee = document.getElementById('taskEmployeeSelect').value;
+    } else {
+      employee = target; // 'all', 'newcomers', 'experienced'
+    }
     const taskName = document.getElementById('taskName').value.trim();
     const points = parseInt(document.getElementById('taskPoints').value) || 0;
     if (!taskName) { showToast('Введите название', false); return; }
     showLoading();
-    const res = await fetch(`${API_URL}?action=createTask&managerLogin=${currentLogin}&taskName=${encodeURIComponent(taskName)}&points=${points}&employeeLogin=${employee}`);
+    const res = await fetch(`${API_URL}?action=createTask&managerLogin=${currentLogin}&taskName=${encodeURIComponent(taskName)}&points=${points}&employeeLogin=${encodeURIComponent(employee)}`);
     const result = await res.json();
     hideLoading();
     showToast(result.message, result.success);
     closeModal('createTaskModal'); loadTeam();
   }
 
-  function toggleAwardSelect() {
-    document.getElementById('awardSpecific').classList.toggle('hidden', document.getElementById('awardTarget').value !== 'specific');
+  function toggleAwardTarget() {
+    const val = document.getElementById('awardTarget').value;
+    const panel = document.getElementById('awardSpecificPanel');
+    panel.style.display = (val === 'specific') ? 'block' : 'none';
   }
   async function awardPoints() {
     const target = document.getElementById('awardTarget').value;
@@ -520,13 +564,19 @@
     closeModal('awardModal'); loadTeam();
   }
 
+  function toggleRewardTarget() {
+    const val = document.getElementById('rewardTarget').value;
+    document.getElementById('rewardSpecificPanel').style.display = (val === 'specific') ? 'block' : 'none';
+  }
   async function addReward() {
     const name = document.getElementById('rewardName').value.trim();
     const cost = parseInt(document.getElementById('rewardCost').value) || 0;
     const target = document.getElementById('rewardTarget').value;
+    const logins = document.getElementById('rewardEmployeeLogins').value.trim();
     if (!name || cost <= 0) { showToast('Заполните название и стоимость', false); return; }
+    if (target === 'specific' && !logins) { showToast('Укажите логины сотрудников', false); return; }
     showLoading();
-    const res = await fetch(`${API_URL}?action=addReward&managerLogin=${currentLogin}&name=${encodeURIComponent(name)}&cost=${cost}&target=${target}`);
+    const res = await fetch(`${API_URL}?action=addReward&managerLogin=${currentLogin}&name=${encodeURIComponent(name)}&cost=${cost}&target=${target}&logins=${encodeURIComponent(logins)}`);
     const result = await res.json();
     hideLoading();
     showToast(result.message, result.success);
@@ -549,11 +599,7 @@
 
   function logout() { localStorage.removeItem('karmabank_manager_login'); location.reload(); }
 
-  // Старт
   loadTeam();
-  loadEmployeeSelects();
-  document.getElementById('taskEmployeeSelect').style.display = 'block';
-  document.getElementById('awardSpecific').classList.add('hidden');
 </script>
 </body>
 </html>
