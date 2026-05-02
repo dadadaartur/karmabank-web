@@ -51,36 +51,26 @@
 <body>
   <div class="stars" id="starsContainer"></div>
   <a class="back-btn" href="/">← Назад</a>
-  <h2>Мои покупки v.4 — Космическая витрина</h2>
+  <h2>Мои покупки</h2>
 
   <div class="filter-bar">
     <span class="filter-label">📅 Период:</span>
     <div class="custom-select">
       <select id="monthSelect">
         <option value="all">Любой месяц</option>
-        <option value="1">Январь</option>
-        <option value="2">Февраль</option>
-        <option value="3">Март</option>
-        <option value="4">Апрель</option>
-        <option value="5">Май</option>
-        <option value="6">Июнь</option>
-        <option value="7">Июль</option>
-        <option value="8">Август</option>
-        <option value="9">Сентябрь</option>
-        <option value="10">Октябрь</option>
-        <option value="11">Ноябрь</option>
-        <option value="12">Декабрь</option>
+        <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
+        <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
+        <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
+        <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
       </select>
     </div>
     <div class="custom-select">
       <select id="yearSelect">
         <option value="all">Любой год</option>
-        <option value="2024">2024</option>
-        <option value="2025">2025</option>
-        <option value="2026">2026</option>
+        <option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option>
       </select>
     </div>
-    <button class="btn" onclick="applyFilter()" style="padding: 10px 24px;">Показать</button>
+    <button class="btn" onclick="applyFilter()">Показать</button>
   </div>
 
   <div class="purchases-grid" id="purchasesList">Загрузка...</div>
@@ -120,59 +110,48 @@
       document.body.appendChild(modal);
     }
 
-    // Загрузка всех покупок при старте
     async function loadPurchases() {
       showLoading();
       try {
-        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}&t=${Date.now()}`);
+        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}`);
         if (!res.ok) throw new Error('Ошибка сервера');
         const data = await res.json();
-        console.log('Ответ API:', data);
         hideLoading();
-
         allPurchases = Array.isArray(data) ? data : [];
-        // Применяем пустой фильтр по умолчанию (показываем все)
         renderPurchases(allPurchases);
       } catch(e) {
         hideLoading();
         document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ ${e.message}</div>`;
-        console.error(e);
       }
     }
 
-    // Функция фильтрации по кнопке "Показать"
     function applyFilter() {
       const month = document.getElementById('monthSelect').value;
       const year = document.getElementById('yearSelect').value;
-
       let filtered = allPurchases;
 
       if (month !== 'all' || year !== 'all') {
         filtered = allPurchases.filter(p => {
           const dateStr = p.date || '';
-          const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-          if (!match) return false; // если дата не соответствует формату, исключаем
-
-          const purchaseMonth = match[2];
-          const purchaseYear = match[3];
-
+          const parts = dateStr.split('.');
+          if (parts.length < 3) return true;
+          const purchaseMonth = parts[1];
+          const purchaseYear = parts[2].split(',')[0];
           let keep = true;
-          if (month !== 'all') keep = keep && (purchaseMonth === month);
-          if (year !== 'all') keep = keep && (purchaseYear === year);
+          if (month !== 'all') keep = keep && purchaseMonth === month;
+          if (year !== 'all') keep = keep && purchaseYear === year;
           return keep;
         });
       }
-
       renderPurchases(filtered);
     }
 
     function renderPurchases(purchases) {
       const container = document.getElementById('purchasesList');
       if (purchases.length === 0) {
-        container.innerHTML = '<div class="empty-message">Нет покупок, соответствующих фильтру</div>';
+        container.innerHTML = '<div class="empty-message">Нет покупок за выбранный период</div>';
         return;
       }
-
       container.innerHTML = purchases.map(p => {
         const isUsed = p.usedDate ? true : false;
         const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
@@ -182,30 +161,20 @@
         } else if (isUsed && p.canRefund) {
           buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName.replace(/'/g, "\\'")}',${p.cost})">Вернуть</button>`;
         }
-        return `<div class="purchase-card">
-          <div class="reward-name">${p.rewardName}${usedHtml}</div>
-          <div class="reward-cost">${p.cost} карм.</div>
-          <div class="reward-date">${p.date}</div>
-          <div class="purchase-actions">${buttonsHtml}</div>
-        </div>`;
+        return `<div class="purchase-card"><div class="reward-name">${p.rewardName}${usedHtml}</div><div class="reward-cost">${p.cost} карм.</div><div class="reward-date">${p.date}</div><div class="purchase-actions">${buttonsHtml}</div></div>`;
       }).join('');
     }
 
-    // Модальные окна для возврата и использования
     function openRefundModal(certId, rewardName, cost) {
       const modal = document.createElement('div'); modal.className='modal active';
       modal.innerHTML = `<div class="modal-content"><p>Вернуть «${rewardName}» и получить ${cost} кармиков?</p><button class="btn refund" id="confirmYesBtn">Да</button><button class="modal-close-btn" id="confirmNoBtn">Отмена</button></div>`;
       document.body.appendChild(modal);
       document.getElementById('confirmYesBtn').onclick = async () => {
-        modal.remove();
-        showLoading();
-        try {
-          const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}`);
-          const result = await res.json();
-          hideLoading();
-          showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
-          loadPurchases();
-        } catch(e) { hideLoading(); showModal('Ошибка соединения'); }
+        modal.remove(); showLoading();
+        const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}`);
+        const result = await res.json(); hideLoading();
+        showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+        loadPurchases();
       };
       document.getElementById('confirmNoBtn').onclick = () => modal.remove();
     }
@@ -216,20 +185,15 @@
       document.body.appendChild(modal);
       document.getElementById('useYesBtn').onclick = async () => {
         const comment = document.getElementById('useComment').value.trim();
-        modal.remove();
-        showLoading();
-        try {
-          const res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}&comment=${encodeURIComponent(comment)}`);
-          const result = await res.json();
-          hideLoading();
-          showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
-          loadPurchases();
-        } catch(e) { hideLoading(); showModal('Ошибка соединения'); }
+        modal.remove(); showLoading();
+        const res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}&comment=${encodeURIComponent(comment)}`);
+        const result = await res.json(); hideLoading();
+        showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+        loadPurchases();
       };
       document.getElementById('useNoBtn').onclick = () => modal.remove();
     }
 
-    // Старт
     loadPurchases();
   </script>
 </body>
