@@ -16,11 +16,8 @@
     body {
       font-family: 'Inter', sans-serif;
       background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
-      color: var(--text-primary);
-      padding: 20px;
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
+      color: var(--text-primary); min-height: 100vh; padding: 20px;
+      position: relative; overflow-x: hidden;
     }
     .stars {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -45,13 +42,9 @@
     h2 {
       font-size: 2rem; font-weight: 800;
       background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 24px;
-      position: relative; z-index: 2;
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; margin-bottom: 24px; position: relative; z-index: 2;
       filter: drop-shadow(0 0 6px rgba(249,115,22,0.5));
-      letter-spacing: 1px;
     }
 
     .filter-bar {
@@ -71,8 +64,8 @@
     .custom-select:hover { border-color: var(--accent); }
     .custom-select select {
       background: transparent; border: none; color: inherit; font-size: inherit;
-      font-family: inherit; outline: none; width: 100%; appearance: none; cursor: pointer;
-      padding-right: 20px;
+      font-family: inherit; outline: none; width: 100%; appearance: none;
+      cursor: pointer; padding-right: 20px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 4px center;
     }
@@ -80,8 +73,7 @@
     .purchases-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-      position: relative; z-index: 2;
+      gap: 16px; position: relative; z-index: 2;
     }
 
     .purchase-card {
@@ -206,7 +198,7 @@
     <button class="btn" onclick="loadPurchases()" style="padding: 10px 24px;">Показать</button>
   </div>
 
-  <div class="purchases-grid" id="purchasesList"></div>
+  <div class="purchases-grid" id="purchasesList">Загрузка...</div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
@@ -250,7 +242,7 @@
       showLoading();
       try {
         const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}`);
-        if (!res.ok) throw new Error('Сетевая ошибка');
+        if (!res.ok) throw new Error('Сетевая ошибка: ' + res.status);
         const data = await res.json();
         hideLoading();
 
@@ -260,11 +252,15 @@
         const month = document.getElementById('monthSelect').value;
         const year = document.getElementById('yearSelect').value;
 
+        // Фильтрация по дате (формат "дд.мм.гггг, чч:мм:сс")
         purchases = purchases.filter(p => {
           const dateStr = p.date || '';
           const parts = dateStr.split('.');
           if (parts.length >= 3) {
-            return parts[1] === month && parts[2].startsWith(year);
+            const dayMonth = parts[0]; // не используется
+            const monthPart = parts[1]; // месяц
+            const yearPart = parts[2].split(',')[0]; // год до запятой
+            return monthPart === month && yearPart === year;
           }
           return false;
         });
@@ -293,7 +289,7 @@
         }).join('');
       } catch(e) {
         hideLoading();
-        document.getElementById('purchasesList').innerHTML = '<div class="empty-message">Ошибка загрузки покупок</div>';
+        document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ Ошибка: ${e.message}</div>`;
         console.error(e);
       }
     }
@@ -310,11 +306,16 @@
       document.getElementById('confirmYesBtn').onclick = async () => {
         modal.remove();
         showLoading();
-        const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}`);
-        const result = await res.json();
-        hideLoading();
-        showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
-        loadPurchases();
+        try {
+          const res = await fetch(`${API_URL}?action=refundPurchase&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}`);
+          const result = await res.json();
+          hideLoading();
+          showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+          loadPurchases();
+        } catch(e) {
+          hideLoading();
+          showModal('Ошибка соединения');
+        }
       };
       document.getElementById('confirmNoBtn').onclick = () => modal.remove();
     }
@@ -333,11 +334,16 @@
         const comment = document.getElementById('useComment').value.trim();
         modal.remove();
         showLoading();
-        const res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}&comment=${encodeURIComponent(comment)}`);
-        const result = await res.json();
-        hideLoading();
-        showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
-        loadPurchases();
+        try {
+          const res = await fetch(`${API_URL}?action=useCertificate&login=${encodeURIComponent(currentLogin)}&certId=${encodeURIComponent(certId)}&comment=${encodeURIComponent(comment)}`);
+          const result = await res.json();
+          hideLoading();
+          showModal(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+          loadPurchases();
+        } catch(e) {
+          hideLoading();
+          showModal('Ошибка соединения');
+        }
       };
       document.getElementById('useNoBtn').onclick = () => modal.remove();
     }
