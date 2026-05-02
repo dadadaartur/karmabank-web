@@ -7,47 +7,28 @@
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
     :root {
-      --bg-primary: #0a1628;
-      --bg-card: #152238;
-      --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1;
-      --accent: #f97316;
-      --border: #1f3350;
-      --success: #10b981;
-      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
+      --bg-primary: #0a1628; --bg-card: #152238; --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1; --accent: #f97316; --border: #1f3350;
+      --success: #10b981; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', sans-serif;
       background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
-      color: var(--text-primary);
-      padding: 20px;
-      min-height: 100vh;
-      user-select: none;
-      position: relative;
-      overflow-x: hidden;
+      color: var(--text-primary); padding: 20px; min-height: 100vh;
+      user-select: none; position: relative; overflow-x: hidden;
     }
-    /* Мерцающие звёзды (космический фон) */
     body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: transparent;
-      z-index: 0;
-      pointer-events: none;
+      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
     }
     .stars {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 0;
-      pointer-events: none;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
     }
     .star {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 2s infinite alternate;
-      opacity: 0.7;
+      position: absolute; background: white; border-radius: 50%;
+      animation: twinkle 2s infinite alternate; opacity: 0.7;
     }
     @keyframes twinkle {
       0% { opacity: 0.3; transform: scale(0.8); }
@@ -63,25 +44,19 @@
     h2 {
       font-size: 1.8rem; font-weight: 800;
       background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 24px;
-      position: relative; z-index: 2;
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; margin-bottom: 24px; position: relative; z-index: 2;
     }
     .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
-      position: relative; z-index: 2;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px; position: relative; z-index: 2;
     }
     .card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border);
-      border-radius: 20px; padding: 24px 20px; text-align: center;
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 24px 20px; text-align: center;
       display: flex; flex-direction: column; align-items: center; gap: 12px;
-      transition: all 0.3s;
-      backdrop-filter: blur(5px);
+      transition: all 0.3s; backdrop-filter: blur(5px);
       position: relative; z-index: 2;
     }
     .card:hover {
@@ -89,30 +64,18 @@
       box-shadow: 0 10px 25px rgba(249,115,22,0.3);
     }
     .card .icon-placeholder {
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
       opacity: 0.9;
     }
     .btn {
-      background: transparent;
-      border: 1px solid var(--accent);
-      border-radius: 40px;
-      padding: 8px 24px;
-      font-weight: 800;
-      font-size: 0.85rem;
-      cursor: pointer;
+      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
+      padding: 8px 24px; font-weight: 800; font-size: 0.85rem; cursor: pointer;
       transition: all 0.3s;
       background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-top: auto;
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; margin-top: auto;
     }
-    .btn:hover {
-      border-color: #c084fc;
-      box-shadow: 0 0 18px rgba(249,115,22,0.6);
-      transform: scale(1.03);
-    }
+    .btn:hover { border-color: #c084fc; box-shadow: 0 0 18px rgba(249,115,22,0.6); transform: scale(1.03); }
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
@@ -122,8 +85,7 @@
       background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
       border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
       max-width: 400px; width: 90%; text-align: center;
-      box-shadow: 0 0 60px rgba(249,115,22,0.6);
-      animation: modalPop 0.4s ease;
+      box-shadow: 0 0 60px rgba(249,115,22,0.6); animation: modalPop 0.4s ease;
     }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .modal-close-btn {
@@ -131,7 +93,6 @@
       padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;
     }
     .modal-close-btn:hover { background: #ef4444; border-color: #ef4444; color: white; }
-    /* Загрузка */
     .loading-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 3000;
@@ -139,21 +100,15 @@
     }
     .loading-arrows { display: flex; gap: 10px; }
     .arrow {
-      width: 12px; height: 12px;
-      background: linear-gradient(135deg, #f97316, #fbbf24);
-      border-radius: 2px;
-      animation: arrowPulse 1.2s infinite ease-in-out both;
-      transform: rotate(45deg);
-      box-shadow: 0 0 10px var(--accent);
+      width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24);
+      border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both;
+      transform: rotate(45deg); box-shadow: 0 0 10px var(--accent);
     }
-    .arrow:nth-child(1) { animation-delay: 0s; }
-    .arrow:nth-child(2) { animation-delay: 0.15s; }
-    .arrow:nth-child(3) { animation-delay: 0.3s; }
+    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
     @keyframes arrowPulse {
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
-    /* Анимация появления карточек */
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -162,12 +117,9 @@
       animation: fadeInUp 0.5s ease forwards;
       opacity: 0;
     }
-    .card:nth-child(1) { animation-delay: 0.05s; }
-    .card:nth-child(2) { animation-delay: 0.1s; }
-    .card:nth-child(3) { animation-delay: 0.15s; }
-    .card:nth-child(4) { animation-delay: 0.2s; }
-    .card:nth-child(5) { animation-delay: 0.25s; }
-    .card:nth-child(6) { animation-delay: 0.3s; }
+    .card:nth-child(1) { animation-delay: 0.05s; } .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; } .card:nth-child(4) { animation-delay: 0.2s; }
+    .card:nth-child(5) { animation-delay: 0.25s; } .card:nth-child(6) { animation-delay: 0.3s; }
   </style>
 </head>
 <body>
@@ -220,7 +172,6 @@
       grid.innerHTML = rewards.map((r, idx) => {
         const colors = ['#f97316','#c084fc','#38bdf8','#f59e0b','#34d399'];
         const c = colors[idx % colors.length];
-        // Карточка без иконок
         return `
         <div class="card" style="border-color: ${c};">
           <div style="font-weight:600; font-size:1.1rem;">${r.name}</div>
