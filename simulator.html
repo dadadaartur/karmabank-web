@@ -8,9 +8,7 @@
   <link rel="apple-touch-icon" href="astralsk.png">
   <style>
     :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
-    * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary); }
-    *::-webkit-scrollbar { width: 4px; }
-    *::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; cursor: default; }
     body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow-x: hidden; cursor: default; }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
@@ -67,7 +65,8 @@
       </div>
       <div class="level-selector">
         <select id="levelSelect">
-          <option value="1">Искра</option><option value="2">Луч</option><option value="3" selected>Созвездие</option><option value="4">Галактика</option><option value="5">Вселенная</option><option value="6">Абсолют</option>
+          <option value="1">Искра</option><option value="2">Луч</option><option value="3" selected>Созвездие</option>
+          <option value="4">Галактика</option><option value="5">Вселенная</option><option value="6">Абсолют</option>
         </select>
       </div>
       <button class="btn" onclick="startTraining()">Начать тренировку</button>
@@ -89,7 +88,6 @@
     <a href="/millionaire.html" class="btn" target="_blank">Открыть викторину</a>
   </div>
 
-  <!-- Динамический модуль AI-теста -->
   <div id="moduleDynamic" class="hidden">
     <button class="btn back-btn" onclick="openModule('menu')">← Назад к списку</button>
     <h3 id="dynamicModuleTitle"></h3>
@@ -119,8 +117,12 @@
     document.body.appendChild(toast);
     setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000);
   }
+  function showConfirm(message, onYes) {
+    const modal = document.createElement('div'); modal.className='modal active';
+    modal.innerHTML = `<div class="modal-content" style="text-align:center;"><p>${message}</p><div class="modal-buttons" style="justify-content:center; margin-top:16px;"><button class="btn cancel" onclick="this.closest('.modal').remove()">Отмена</button><button class="btn" onclick="this.closest('.modal').remove(); onYes();">Да</button></div></div>`;
+    document.body.appendChild(modal);
+  }
 
-  // Загрузка модулей LMS
   async function loadLmsModules() {
     try {
       const res = await fetch(`${API_URL}?action=getLmsModules`);
@@ -129,11 +131,11 @@
         { title: 'AI-Тренажёр', desc: 'Практика переговоров и продаж с искусственным интеллектом', action: 'trainer' },
         { title: 'Кармический миллионер', desc: 'Викторина по продажам с персональными вопросами', action: 'quiz' }
       ];
-      const allModules = [...staticModules, ...modules.map(m => ({ ...m, action: 'dynamic', dynamic: true }))];
+      const all = [...staticModules, ...modules.map(m => ({ ...m, action: 'dynamic', dynamic: true }))];
       const grid = document.getElementById('lmsModulesGrid');
-      grid.innerHTML = allModules.map(mod => `
+      grid.innerHTML = all.map(mod => `
         <div class="lms-card" onclick="${mod.dynamic ? `openDynamicModule('${mod.title.replace(/'/g, "\\'")}', '${(mod.description || '').replace(/'/g, "\\'")}', '${(mod.aiPrompt || '').replace(/'/g, "\\'")}')` : `openModule('${mod.action}')`}">
-          ${mod.dynamic ? `<button class="delete-module-btn" onclick="event.stopPropagation(); deleteModule('${mod.title.replace(/'/g, "\\'")}')">Удалить</button>` : ''}
+          ${mod.dynamic ? `<button class="delete-module-btn" onclick="event.stopPropagation(); showConfirm('Удалить модуль «${mod.title}»?', () => deleteModule('${mod.title.replace(/'/g, "\\'")}'))">✕</button>` : ''}
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           <div class="title">${mod.title}</div>
           <div class="desc">${mod.desc || mod.description || ''}</div>
@@ -183,19 +185,18 @@
       });
       const data = await res.json();
       if (data.message) addDynamicMessage('bot', data.message);
-      else addDynamicMessage('bot', 'Отличный вопрос! Дай мне ещё немного информации, чтобы ответить точнее.');
-    } catch(e) { addDynamicMessage('bot', 'Произошла небольшая заминка. Попробуем ещё раз?'); }
+      else addDynamicMessage('bot', 'Хороший вопрос! Дай мне ещё немного информации.');
+    } catch(e) { addDynamicMessage('bot', 'Произошла заминка. Попробуем ещё раз?'); }
   }
   function endDynamicSession() {
     openModule('menu');
   }
   async function deleteModule(title) {
-    if (confirm('Удалить модуль "' + title + '"?')) {
-      try {
-        await fetch(`${API_URL}?action=deleteLmsModule&managerLogin=${login}&title=${encodeURIComponent(title)}`);
-        loadLmsModules();
-      } catch(e) { alert('Ошибка удаления'); }
-    }
+    try {
+      await fetch(`${API_URL}?action=deleteLmsModule&managerLogin=${login}&title=${encodeURIComponent(title)}`);
+      loadLmsModules();
+      showToast('Модуль удалён');
+    } catch(e) { showToast('Ошибка удаления', false); }
   }
 
   // Базовый тренажёр
@@ -222,7 +223,7 @@
       hideLoading();
       if (data.message) addTrainerMessage('bot', data.message);
       else addTrainerMessage('bot', 'Привет! Я готов к тренировке.');
-    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка соединения. Попробуй позже.'); }
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка соединения.'); }
   }
   function addTrainerMessage(role, text) { trainerMessages.push({role, text}); const div = document.createElement('div'); div.className = `message ${role}`; div.textContent = text; document.getElementById('chatBox').appendChild(div); }
   async function sendMessage() {
@@ -236,18 +237,10 @@
       hideLoading();
       if (data.message) addTrainerMessage('bot', data.message);
       else addTrainerMessage('bot', 'Уточни, пожалуйста, что ты имеешь в виду?');
-    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка связи.'); }
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка.'); }
   }
   function confirmEvaluate() {
     showConfirm('Завершить тренировку и получить оценку?', evaluateSession);
-  }
-  // Кастомный confirm
-  function showConfirm(message, onYes) {
-    const modal = document.createElement('div'); modal.className='modal active';
-    modal.innerHTML = `<div class="modal-content" style="text-align:center;"><p>${message}</p><div class="modal-buttons" style="justify-content:center; margin-top:16px;"><button class="btn cancel" id="modalNo">Отмена</button><button class="btn" id="modalYes">Да</button></div></div>`;
-    document.body.appendChild(modal);
-    document.getElementById('modalYes').onclick = () => { modal.remove(); onYes(); };
-    document.getElementById('modalNo').onclick = () => modal.remove();
   }
   async function evaluateSession() {
     const formData = new URLSearchParams({ mode: 'evaluate', scenario: currentScenario, level: currentLevel, history: JSON.stringify(trainerMessages), login });
