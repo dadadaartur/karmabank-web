@@ -51,12 +51,13 @@
 <body>
   <div class="stars" id="starsContainer"></div>
   <a class="back-btn" href="/">← Назад</a>
-  <h2>Мои покупки v.2</h2>
+  <h2>Мои покупки v.3</h2>
 
   <div class="filter-bar">
-    <span class="filter-label">📅 Период:</span>
+    <span class="filter-label">📅 Фильтр по дате:</span>
     <div class="custom-select">
       <select id="monthSelect">
+        <option value="all">Весь год</option>
         <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
         <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
         <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
@@ -68,7 +69,7 @@
         <option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option>
       </select>
     </div>
-    <button class="btn" onclick="loadPurchases()" style="padding:10px 24px;">Показать</button>
+    <button class="btn" onclick="applyFilter()">Показать</button>
   </div>
 
   <div class="purchases-grid" id="purchasesList">Загрузка...</div>
@@ -77,6 +78,8 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const currentLogin = localStorage.getItem('karmabank_login');
     if (!currentLogin) window.location.href = '/';
+
+    let allPurchases = [];
 
     function createStars() {
       const container = document.getElementById('starsContainer');
@@ -108,54 +111,74 @@
     }
 
     const now = new Date();
-    document.getElementById('monthSelect').value = now.getMonth() + 1;
     document.getElementById('yearSelect').value = now.getFullYear();
+    document.getElementById('monthSelect').value = 'all'; // показываем всё по умолчанию
 
     async function loadPurchases() {
       showLoading();
       try {
-        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}`);
+        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}&t=${Date.now()}`);
         if (!res.ok) throw new Error('Ошибка сервера');
         const data = await res.json();
+        console.log('Данные от API:', data);
         hideLoading();
 
-        const container = document.getElementById('purchasesList');
-        let purchases = Array.isArray(data) ? data : [];
+        allPurchases = Array.isArray(data) ? data : [];
+        // По умолчанию показываем все
+        document.getElementById('monthSelect').value = 'all';
+        renderPurchases(allPurchases);
+      } catch(e) {
+        hideLoading();
+        document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ Ошибка: ${e.message}</div>`;
+        console.error(e);
+      }
+    }
 
-        const month = document.getElementById('monthSelect').value;
-        const year = document.getElementById('yearSelect').value;
+    function applyFilter() {
+      const month = document.getElementById('monthSelect').value;
+      const year = document.getElementById('yearSelect').value;
+      let filtered = allPurchases;
 
-        purchases = purchases.filter(p => {
+      if (month !== 'all') {
+        filtered = allPurchases.filter(p => {
           const dateStr = p.date || '';
           const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
           return match && match[2] === month && match[3] === year;
         });
-
-        if (purchases.length === 0) {
-          container.innerHTML = '<div class="empty-message">Нет покупок за выбранный период</div>';
-          return;
-        }
-
-        container.innerHTML = purchases.map(p => {
-          const isUsed = p.usedDate ? true : false;
-          const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
-          let buttonsHtml = '';
-          if (!isUsed && p.canUse) {
-            buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}','${p.rewardName}')">Использовать</button>`;
-          } else if (isUsed && p.canRefund) {
-            buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName}',${p.cost})">Вернуть</button>`;
-          }
-          return `<div class="purchase-card">
-            <div class="reward-name">${p.rewardName}${usedHtml}</div>
-            <div class="reward-cost">${p.cost} карм.</div>
-            <div class="reward-date">${p.date}</div>
-            <div class="purchase-actions">${buttonsHtml}</div>
-          </div>`;
-        }).join('');
-      } catch(e) {
-        hideLoading();
-        document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ Ошибка: ${e.message}</div>`;
+      } else {
+        // Если выбран "Весь год", фильтруем только по году
+        filtered = allPurchases.filter(p => {
+          const dateStr = p.date || '';
+          const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+          return match && match[3] === year;
+        });
       }
+      renderPurchases(filtered);
+    }
+
+    function renderPurchases(purchases) {
+      const container = document.getElementById('purchasesList');
+      if (purchases.length === 0) {
+        container.innerHTML = '<div class="empty-message">Нет покупок за выбранный период</div>';
+        return;
+      }
+
+      container.innerHTML = purchases.map(p => {
+        const isUsed = p.usedDate ? true : false;
+        const usedHtml = isUsed ? `<span class="used-badge">Использован ${p.usedDate}</span>` : '';
+        let buttonsHtml = '';
+        if (!isUsed && p.canUse) {
+          buttonsHtml = `<button class="btn use" onclick="openUseModal('${p.id}','${p.rewardName}')">Использовать</button>`;
+        } else if (isUsed && p.canRefund) {
+          buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName}',${p.cost})">Вернуть</button>`;
+        }
+        return `<div class="purchase-card">
+          <div class="reward-name">${p.rewardName}${usedHtml}</div>
+          <div class="reward-cost">${p.cost} карм.</div>
+          <div class="reward-date">${p.date}</div>
+          <div class="purchase-actions">${buttonsHtml}</div>
+        </div>`;
+      }).join('');
     }
 
     function openRefundModal(certId, rewardName, cost) {
