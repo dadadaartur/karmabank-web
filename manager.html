@@ -6,160 +6,77 @@
   <title>Панель руководителя — Кармический банк</title>
   <link rel="icon" type="image/png" href="astralsk.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
-      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350;
-      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
-    }
+    :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
-      color: var(--text-primary); min-height: 100vh; padding: 20px;
-      position: relative; overflow-x: hidden;
-      cursor: default;
-    }
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; cursor: default; }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
     @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; } }
-    .header {
-      background: rgba(21,38,56,0.7); backdrop-filter: blur(10px);
-      border: 1px solid var(--border); border-radius: 20px; padding: 16px 24px; margin-bottom: 24px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-      position: relative; z-index: 2;
-    }
-    .header h2 {
-      font-size: 1.4rem; font-weight: 800;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none;
-    }
+    .header { background: rgba(21,38,56,0.7); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 20px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: relative; z-index: 2; }
+    .header h2 { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .main-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; position: relative; z-index: 2; }
-    .action-btn {
-      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
-      padding: 10px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
-      transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    .action-btn { background: transparent; border: 1px solid var(--accent); border-radius: 40px; padding: 10px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .action-btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02); }
     .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; position: relative; z-index: 2; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; position: relative; z-index: 2; }
-    .employee-card {
-      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 20px; padding: 20px;
-      display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px);
-      cursor: pointer;
-    }
+    .employee-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px); cursor: default; }
     .employee-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .emp-header { display: flex; align-items: center; gap: 10px; }
-    .emp-avatar {
-      width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
-      display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white;
-    }
+    .emp-header { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .emp-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white; }
     .emp-name { font-weight: 700; }
     .emp-dept { font-size: 0.8rem; color: var(--text-secondary); }
-    .metrics-row { display: flex; gap: 12px; }
+    .metrics-row { display: flex; gap: 12px; cursor: pointer; }
     .metric { text-align: center; }
     .metric .val { font-weight: 700; font-size: 1.1rem; }
     .val.success { color: var(--success); } .val.accent { color: var(--accent); } .val.warning { color: var(--warning); }
     .metric .lbl { font-size: 0.7rem; color: var(--text-secondary); }
     .card-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
-    .delete-employee-btn {
-      background: transparent; border: 1px solid var(--danger); color: var(--danger);
-      padding: 2px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 600; cursor: pointer;
-      transition: all 0.2s; opacity: 0.7;
-    }
+    .delete-employee-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 2px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: all 0.2s; opacity: 0.7; }
     .delete-employee-btn:hover { opacity: 1; background: rgba(239,68,68,0.1); }
     .task-review { border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .review-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
-    .verify-btn {
-      background: transparent; border: 1px solid var(--success); border-radius: 12px;
-      color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
+    .verify-btn { background: transparent; border: 1px solid var(--success); border-radius: 12px; color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .verify-btn:hover { background: var(--success); color: white; }
     .notif-icon { position: relative; cursor: pointer; margin-left: auto; display: flex; align-items: center; }
     .notif-icon svg { width: 24px; height: 24px; stroke: var(--text-secondary); transition: 0.2s; }
     .notif-icon:hover svg { stroke: var(--accent); }
-    .notif-badge {
-      position: absolute; top: -6px; right: -6px; background: var(--accent); color: white;
-      border-radius: 50%; font-size: 0.7rem; width: 18px; height: 18px;
-      display: flex; align-items: center; justify-content: center; font-weight: bold;
-    }
+    .notif-badge { position: absolute; top: -6px; right: -6px; background: var(--accent); color: white; border-radius: 50%; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
-    .modal-content {
-      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
-      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-      max-width: 500px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6);
-      color: var(--text-primary); animation: modalPop 0.3s ease;
-    }
+    .modal-content { background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 500px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6); color: var(--text-primary); animation: modalPop 0.3s ease; }
     @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .modal-content input, .modal-content select, .modal-content textarea {
-      width: 100%; padding: 10px; margin: 8px 0 16px;
-      border-radius: 12px; border: 1px solid var(--border);
-      background: var(--bg-primary); color: var(--text-primary); font-size: 0.95rem; outline: none;
-      cursor: text;
-    }
-    .modal-content select {
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-    }
-    .modal-content select[multiple] {
-      height: auto;
-      background-image: none;
-      padding-right: 10px;
-    }
-    .modal-content label {
-      font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 8px; display: block;
-    }
+    .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary); font-size: 0.95rem; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+    .modal-content select[multiple] { background-image: none; padding-right: 10px; height: auto; }
+    .modal-content label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 8px; display: block; }
     .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
-    .modal-buttons .btn {
-      background: transparent; border: 1px solid var(--accent); border-radius: 30px;
-      padding: 8px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.3s;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    .modal-buttons .btn { background: transparent; border: 1px solid var(--accent); border-radius: 30px; padding: 8px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .modal-buttons .btn.cancel { background: transparent; border-color: var(--border); -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary); }
     .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
     .loading-arrows { display: flex; gap: 10px; }
     .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
     .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
     @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
-    .toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
-      border: 1px solid var(--accent); border-radius: 40px; padding: 12px 30px;
-      color: var(--text-primary); font-weight: 500; box-shadow: 0 0 30px rgba(249,115,22,0.5);
-      z-index: 10000; animation: toastIn 0.4s ease, toastOut 0.4s 2.5s ease forwards;
-    }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 40px; padding: 12px 30px; color: var(--text-primary); font-weight: 500; box-shadow: 0 0 30px rgba(249,115,22,0.5); z-index: 10000; animation: toastIn 0.4s ease, toastOut 0.4s 2.5s ease forwards; }
     @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+    .profile-fields { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .profile-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .profile-row b { color: var(--text-secondary); font-weight: 500; }
+    .profile-row span { color: var(--text-primary); }
+    .notif-scroll { max-height: 300px; overflow-y: auto; margin: 12px 0; }
+    .notif-item { padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 0.85rem; }
+    .crm-link { color: var(--accent); text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
+    .crm-link:hover { color: #c084fc; }
     .dashboard { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; position: relative; z-index: 2; }
     .dashboard-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px; flex: 1; min-width: 130px; backdrop-filter: blur(4px); }
     .dashboard-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
     .dashboard-value { font-size: 1.4rem; font-weight: 700; }
-    .dashboard-value.income { color: var(--success); } .dashboard-value.expense { color: var(--danger); }
-    .rating-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .dashboard-value.income { color: var(--success); }
+    .rating-table { width: 100%; border-collapse: collapse; margin-top: 10px; position: relative; z-index: 2; }
     .rating-table th, .rating-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
     .rating-table th { color: var(--text-secondary); font-size: 0.8rem; }
-    .notif-scroll { max-height: 300px; overflow-y: auto; margin: 12px 0; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary); }
-    .notif-scroll::-webkit-scrollbar { width: 4px; }
-    .notif-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
-    .notif-item { padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 0.85rem; }
-    .profile-field { margin-bottom: 12px; }
-    .profile-field b { color: var(--text-secondary); display: inline-block; width: 100px; }
-    .profile-field span { color: var(--text-primary); }
-    .crm-link { color: var(--accent); text-decoration: underline; cursor: pointer; font-size: 0.9rem; }
-    .crm-link:hover { color: #c084fc; }
   </style>
 </head>
 <body>
@@ -209,7 +126,7 @@
 <div id="deleteEmployeeModal" class="modal">
   <div class="modal-content">
     <h3>Удалить сотрудника</h3>
-    <p id="deleteEmployeeName" style="margin-bottom: 12px;"></p>
+    <p id="deleteEmployeeName" style="margin-bottom:12px;"></p>
     <label>Причина</label>
     <input type="text" id="deleteReason" placeholder="Обязательно укажите причину">
     <div class="modal-buttons">
@@ -340,9 +257,23 @@
   if (!currentLogin) window.location.href = '/';
   let currentDeleteLogin = '';
 
-  function createStars() { const container = document.getElementById('starsContainer'); for (let i=0; i<80; i++) { const star = document.createElement('div'); star.className='star'; star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px'; star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%'; star.style.animationDelay = Math.random()*3+'s'; container.appendChild(star); } }
+  function createStars() {
+    const container = document.getElementById('starsContainer');
+    for (let i=0; i<80; i++) {
+      const star = document.createElement('div'); star.className='star';
+      star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px';
+      star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+      star.style.animationDelay = Math.random()*3+'s';
+      container.appendChild(star);
+    }
+  }
   createStars();
-  function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
+
+  function showLoading() {
+    const overlay = document.createElement('div'); overlay.className='loading-overlay';
+    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
+    document.body.appendChild(overlay);
+  }
   function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
   function openModal(id) { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
@@ -353,6 +284,7 @@
     setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000);
   }
 
+  // Загрузка отделов, должностей и списка сотрудников
   async function loadFormData() {
     const res = await fetch(`${API_URL}?action=getAllEmployees`);
     const employees = await res.json();
@@ -493,11 +425,13 @@
     document.getElementById('profileModal').classList.add('active');
     document.getElementById('profileModalContent').innerHTML = `
       <h3>${user.name}</h3>
-      <div class="profile-field"><b>Отдел:</b> <span>${user.department || '—'}</span></div>
-      <div class="profile-field"><b>Должность:</b> <span>${user.position || '—'}</span></div>
-      <div class="profile-field"><b>Кармики:</b> <span>${user.points}</span></div>
-      <div class="profile-field"><b>Энергия:</b> <span>${user.energy}</span></div>
-      <div class="profile-field"><b>Паспорт:</b> <span>${user.passport}</span></div>
+      <div class="profile-fields">
+        <div class="profile-row"><b>Отдел:</b> <span>${user.department || '—'}</span></div>
+        <div class="profile-row"><b>Должность:</b> <span>${user.position || '—'}</span></div>
+        <div class="profile-row"><b>Кармики:</b> <span>${user.points}</span></div>
+        <div class="profile-row"><b>Энергия:</b> <span>${user.energy}</span></div>
+        <div class="profile-row"><b>Паспорт:</b> <span>${user.passport}</span></div>
+      </div>
       <div class="modal-buttons">
         <button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>
       </div>
@@ -518,46 +452,38 @@
   }
 
   function toggleTaskTarget() {
-    const val = document.getElementById('taskTarget').value;
-    document.getElementById('taskPersonalSelect').style.display = (val === 'personal') ? 'block' : 'none';
+    document.getElementById('taskPersonalSelect').style.display = document.getElementById('taskTarget').value === 'personal' ? 'block' : 'none';
   }
   async function createTask() {
     const target = document.getElementById('taskTarget').value;
-    let employee = 'all';
-    if (target === 'personal') {
-      employee = document.getElementById('taskEmployeeSelect').value;
-    } else {
-      employee = target; // 'all', 'newcomers', 'experienced'
-    }
-    const taskName = document.getElementById('taskName').value.trim();
+    let employee = target === 'personal' ? document.getElementById('taskEmployeeSelect').value : target;
+    const name = document.getElementById('taskName').value.trim();
     const points = parseInt(document.getElementById('taskPoints').value) || 0;
-    if (!taskName) { showToast('Введите название', false); return; }
+    if (!name) { showToast('Введите название', false); return; }
     showLoading();
-    const res = await fetch(`${API_URL}?action=createTask&managerLogin=${currentLogin}&taskName=${encodeURIComponent(taskName)}&points=${points}&employeeLogin=${encodeURIComponent(employee)}`);
+    const res = await fetch(`${API_URL}?action=createTask&managerLogin=${currentLogin}&taskName=${encodeURIComponent(name)}&points=${points}&employeeLogin=${encodeURIComponent(employee)}`);
     const result = await res.json();
     hideLoading();
     showToast(result.message, result.success);
-    closeModal('createTaskModal'); loadTeam();
+    if (result.success) { closeModal('createTaskModal'); loadTeam(); }
   }
 
   function toggleAwardTarget() {
-    const val = document.getElementById('awardTarget').value;
-    const panel = document.getElementById('awardSpecificPanel');
-    panel.style.display = (val === 'specific') ? 'block' : 'none';
+    document.getElementById('awardSpecificPanel').style.display = document.getElementById('awardTarget').value === 'specific' ? 'block' : 'none';
   }
   async function awardPoints() {
     const target = document.getElementById('awardTarget').value;
-    let employeeLogins = '';
+    let logins = '';
     if (target === 'specific') {
       const select = document.getElementById('awardEmployeeSelect');
-      employeeLogins = Array.from(select.selectedOptions).map(opt => opt.value).join(',');
-      if (!employeeLogins) { showToast('Выберите сотрудников', false); return; }
+      logins = Array.from(select.selectedOptions).map(o => o.value).join(',');
+      if (!logins) { showToast('Выберите сотрудников', false); return; }
     }
     const amount = parseInt(document.getElementById('awardAmount').value) || 0;
     const comment = document.getElementById('awardComment').value.trim();
     if (amount <= 0 || !comment) { showToast('Заполните сумму и комментарий', false); return; }
     showLoading();
-    const res = await fetch(`${API_URL}?action=awardPointsFiltered&managerLogin=${currentLogin}&target=${target}&employeeLogins=${encodeURIComponent(employeeLogins)}&amount=${amount}&comment=${encodeURIComponent(comment)}`);
+    const res = await fetch(`${API_URL}?action=awardPointsFiltered&managerLogin=${currentLogin}&target=${target}&employeeLogins=${encodeURIComponent(logins)}&amount=${amount}&comment=${encodeURIComponent(comment)}`);
     const result = await res.json();
     hideLoading();
     showToast(result.message, result.success);
@@ -565,8 +491,7 @@
   }
 
   function toggleRewardTarget() {
-    const val = document.getElementById('rewardTarget').value;
-    document.getElementById('rewardSpecificPanel').style.display = (val === 'specific') ? 'block' : 'none';
+    document.getElementById('rewardSpecificPanel').style.display = document.getElementById('rewardTarget').value === 'specific' ? 'block' : 'none';
   }
   async function addReward() {
     const name = document.getElementById('rewardName').value.trim();
@@ -574,7 +499,7 @@
     const target = document.getElementById('rewardTarget').value;
     const logins = document.getElementById('rewardEmployeeLogins').value.trim();
     if (!name || cost <= 0) { showToast('Заполните название и стоимость', false); return; }
-    if (target === 'specific' && !logins) { showToast('Укажите логины сотрудников', false); return; }
+    if (target === 'specific' && !logins) { showToast('Укажите логины', false); return; }
     showLoading();
     const res = await fetch(`${API_URL}?action=addReward&managerLogin=${currentLogin}&name=${encodeURIComponent(name)}&cost=${cost}&target=${target}&logins=${encodeURIComponent(logins)}`);
     const result = await res.json();
