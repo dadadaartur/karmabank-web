@@ -34,9 +34,6 @@
     .metric .val { font-weight: 700; font-size: 1.1rem; }
     .val.success { color: var(--success); } .val.accent { color: var(--accent); } .val.warning { color: var(--warning); }
     .metric .lbl { font-size: 0.7rem; color: var(--text-secondary); }
-    .card-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
-    .delete-employee-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 2px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: all 0.2s; opacity: 0.7; }
-    .delete-employee-btn:hover { opacity: 1; background: rgba(239,68,68,0.1); }
     .task-review { border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .review-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
     .verify-btn { background: transparent; border: 1px solid var(--success); border-radius: 12px; color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
@@ -44,7 +41,7 @@
     .notif-icon { position: relative; cursor: pointer; margin-left: auto; display: flex; align-items: center; }
     .notif-icon svg { width: 24px; height: 24px; stroke: var(--text-secondary); transition: 0.2s; }
     .notif-icon:hover svg { stroke: var(--accent); }
-    .notif-badge { position: absolute; top: -6px; right: -6px; background: var(--accent); color: white; border-radius: 50%; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .notif-badge { position: absolute; top: -6px; right: -6px; background: var(--accent); color: white; border-radius: 50%; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
     .modal-content { background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 500px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6); color: var(--text-primary); animation: modalPop 0.3s ease; }
@@ -106,7 +103,7 @@
 <div class="dashboard" id="dashboard"></div>
 <table class="rating-table" id="ratingTable"><thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th><th>Энергия</th></tr></thead><tbody></tbody></table>
 <div class="section-title" style="margin-top: 24px;">Сотрудники</div>
-<div class="grid" id="teamGrid">Загрузка...</div>
+<div class="grid" id="teamGrid"></div>
 
 <!-- Модалки -->
 <div id="addEmployeeModal" class="modal">
@@ -253,17 +250,6 @@
   <div class="modal-content" id="verifyModalContent"></div>
 </div>
 
-<!-- Кастомное окно подтверждения -->
-<div id="confirmModal" class="modal">
-  <div class="modal-content" style="text-align: center;">
-    <p id="confirmMessage"></p>
-    <div class="modal-buttons" style="justify-content: center;">
-      <button class="btn cancel" id="confirmNo">Отмена</button>
-      <button class="btn" id="confirmYes">Да</button>
-    </div>
-  </div>
-</div>
-
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
@@ -297,18 +283,6 @@
     setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000);
   }
 
-  // Кастомное подтверждение (замена confirm)
-  function showConfirm(message, onYes) {
-    document.getElementById('confirmMessage').textContent = message;
-    openModal('confirmModal');
-    document.getElementById('confirmYes').onclick = () => {
-      closeModal('confirmModal');
-      onYes();
-    };
-    document.getElementById('confirmNo').onclick = () => closeModal('confirmModal');
-  }
-
-  // Загрузка отделов, должностей и списка сотрудников
   async function loadFormData() {
     const res = await fetch(`${API_URL}?action=getAllEmployees`);
     const employees = await res.json();
@@ -341,17 +315,14 @@
     const grid = document.getElementById('teamGrid');
     if (!team || team.length === 0) { grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>'; return; }
     grid.innerHTML = team.map(emp => `
-      <div class="employee-card">
-        <div class="emp-header" onclick="openProfile('${emp.login}')"><div class="emp-avatar">${emp.name.charAt(0)}</div><div><div class="emp-name">${emp.name}</div><div class="emp-dept">${emp.department || '—'}</div></div></div>
-        <div class="metrics-row" onclick="openProfile('${emp.login}')">
+      <div class="employee-card" onclick="openProfile('${emp.login}')">
+        <div class="emp-header"><div class="emp-avatar">${emp.name.charAt(0)}</div><div><div class="emp-name">${emp.name}</div><div class="emp-dept">${emp.department || '—'}</div></div></div>
+        <div class="metrics-row">
           <div class="metric"><div class="val success">${emp.points}</div><div class="lbl">кармиков</div></div>
           <div class="metric"><div class="val accent">${emp.energy}</div><div class="lbl">энергии</div></div>
           <div class="metric"><div class="val warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="lbl">заданий</div></div>
         </div>
-        <div class="task-review" id="review-${emp.login}">Загрузка...</div>
-        <div class="card-actions">
-          <button class="delete-employee-btn" onclick="event.stopPropagation(); openDeleteModal('${emp.login}','${emp.name}')">Удалить</button>
-        </div>
+        <div class="task-review" id="review-${emp.login}"></div>
       </div>
     `).join('');
     team.forEach(emp => {
@@ -367,6 +338,30 @@
           }
         }).catch(() => {});
     });
+  }
+
+  function openProfile(login) {
+    // загружаем и показываем профиль с кнопкой удаления
+    showLoading();
+    fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`)
+      .then(r => r.json())
+      .then(user => {
+        hideLoading();
+        if (!user) { showToast('Пользователь не найден', false); return; }
+        document.getElementById('profileModal').classList.add('active');
+        document.getElementById('profileModalContent').innerHTML = `
+          <h3>${user.name}</h3>
+          <div class="profile-fields">
+            <div class="profile-row"><b>Отдел:</b> <span>${user.department || '—'}</span></div>
+            <div class="profile-row"><b>Должность:</b> <span>${user.position || '—'}</span></div>
+            <div class="profile-row"><b>Кармики:</b> <span>${user.points}</span></div>
+            <div class="profile-row"><b>Энергия:</b> <span>${user.energy}</span></div>
+            <div class="profile-row"><b>Паспорт:</b> <span>${user.passport}</span></div>
+          </div>
+          <button class="btn cancel" onclick="closeModal('profileModal')" style="margin-right: 8px;">Закрыть</button>
+          <button class="btn" style="background: linear-gradient(135deg, #ef4444, #e65c00); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: #ef4444;" onclick="closeModal('profileModal'); openDeleteModal('${login}','${user.name}')">Удалить сотрудника</button>
+        `;
+      }).catch(() => { hideLoading(); showToast('Ошибка загрузки', false); });
   }
 
   function openDeleteModal(login, name) {
@@ -438,28 +433,6 @@
     list.innerHTML = notifs.length === 0 ? '<p>Нет новых уведомлений</p>' :
       notifs.map(n => `<div class="notif-item">${n.employee} — ${n.reward} (${n.date})</div>`).join('');
     openModal('notificationsModal');
-  }
-
-  async function openProfile(login) {
-    showLoading();
-    const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
-    const user = await res.json();
-    hideLoading();
-    if (!user) { showToast('Пользователь не найден', false); return; }
-    document.getElementById('profileModal').classList.add('active');
-    document.getElementById('profileModalContent').innerHTML = `
-      <h3>${user.name}</h3>
-      <div class="profile-fields">
-        <div class="profile-row"><b>Отдел:</b> <span>${user.department || '—'}</span></div>
-        <div class="profile-row"><b>Должность:</b> <span>${user.position || '—'}</span></div>
-        <div class="profile-row"><b>Кармики:</b> <span>${user.points}</span></div>
-        <div class="profile-row"><b>Энергия:</b> <span>${user.energy}</span></div>
-        <div class="profile-row"><b>Паспорт:</b> <span>${user.passport}</span></div>
-      </div>
-      <div class="modal-buttons">
-        <button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>
-      </div>
-    `;
   }
 
   async function addEmployee() {
