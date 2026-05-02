@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Кармический миллионер — Викторина по продажам</title>
+  <link rel="icon" type="image/png" href="belchonok.png">
+  <style>
+    :root {
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --success: #10b981; --warning: #f59e0b; --border: #1f3350;
+      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
+      color: var(--text-primary); min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; padding: 20px;
+      position: relative; overflow-x: hidden;
+    }
+    .stars {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    .star {
+      position: absolute; background: white; border-radius: 50%;
+      animation: twinkle 2s infinite alternate; opacity: 0.7;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
+    }
+    .game-container {
+      max-width: 700px; width: 100%; position: relative; z-index: 2;
+      background: radial-gradient(circle at 20% 30%, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid var(--accent); border-radius: 32px; padding: 40px 30px;
+      box-shadow: 0 0 60px rgba(249,115,22,0.6);
+      text-align: center; animation: fadeInUp 0.6s ease;
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .game-screen { display: none; }
+    .game-screen.active { display: block; }
+    h2 {
+      font-size: 2rem; font-weight: 800; margin-bottom: 12px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .host-message {
+      background: rgba(21,38,56,0.6); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px; margin: 20px 0;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .host-avatar {
+      width: 40px; height: 40px; background: var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+    .question-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 24px; margin: 20px 0; font-size: 1.1rem; font-weight: 600;
+    }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    .option-btn {
+      background: transparent; border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+      color: var(--text-primary); font-size: 1rem;
+    }
+    .option-btn:hover { border-color: var(--accent); box-shadow: var(--hologram-glow); }
+    .option-btn.correct { background: var(--success); border-color: var(--success); color: white; }
+    .option-btn.wrong { background: var(--danger); border-color: var(--danger); color: white; }
+    .timer {
+      font-size: 2rem; font-weight: 800; color: var(--warning); margin: 12px 0;
+    }
+    .score {
+      font-size: 1.2rem; margin: 8px 0;
+    }
+    .score span { color: var(--accent); font-weight: 700; }
+    .btn {
+      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
+      padding: 12px 36px; font-weight: 800; font-size: 1rem; cursor: pointer;
+      transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.03); }
+    .rating-table {
+      width: 100%; border-collapse: collapse; margin: 20px 0;
+    }
+    .rating-table th, .rating-table td {
+      padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .rating-table th { color: var(--text-secondary); font-weight: 500; font-size: 0.85rem; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+      text-decoration: none; margin-top: 20px;
+    }
+    .back-btn:hover { background: var(--border); color: var(--text-primary); }
+  </style>
+</head>
+<body>
+<div class="stars" id="starsContainer"></div>
+<div class="game-container">
+  <!-- Стартовый экран -->
+  <div class="game-screen active" id="startScreen">
+    <h2>Кармический миллионер</h2>
+    <div class="host-message">
+      <div class="host-avatar">🐿️</div>
+      <p>Добро пожаловать на викторину по продажам! Я твой ведущий. Проверим твои навыки? 5 вопросов, и ты в рейтинге!</p>
+    </div>
+    <button class="btn" onclick="startGame()">Начать игру</button>
+  </div>
+
+  <!-- Экран игры -->
+  <div class="game-screen" id="gameScreen">
+    <div class="timer" id="timer">30</div>
+    <div class="score">Вопрос <span id="questionNum">1</span> из 5 • Баллов: <span id="points">0</span></div>
+    <div class="question-card" id="questionText">Загрузка вопроса...</div>
+    <div class="options-grid" id="optionsGrid">
+      <button class="option-btn">A</button>
+      <button class="option-btn">B</button>
+      <button class="option-btn">C</button>
+      <button class="option-btn">D</button>
+    </div>
+    <div class="host-message" id="hostComment" style="display:none;"></div>
+  </div>
+
+  <!-- Экран результата -->
+  <div class="game-screen" id="resultScreen">
+    <h2 id="resultTitle"></h2>
+    <div class="host-message" id="resultMessage"></div>
+    <div class="score" style="font-size: 1.5rem;">Итоговый балл: <span id="finalScore">0</span></div>
+    <button class="btn" onclick="startGame()">Играть снова</button>
+    <h3 style="margin-top: 24px;">🏆 Рейтинг</h3>
+    <table class="rating-table" id="ratingTable"></table>
+    <a href="/" class="back-btn">← На главную</a>
+  </div>
+</div>
+
+<script>
+  const QUESTIONS = [
+    {
+      question: "Какой этап продаж самый важный для установления доверия?",
+      options: ["Презентация", "Работа с возражениями", "Установление контакта", "Закрытие сделки"],
+      correct: 2
+    },
+    {
+      question: "Что такое СПИН в продажах?",
+      options: ["Метод активного слушания", "Техника задавания вопросов", "Способ презентации", "Метод закрытия сделки"],
+      correct: 1
+    },
+    {
+      question: "Какая техника помогает выявить скрытые потребности клиента?",
+      options: ["AIDA", "SMART", "СПИН", "GROW"],
+      correct: 2
+    },
+    {
+      question: "Что такое 'холодный звонок'?",
+      options: ["Звонок недовольному клиенту", "Звонок без предварительного контакта", "Звонок после встречи", "Звонок в холодную погоду"],
+      correct: 1
+    },
+    {
+      question: "Какой показатель отражает среднюю сумму чека?",
+      options: ["Конверсия", "Средний чек", "LTV", "ROI"],
+      correct: 1
+    }
+  ];
+
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+  const currentLogin = localStorage.getItem('karmabank_login') || 'anonymous';
+
+  let timerInterval, timeLeft, currentQuestion = 0, totalPoints = 0, gameActive = false;
+
+  function createStars() {
+    const container = document.getElementById('starsContainer');
+    const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div'); star.className = 'star';
+      const size = Math.random() * 3 + 1;
+      star.style.width = size + 'px'; star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+      star.style.background = colors[Math.floor(Math.random() * colors.length)];
+      star.style.animationDelay = Math.random() * 3 + 's';
+      container.appendChild(star);
+    }
+  }
+  createStars();
+
+  function switchScreen(screenId) {
+    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  function startGame() {
+    currentQuestion = 0;
+    totalPoints = 0;
+    gameActive = true;
+    document.getElementById('hostComment').style.display = 'none';
+    switchScreen('gameScreen');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    if (currentQuestion >= QUESTIONS.length) {
+      endGame(true);
+      return;
+    }
+    const q = QUESTIONS[currentQuestion];
+    document.getElementById('questionNum').textContent = currentQuestion + 1;
+    document.getElementById('questionText').textContent = q.question;
+    document.getElementById('points').textContent = totalPoints;
+    const btns = document.querySelectorAll('#optionsGrid .option-btn');
+    btns.forEach((btn, idx) => {
+      btn.textContent = q.options[idx];
+      btn.className = 'option-btn';
+      btn.disabled = false;
+      btn.onclick = () => answerQuestion(idx);
+    });
+    startTimer();
+  }
+
+  function startTimer() {
+    timeLeft = 30;
+    document.getElementById('timer').textContent = timeLeft;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timer').textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timeOut();
+      }
+    }, 1000);
+  }
+
+  function timeOut() {
+    gameActive = false;
+    showHostComment('⏰ Время вышло! Игра окончена.');
+    setTimeout(() => endGame(false), 1500);
+  }
+
+  async function answerQuestion(selected) {
+    if (!gameActive) return;
+    clearInterval(timerInterval);
+    gameActive = false;
+    const q = QUESTIONS[currentQuestion];
+    const btns = document.querySelectorAll('#optionsGrid .option-btn');
+    btns.forEach(b => b.disabled = true);
+
+    if (selected === q.correct) {
+      btns[selected].classList.add('correct');
+      const points = 100 + timeLeft * 5;
+      totalPoints += points;
+      document.getElementById('points').textContent = totalPoints;
+      await showHostComment(`✅ Правильно! +${points} баллов за скорость.`);
+      currentQuestion++;
+      setTimeout(() => {
+        gameActive = true;
+        loadQuestion();
+      }, 1500);
+    } else {
+      btns[selected].classList.add('wrong');
+      btns[q.correct].classList.add('correct');
+      await showHostComment('❌ Неправильно. Но не расстраивайся, попробуй снова!');
+      setTimeout(() => endGame(false), 2000);
+    }
+  }
+
+  async function showHostComment(text) {
+    const host = document.getElementById('hostComment');
+    host.innerHTML = `<div class="host-avatar">🐿️</div><p>${text}</p>`;
+    host.style.display = 'flex';
+  }
+
+  function endGame(won) {
+    clearInterval(timerInterval);
+    document.getElementById('finalScore').textContent = totalPoints;
+    document.getElementById('resultTitle').textContent = won ? '🎉 Поздравляем!' : 'Конец игры';
+    document.getElementById('resultMessage').innerHTML = `<div class="host-avatar">🐿️</div><p>Ты набрал ${totalPoints} баллов. ${won ? 'Отличный результат!' : 'Приходи ещё!'}</p>`;
+    updateRating();
+    switchScreen('resultScreen');
+  }
+
+  function updateRating() {
+    let rating = JSON.parse(localStorage.getItem('millionaireRating') || '[]');
+    rating.push({ name: currentLogin, points: totalPoints, date: new Date().toLocaleDateString('ru-RU') });
+    rating.sort((a, b) => b.points - a.points);
+    rating = rating.slice(0, 10);
+    localStorage.setItem('millionaireRating', JSON.stringify(rating));
+    const table = document.getElementById('ratingTable');
+    table.innerHTML = rating.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.points}</td><td>${r.date}</td></tr>`).join('');
+  }
+
+  // Загрузка рейтинга при открытии
+  (function loadRating() {
+    const rating = JSON.parse(localStorage.getItem('millionaireRating') || '[]');
+    document.getElementById('ratingTable').innerHTML = rating.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.points}</td><td>${r.date}</td></tr>`).join('');
+  })();
+</script>
+</body>
+</html>
