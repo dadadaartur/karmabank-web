@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Кармический банк</title>
-  <link rel="icon" type="image/png" href="belchonok.png">
-  <link rel="apple-touch-icon" href="belchonok.png">
+  <link rel="icon" type="image/png" href="astralsk.png">
+  <link rel="apple-touch-icon" href="astralsk.png">
   <style>
     :root {
       --bg-primary: #0a1628;
@@ -60,9 +60,23 @@
       0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
       50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
     }
+    /* Анимация маскота */
+    @keyframes mascotFloat {
+      0% { transform: translateY(0); filter: drop-shadow(0 0 4px #f97316); }
+      50% { transform: translateY(-3px); filter: drop-shadow(0 0 12px #c084fc); }
+      100% { transform: translateY(0); filter: drop-shadow(0 0 4px #f97316); }
+    }
+    .mascot-icon {
+      animation: mascotFloat 3s ease-in-out infinite;
+      transition: transform 0.3s;
+    }
+    .mascot-icon:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
     .loading-arrows { display: flex; gap: 12px; align-items: center; justify-content: center; }
     .arrow {
-      width: 14px; height: 14px;
+      width: 14px;
+      height: 14px;
       background: linear-gradient(135deg, #f97316, #fbbf24);
       border-radius: 2px;
       animation: arrowPulse 1.2s infinite ease-in-out both;
@@ -131,7 +145,8 @@
     }
     .login-form {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--accent); border-radius: 24px; padding: 40px 30px;
+      border: 1px solid var(--accent);
+      border-radius: 24px; padding: 40px 30px;
       box-shadow: 0 0 40px rgba(249,115,22,0.4), 0 15px 30px rgba(0,0,0,0.5);
       width: 100%; max-width: 400px; text-align: center; animation: fadeInUp 0.6s ease;
       position: relative; overflow: hidden;
@@ -257,10 +272,11 @@
     }
     .balance-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
     .action-btn {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+      background: var(--bg-card); border: 1px solid rgba(249,115,22,0.5); border-radius: 20px;
       padding: 14px 18px; cursor: pointer; transition: all 0.3s ease;
       display: flex; flex-direction: column; align-items: center; gap: 10px;
       min-width: 100px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      animation: borderShine 4s infinite;
     }
     .action-btn .icon-wrapper { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
     .action-btn svg { width: 26px; height: 26px; filter: drop-shadow(0 0 2px var(--accent)); transition: all 0.3s; }
@@ -282,9 +298,10 @@
     }
     .dash-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 20px;
+      border: 1px solid rgba(249,115,22,0.5); border-radius: 20px;
       padding: 20px; transition: all 0.3s;
       backdrop-filter: blur(4px);
+      animation: borderShine 4s infinite;
     }
     .dash-card:hover { border-color: var(--accent); }
     .dash-card h3 {
@@ -311,6 +328,26 @@
       font-size: 0.85rem; color: var(--text-secondary);
       line-height: 1.4;
     }
+    /* Топ качеств */
+    .traits-grid {
+      display: flex; flex-direction: column; gap: 8px; margin: 12px 0;
+    }
+    .trait-item {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .trait-name { font-size: 0.8rem; color: var(--text-secondary); width: 100px; }
+    .trait-bar {
+      flex: 1; height: 6px; background: var(--border); border-radius: 3px;
+      margin: 0 8px; overflow: hidden;
+    }
+    .trait-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent), #c084fc);
+      border-radius: 3px;
+    }
+    .trait-value { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); width: 40px; text-align: right; }
+    .goals-list { list-style: none; padding: 0; margin: 8px 0; }
+    .goals-list li { font-size: 0.85rem; color: var(--text-secondary); padding: 4px 0; border-bottom: 1px solid var(--border); }
+    .goals-list li:last-child { border-bottom: none; }
 
     .premium-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; justify-content: space-between; }
     .premium-feature-btn {
@@ -376,10 +413,7 @@
 
 <div id="loginScreen" class="login-screen">
   <div class="login-form">
-    <svg class="login-star" viewBox="0 0 24 24" fill="none" stroke="url(#loginStarGradient)">
-      <polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" />
-      <circle cx="12" cy="11.5" r="2.5" fill="rgba(249,115,22,0.3)" stroke="#f97316"/>
-    </svg>
+    <img src="astralsk.png" class="login-star mascot-icon" alt="Астралиск">
     <h2>Кармический банк</h2>
     <p>Введите ваш логин, чтобы продолжить</p>
     <input type="text" id="loginInput" placeholder="Логин (например, arthur)" />
@@ -485,6 +519,22 @@
           <span class="active-count" id="activeTasksCount">0</span>
           <span style="color: var(--text-secondary); font-size: 0.9rem;">активных задач</span>
         </div>
+        <div style="margin-top: 16px;">
+          <span style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 8px;">Топ‑3 качеств из ЦПС</span>
+          <div class="traits-grid" id="topTraits">
+            <div class="trait-item"><span class="trait-name">Дисциплина</span><div class="trait-bar"><div class="trait-fill" style="width: 0%;"></div></div><span class="trait-value">0</span></div>
+            <div class="trait-item"><span class="trait-name">Обучаемость</span><div class="trait-bar"><div class="trait-fill" style="width: 0%;"></div></div><span class="trait-value">0</span></div>
+            <div class="trait-item"><span class="trait-name">Коммуникация</span><div class="trait-bar"><div class="trait-fill" style="width: 0%;"></div></div><span class="trait-value">0</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-card">
+        <h3>Цели</h3>
+        <ul class="goals-list">
+          <li>🎯 Пройти 3 тренинга по продажам</li>
+          <li>🎯 Закрыть 10 сделок в этом месяце</li>
+          <li>🎯 Достичь уровня «Созвездие»</li>
+        </ul>
       </div>
       <div class="dash-card">
         <h3>Рекомендация</h3>
@@ -527,12 +577,7 @@
     </div>
   </div>
   <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
-    <svg viewBox="0 0 24 24" fill="none">
-      <defs><linearGradient id="bookGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs>
-      <path d="M4 3.5 L12 7 L20 3.5 L20 19.5 L12 23 L4 19.5 Z" stroke="url(#bookGrad)" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M12 7 L12 23" stroke="url(#bookGrad)" stroke-width="1.5"/>
-      <path d="M8 10 L12 12 L8 14" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-    </svg>
+    <img src="astralsk.png" class="mascot-icon" style="width:28px; height:28px;" alt="База знаний">
     <span>База знаний</span>
   </div>
 </div>
@@ -580,7 +625,7 @@
     `;
   }
 
-  function updateDashboard(energy, activeCount) {
+  async function updateDashboard(energy, activeCount) {
     document.getElementById('energyDashValue').textContent = energy;
     document.getElementById('activeTasksCount').textContent = activeCount;
     if (levelsCache.length) {
@@ -603,6 +648,25 @@
         document.getElementById('energyRemaining').textContent = '';
       }
     }
+    // Загрузка качеств из паспорта
+    try {
+      const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
+      const user = await res.json();
+      if (user) {
+        // Пытаемся получить характеристики (пока случайные, позже из паспорта)
+        const traits = {
+          'Дисциплина': Math.floor(Math.random()*200)+100,
+          'Обучаемость': Math.floor(Math.random()*250)+50,
+          'Коммуникация': Math.floor(Math.random()*190)+60
+        };
+        const maxTrait = 300;
+        const container = document.getElementById('topTraits');
+        container.innerHTML = Object.entries(traits).map(([name, val]) => {
+          const pct = Math.min((val / maxTrait) * 100, 100);
+          return `<div class="trait-item"><span class="trait-name">${name}</span><div class="trait-bar"><div class="trait-fill" style="width:${pct}%;"></div></div><span class="trait-value">${val}</span></div>`;
+        }).join('');
+      }
+    } catch(e) {}
   }
 
   async function updateTasksAnalytics() {
