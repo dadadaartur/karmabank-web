@@ -69,13 +69,11 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 4px center;
     }
-
     .purchases-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 16px; position: relative; z-index: 2;
     }
-
     .purchase-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border: 1px solid var(--border); border-radius: 20px;
@@ -109,7 +107,6 @@
     .purchase-actions {
       display: flex; gap: 8px; margin-top: auto; flex-wrap: wrap; justify-content: center;
     }
-
     .btn {
       background: transparent; border: 1px solid var(--accent); border-radius: 30px;
       padding: 6px 16px; font-weight: 800; font-size: 0.8rem; cursor: pointer;
@@ -129,7 +126,6 @@
       -webkit-background-clip: text; background-clip: text; color: transparent;
       border-color: var(--danger);
     }
-
     .empty-message {
       text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem;
     }
@@ -175,8 +171,7 @@
     .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
   </style>
 </head>
-<body>
-  <div class="stars" id="starsContainer"></div>
+<body>  <div class="stars" id="starsContainer"></div>
   <a class="back-btn" href="/">← Назад</a>
   <h2>Мои покупки</h2>
 
@@ -252,14 +247,13 @@
         const month = document.getElementById('monthSelect').value;
         const year = document.getElementById('yearSelect').value;
 
-        // Фильтрация по дате (формат "дд.мм.гггг, чч:мм:сс")
         purchases = purchases.filter(p => {
           const dateStr = p.date || '';
           const parts = dateStr.split('.');
           if (parts.length >= 3) {
-            const dayMonth = parts[0]; // не используется
-            const monthPart = parts[1]; // месяц
-            const yearPart = parts[2].split(',')[0]; // год до запятой
+            const dayMonth = parts[0];
+            const monthPart = parts[1];
+            const yearPart = parts[2].split(',')[0];
             return monthPart === month && yearPart === year;
           }
           return false;
