@@ -76,7 +76,6 @@
       } catch (e) { hideLoading(); addMessage('bot', 'Ошибка соединения.'); }
     }
 
-    // Подгружаем статус базы знаний при старте
     async function initKnowledgeBase() {
       try {
         const res = await fetch(`${API_URL}?action=getKnowledgeStatus`);
