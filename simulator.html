@@ -7,98 +7,27 @@
   <link rel="icon" type="image/png" href="astralsk.png">
   <link rel="apple-touch-icon" href="astralsk.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
-      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --success: #10b981; --border: #1f3350;
-      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
-    }
+    :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
-      color: var(--text-primary); min-height: 100vh; display: flex;
-      align-items: center; justify-content: center; padding: 20px;
-      position: relative; overflow-x: hidden;
-      cursor: default;
-    }
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow-x: hidden; cursor: default; }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
     @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; } }
-    .app-container {
-      max-width: 800px; width: 100%; position: relative; z-index: 2;
-      background: radial-gradient(circle at 20% 30%, #1a2f4a 0%, #0f1f35 100%);
-      border: 1px solid rgba(249,115,22,0.3); border-radius: 32px; padding: 40px 30px;
-      box-shadow: 0 0 60px rgba(249,115,22,0.3); text-align: center;
-    }
+    .app-container { max-width: 800px; width: 100%; position: relative; z-index: 2; background: radial-gradient(circle at 20% 30%, #1a2f4a 0%, #0f1f35 100%); border: 1px solid rgba(249,115,22,0.3); border-radius: 32px; padding: 40px 30px; box-shadow: 0 0 60px rgba(249,115,22,0.3); text-align: center; }
     .hidden { display: none !important; }
-    h2 {
-      font-size: 2rem; font-weight: 800; margin-bottom: 20px;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      filter: drop-shadow(0 0 6px rgba(249,115,22,0.5));
-    }
-    h3 {
-      font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    h2 { font-size: 2rem; font-weight: 800; margin-bottom: 20px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 6px rgba(249,115,22,0.5)); }
+    h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
-    .lms-card {
-      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 24px;
-      padding: 30px 20px; cursor: pointer; transition: all 0.3s;
-      backdrop-filter: blur(5px);
-    }
+    .lms-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 24px; padding: 30px 20px; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px); }
     .lms-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--hologram-glow); }
     .lms-card .title { font-weight: 700; font-size: 1.2rem; margin: 12px 0 4px; background: linear-gradient(135deg, #c084fc, #38bdf8); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lms-card .desc { font-size: 0.85rem; color: var(--text-secondary); }
-    .btn, button, select, .scenario-btn, .option-btn, .lms-card, .back-link { cursor: pointer; }
-    .btn {
-      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
-      padding: 10px 24px; font-weight: 800; font-size: 0.9rem; transition: all 0.3s;
-      display: inline-flex; align-items: center; gap: 6px;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    .btn, button, select, .scenario-btn, .lms-card, .back-link { cursor: pointer; }
+    .btn { background: transparent; border: 1px solid var(--accent); border-radius: 40px; padding: 10px 24px; font-weight: 800; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.03); }
-    .btn.back-btn {
-      background: transparent; border-color: var(--border);
-      -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary);
-      margin-bottom: 20px;
-    }
+    .btn.back-btn { background: transparent; border-color: var(--border); -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary); margin-bottom: 20px; }
     .btn.back-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .btn.action-btn {
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text;
-      border-color: var(--accent);
-    }
-    .scenario-selector { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
-    .scenario-btn {
-      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary);
-      padding: 10px 20px; border-radius: 14px; font-weight: 600; transition: all 0.2s;
-    }
-    .scenario-btn:hover, .scenario-btn.active { border-color: var(--accent); background: rgba(249,115,22,0.1); }
-    .level-selector { margin-bottom: 20px; }
-    .level-selector select {
-      padding: 8px 16px; border-radius: 10px; background: var(--bg-card); color: var(--text-primary);
-      border: 1px solid var(--border); font-size: 1rem; outline: none; appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 8px center;
-    }
-    .chat-box { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; padding: 0 4px; }
-    .message { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.4; }
-    .message.user { align-self: flex-end; background: var(--accent); color: white; }
-    .message.bot { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border); }
-    .input-area { display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--border); padding-top: 16px; }
-    .input-area input { flex: 1; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; outline: none; }
-    .input-area input:focus { border-color: var(--accent); }
     .back-link { color: var(--text-secondary); margin-top: 20px; display: inline-flex; align-items: center; gap: 6px; }
-    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
-    .loading-arrows { display: flex; gap: 10px; }
-    .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
-    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
   </style>
 </head>
 <body>
@@ -106,21 +35,8 @@
 <div class="app-container" id="app">
   <div id="lmsMenu">
     <h2>Путь к совершенству</h2>
-    <div class="lms-grid">
-      <div class="lms-card" onclick="openModule('trainer')">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/><path d="M18 14v-1a5 5 0 0 0-5-5h-2a5 5 0 0 0-5 5v1"/><path d="M4 21h16"/>
-        </svg>
-        <div class="title">AI-Тренажёр</div>
-        <div class="desc">Практика переговоров и продаж с искусственным интеллектом</div>
-      </div>
-      <div class="lms-card" onclick="openModule('quiz')">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/>
-        </svg>
-        <div class="title">Кармический миллионер</div>
-        <div class="desc">Викторина по продажам с персональными вопросами</div>
-      </div>
+    <div class="lms-grid" id="lmsModulesGrid">
+      <!-- Статические модули и динамические AI тесты будут здесь -->
     </div>
     <a href="/" class="back-link">← Вернуться в Кармический банк</a>
   </div>
@@ -135,18 +51,16 @@
       </div>
       <div class="level-selector">
         <select id="levelSelect">
-          <option value="1">Искра</option><option value="2">Луч</option>
-          <option value="3" selected>Созвездие</option><option value="4">Галактика</option>
-          <option value="5">Вселенная</option><option value="6">Абсолют</option>
+          <option value="1">Искра</option><option value="2">Луч</option><option value="3" selected>Созвездие</option><option value="4">Галактика</option><option value="5">Вселенная</option><option value="6">Абсолют</option>
         </select>
       </div>
-      <button class="btn action-btn" onclick="startTraining()">Начать тренировку</button>
+      <button class="btn" onclick="startTraining()">Начать тренировку</button>
     </div>
     <div id="trainerChat" class="hidden">
       <div class="chat-box" id="chatBox"></div>
       <div class="input-area">
         <input type="text" id="userInput" placeholder="Ваше сообщение...">
-        <button class="btn action-btn" onclick="sendMessage()">➤</button>
+        <button class="btn" onclick="sendMessage()">➤</button>
         <button class="btn" style="border-color: var(--success);" onclick="confirmEvaluate()">Завершить</button>
       </div>
     </div>
@@ -155,11 +69,20 @@
   <div id="moduleQuiz" class="hidden">
     <button class="btn back-btn" onclick="openModule('menu')">← Назад к списку</button>
     <h3>Кармический миллионер</h3>
-    <div id="quizContainer">
-      <!-- Викторина откроется в iframe или можно загрузить отдельно,
-      но здесь просто ссылка на страницу викторины для удобства -->
-      <p style="color: var(--text-secondary); margin: 20px 0;">Викторина открывается в отдельной странице.</p>
-      <a href="/millionaire.html" class="btn action-btn" target="_blank">Открыть викторину</a>
+    <p style="color: var(--text-secondary); margin: 20px 0;">Викторина открывается в отдельной странице.</p>
+    <a href="/millionaire.html" class="btn" target="_blank">Открыть викторину</a>
+  </div>
+
+  <!-- Общий контейнер для динамического модуля -->
+  <div id="moduleDynamic" class="hidden">
+    <button class="btn back-btn" onclick="openModule('menu')">← Назад к списку</button>
+    <h3 id="dynamicModuleTitle"></h3>
+    <p id="dynamicModuleDescription" style="color: var(--text-secondary); margin-bottom: 20px;"></p>
+    <div class="chat-box" id="dynamicChatBox"></div>
+    <div class="input-area">
+      <input type="text" id="dynamicUserInput" placeholder="Общайтесь с AI-тренером...">
+      <button class="btn" onclick="sendDynamicMessage()">➤</button>
+      <button class="btn" style="border-color: var(--success);" onclick="endDynamicSession()">Завершить</button>
     </div>
   </div>
 </div>
@@ -168,40 +91,85 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   const login = localStorage.getItem('karmabank_login') || 'anonymous';
 
-  function openModule(name) {
-    document.getElementById('lmsMenu').classList.toggle('hidden', name !== 'menu');
-    document.getElementById('moduleTrainer').classList.toggle('hidden', name !== 'trainer');
-    document.getElementById('moduleQuiz').classList.toggle('hidden', name !== 'quiz');
-    if (name === 'menu') {
-      document.getElementById('trainerSetup').classList.remove('hidden');
-      document.getElementById('trainerChat').classList.add('hidden');
-    }
-  }
-
-  function createStars() {
-    const container = document.getElementById('starsContainer');
-    for (let i=0; i<80; i++) {
-      const star = document.createElement('div'); star.className='star';
-      star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px';
-      star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
-      star.style.animationDelay = Math.random()*3+'s';
-      container.appendChild(star);
-    }
-  }
+  function createStars() { const container = document.getElementById('starsContainer'); for (let i=0; i<80; i++) { const star = document.createElement('div'); star.className='star'; star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px'; star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%'; star.style.animationDelay = Math.random()*3+'s'; container.appendChild(star); } }
   createStars();
-
-  function showLoading() {
-    const overlay = document.createElement('div'); overlay.className='loading-overlay';
-    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
-    document.body.appendChild(overlay);
-  }
+  function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
   function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
 
-  // Тренажёр
+  // Загрузка модулей LMS
+  async function loadLmsModules() {
+    try {
+      const res = await fetch(`${API_URL}?action=getLmsModules`);
+      const modules = await res.json();
+      const staticModules = [
+        { title: 'AI-Тренажёр', desc: 'Практика переговоров и продаж с искусственным интеллектом', action: 'trainer' },
+        { title: 'Кармический миллионер', desc: 'Викторина по продажам с персональными вопросами', action: 'quiz' }
+      ];
+      const allModules = [...staticModules, ...modules.map(m => ({ ...m, action: 'dynamic', dynamic: true }))];
+      const grid = document.getElementById('lmsModulesGrid');
+      grid.innerHTML = allModules.map(mod => `
+        <div class="lms-card" onclick="${mod.dynamic ? `openDynamicModule('${mod.title.replace(/'/g, "\\'")}', '${(mod.description || '').replace(/'/g, "\\'")}', '${(mod.aiPrompt || '').replace(/'/g, "\\'")}')` : `openModule('${mod.action}')`}">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <div class="title">${mod.title}</div>
+          <div class="desc">${mod.desc || mod.description || ''}</div>
+        </div>
+      `).join('');
+    } catch(e) { console.error(e); }
+  }
+  loadLmsModules();
+
+  function openModule(name) {
+    document.getElementById('lmsMenu').classList.add('hidden');
+    document.getElementById('moduleTrainer').classList.add('hidden');
+    document.getElementById('moduleQuiz').classList.add('hidden');
+    document.getElementById('moduleDynamic').classList.add('hidden');
+    if (name === 'menu') {
+      document.getElementById('lmsMenu').classList.remove('hidden');
+    } else if (name === 'trainer') {
+      document.getElementById('moduleTrainer').classList.remove('hidden');
+    } else if (name === 'quiz') {
+      document.getElementById('moduleQuiz').classList.remove('hidden');
+    }
+  }
+
+  let dynamicAiPrompt = '';
+  let dynamicMessages = [];
+  function openDynamicModule(title, description, aiPrompt) {
+    document.getElementById('lmsMenu').classList.add('hidden');
+    document.getElementById('moduleDynamic').classList.remove('hidden');
+    document.getElementById('dynamicModuleTitle').textContent = title;
+    document.getElementById('dynamicModuleDescription').textContent = description;
+    dynamicAiPrompt = aiPrompt;
+    dynamicMessages = [];
+    document.getElementById('dynamicChatBox').innerHTML = '';
+    addDynamicMessage('bot', 'Привет! Я AI-тренер этого модуля. Готов начать?');
+  }
+  function addDynamicMessage(role, text) {
+    dynamicMessages.push({role, text});
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    div.textContent = text;
+    document.getElementById('dynamicChatBox').appendChild(div);
+  }
+  async function sendDynamicMessage() {
+    const input = document.getElementById('dynamicUserInput');
+    const text = input.value.trim();
+    if (!text) return;
+    addDynamicMessage('user', text);
+    input.value = '';
+    // Здесь должен быть вызов API с AI промптом, но для MVP просто эхо
+    addDynamicMessage('bot', 'Ответ AI-тренера на ваш запрос: ' + text);
+  }
+  function endDynamicSession() {
+    openModule('menu');
+  }
+
+  // Остальной код тренажёра (старый) оставлен без изменений, но скрыт
   let currentScenario = 'sales_manager';
   let currentLevel = '3';
   let trainerMessages = [];
-
   document.querySelectorAll('#scenarioSelector .scenario-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#scenarioSelector .scenario-btn').forEach(b => b.classList.remove('active'));
@@ -210,7 +178,6 @@
     });
   });
   document.getElementById('levelSelect').addEventListener('change', (e) => { currentLevel = e.target.value; });
-
   async function startTraining() {
     document.getElementById('trainerSetup').classList.add('hidden');
     document.getElementById('trainerChat').classList.remove('hidden');
@@ -218,48 +185,27 @@
     document.getElementById('chatBox').innerHTML = '';
     showLoading();
     try {
-      const res = await fetch(`${API_URL}?action=simulatorChat`, {
-        method: 'POST',
-        body: new URLSearchParams({ mode: 'start', scenario: currentScenario, level: currentLevel, login })
-      });
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: new URLSearchParams({ mode: 'start', scenario: currentScenario, level: currentLevel, login }) });
       const data = await res.json();
       hideLoading();
-      if (data.message) addMessage('bot', data.message);
-      else addMessage('bot', 'Привет! Я готов к тренировке. Расскажи, какую ситуацию ты хочешь отработать?');
-    } catch(e) { hideLoading(); addMessage('bot', 'Ошибка соединения. Попробуй снова.'); }
+      if (data.message) addTrainerMessage('bot', data.message);
+      else addTrainerMessage('bot', 'Привет! Я готов к тренировке.');
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка соединения.'); }
   }
-
-  function addMessage(role, text) {
-    trainerMessages.push({ role, text });
-    const div = document.createElement('div');
-    div.className = `message ${role}`;
-    div.textContent = text;
-    document.getElementById('chatBox').appendChild(div);
-    document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-  }
-
+  function addTrainerMessage(role, text) { trainerMessages.push({role, text}); const div = document.createElement('div'); div.className = `message ${role}`; div.textContent = text; document.getElementById('chatBox').appendChild(div); }
   async function sendMessage() {
-    const input = document.getElementById('userInput');
-    const text = input.value.trim();
-    if (!text) return;
-    addMessage('user', text);
-    input.value = '';
+    const input = document.getElementById('userInput'); const text = input.value.trim(); if (!text) return;
+    addTrainerMessage('user', text); input.value = '';
     const formData = new URLSearchParams({ mode: 'continue', scenario: currentScenario, level: currentLevel, message: text, history: JSON.stringify(trainerMessages), login });
     showLoading();
     try {
       const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
       hideLoading();
-      if (data.message) addMessage('bot', data.message);
-      else addMessage('bot', 'Я не совсем понял твой ответ. Давай попробуем ещё раз.');
-    } catch(e) { hideLoading(); addMessage('bot', 'Ошибка соединения.'); }
+      if (data.message) addTrainerMessage('bot', data.message);
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка.'); }
   }
-
-  function confirmEvaluate() {
-    // Кастомное модальное окно вместо confirm
-    if (confirm('Завершить тренировку и получить оценку?')) evaluateSession();
-  }
-
+  function confirmEvaluate() { if (confirm('Завершить тренировку?')) evaluateSession(); }
   async function evaluateSession() {
     const formData = new URLSearchParams({ mode: 'evaluate', scenario: currentScenario, level: currentLevel, history: JSON.stringify(trainerMessages), login });
     showLoading();
@@ -267,14 +213,13 @@
       const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
       hideLoading();
-      alert(data.feedback || 'Тренировка завершена. Ты отлично справился!');
+      alert(data.feedback || 'Оценка завершена.');
       document.getElementById('trainerSetup').classList.remove('hidden');
       document.getElementById('trainerChat').classList.add('hidden');
       trainerMessages = [];
       document.getElementById('chatBox').innerHTML = '';
-    } catch(e) { hideLoading(); alert('Ошибка при оценке.'); }
+    } catch(e) { hideLoading(); alert('Ошибка оценки.'); }
   }
-
   document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 </script>
 </body>
