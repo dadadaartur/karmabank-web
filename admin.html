@@ -10,7 +10,7 @@
     :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --accent-hover: #ea580c; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; user-select: none; }
-    input[type="text"] { user-select: text; }
+    input[type="password"] { user-select: text; }
     .header { background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
     .header h1 img { height: 1.8rem; vertical-align: middle; }
@@ -175,11 +175,9 @@
       document.getElementById('rewardList').innerHTML = rewards.map(r => `<div class="reward-item"><span>${r.name}</span><span>${r.cost} карм.</span></div>`).join('');
     }
 
-    // Проверка при загрузке
     (function init() {
       const token = localStorage.getItem('karmabank_admin_token');
       if (token) {
-        // Можно добавить проверку валидности токена, но пока просто показываем панель
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainScreen').style.display = 'flex';
         loadLevels().then(() => { fetchData(); setInterval(fetchData, 30000); });
