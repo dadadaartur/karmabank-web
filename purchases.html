@@ -246,7 +246,7 @@
   <a class="back-btn" href="/">← Назад</a>
   <h2>Мои покупки</h2>
 
-  <!-- Фильтр по дате в стиле платформы -->
+  <!-- Стильный фильтр по месяцу/году -->
   <div class="filter-bar">
     <label>📅 Период:</label>
     <div class="custom-select">
@@ -312,7 +312,7 @@
       document.getElementById('modalCloseBtn').onclick = () => modal.remove();
     }
 
-    // Установим текущие месяц/год в фильтре
+    // Установка текущего месяца/года
     const now = new Date();
     document.getElementById('monthSelect').value = now.getMonth() + 1;
     document.getElementById('yearSelect').value = now.getFullYear();
@@ -328,15 +328,17 @@
         const container = document.getElementById('purchasesList');
         let purchases = Array.isArray(data) ? data : [];
 
-        // Фильтрация по выбранному месяцу/году
         const month = document.getElementById('monthSelect').value;
         const year = document.getElementById('yearSelect').value;
+
+        // Фильтрация по выбранному месяцу/году
         purchases = purchases.filter(p => {
-          const parts = p.date.split('.');
+          const dateStr = p.date || '';
+          const parts = dateStr.split('.');
           if (parts.length >= 3) {
             return parts[1] === month && parts[2].startsWith(year);
           }
-          return true;
+          return false;
         });
 
         if (purchases.length === 0) {
