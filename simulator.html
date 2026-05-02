@@ -7,38 +7,94 @@
   <link rel="icon" type="image/png" href="belchonok.png">
   <style>
     :root {
-      --bg-primary: #0a1628;
-      --bg-secondary: #0f1f35;
-      --bg-card: #152238;
-      --text-primary: #eaf0fb;
-      --text-secondary: #9aa9c1;
-      --accent: #f97316;
-      --success: #10b981;
-      --border: #1f3350;
+      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
+      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
+      --success: #10b981; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
-      color: var(--text-primary);
-      margin: 0; display: flex; flex-direction: column; height: 100vh;
-      overflow: hidden;
+      background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
+      color: var(--text-primary); min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; padding: 20px;
+      position: relative; overflow-x: hidden;
     }
-    .header {
-      background: rgba(21,38,56,0.7); backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border); padding: 12px 24px;
-      display: flex; align-items: center; justify-content: space-between;
+    .stars {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
     }
-    .header h2 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-    .header h2 svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; }
-    .back-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-      text-decoration: none;
+    .star {
+      position: absolute; background: white; border-radius: 50%;
+      animation: twinkle 2s infinite alternate; opacity: 0.7;
     }
-    .back-btn:hover { background: var(--border); color: var(--text-primary); }
-    .setup-panel {
-      padding: 30px 20px; text-align: center; flex-shrink: 0;
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
     }
+    .app-container {
+      max-width: 800px; width: 100%; position: relative; z-index: 2;
+      background: radial-gradient(circle at 20% 30%, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid var(--accent); border-radius: 32px; padding: 40px 30px;
+      box-shadow: 0 0 60px rgba(249,115,22,0.6); text-align: center;
+    }
+    .hidden { display: none !important; }
+
+    /* Заголовки */
+    h2 {
+      font-size: 2rem; font-weight: 800; margin-bottom: 20px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 0 6px rgba(249,115,22,0.5));
+    }
+    h3 {
+      font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    /* Главное меню LMS */
+    .lms-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px; margin-top: 20px;
+    }
+    .lms-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border); border-radius: 24px;
+      padding: 30px 20px; cursor: pointer; transition: all 0.3s;
+      backdrop-filter: blur(5px);
+    }
+    .lms-card:hover {
+      border-color: var(--accent); transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(249,115,22,0.3);
+    }
+    .lms-card .icon {
+      font-size: 3rem; margin-bottom: 12px;
+    }
+    .lms-card .title {
+      font-weight: 700; font-size: 1.2rem; margin-bottom: 8px;
+    }
+    .lms-card .desc {
+      font-size: 0.85rem; color: var(--text-secondary);
+    }
+
+    /* Кнопки */
+    .btn {
+      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
+      padding: 10px 24px; font-weight: 800; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.03); }
+    .btn.back-btn {
+      background: transparent; border-color: var(--border);
+      -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .btn.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Стили тренажёра (вложены внутрь) */
+    .setup-panel { padding: 10px 0; }
     .scenario-selector { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
     .scenario-btn {
       background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary);
@@ -46,7 +102,7 @@
       transition: all 0.2s;
     }
     .scenario-btn:hover, .scenario-btn.active { border-color: var(--accent); background: var(--accent); }
-    .level-selector { margin-bottom: 30px; }
+    .level-selector { margin-bottom: 20px; }
     .level-selector select {
       padding: 8px 16px; border-radius: 10px; background: var(--bg-card); color: var(--text-primary);
       border: 1px solid var(--border); font-size: 1rem;
@@ -55,237 +111,380 @@
       background: linear-gradient(135deg, #f97316, #c084fc);
       border: none; color: white; padding: 14px 40px; border-radius: 30px;
       font-size: 1.1rem; font-weight: 700; cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
       box-shadow: 0 0 20px rgba(249,115,22,0.4);
-      display: inline-flex; align-items: center; gap: 8px;
     }
-    .start-btn svg { width: 18px; height: 18px; stroke: white; fill: none; }
     .start-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(249,115,22,0.7); }
-    .chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .chat-container { flex: 1; display: flex; flex-direction: column; }
+    .chat-box { flex: 1; overflow-y: auto; padding: 10px 0; display: flex; flex-direction: column; gap: 12px; max-height: 400px; }
     .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.4; }
     .user-msg { align-self: flex-end; background: var(--accent); color: white; }
     .bot-msg { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border); }
-    .input-area {
-      display: flex; padding: 12px; background: var(--bg-card); border-top: 1px solid var(--border);
-      align-items: center; gap: 8px;
-    }
-    .input-area input {
-      flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border);
-      background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem;
-    }
-    .input-area button {
-      padding: 12px 20px; background: var(--accent); color: white; border: none;
-      border-radius: 12px; cursor: pointer; font-weight: 600;
-    }
+    .input-area { display: flex; padding: 12px 0; background: transparent; border-top: 1px solid var(--border); align-items: center; gap: 8px; }
+    .input-area input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; }
+    .input-area button { padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
     .evaluate-btn { background: var(--success); }
-    .loading-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
+
+    /* Стили викторины */
+    .host-message {
+      background: rgba(21,38,56,0.6); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px; margin: 20px 0;
+      display: flex; align-items: center; gap: 12px;
     }
+    .host-avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .question-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 24px; margin: 20px 0; font-size: 1.1rem; font-weight: 600;
+    }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    .option-btn {
+      background: transparent; border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+      color: var(--text-primary); font-size: 1rem;
+    }
+    .option-btn:hover { border-color: var(--accent); box-shadow: var(--hologram-glow); }
+    .option-btn.correct { background: var(--success); border-color: var(--success); color: white; }
+    .option-btn.wrong { background: var(--danger); border-color: var(--danger); color: white; }
+    .timer { font-size: 2rem; font-weight: 800; color: var(--warning); margin: 12px 0; }
+    .score { font-size: 1.2rem; margin: 8px 0; }
+    .score span { color: var(--accent); font-weight: 700; }
+    .lives { display: flex; justify-content: center; gap: 6px; margin: 8px 0; }
+    .life { font-size: 1.5rem; }
+    .btn.shield-btn { border-color: var(--success); color: var(--success); background: rgba(16,185,129,0.1); margin: 10px auto; }
+    .risk-panel {
+      background: rgba(249,115,22,0.1); border: 1px solid var(--accent); border-radius: 16px;
+      padding: 12px; margin: 12px 0; font-weight: 600; color: var(--accent);
+    }
+
+    .back-link { color: var(--text-secondary); margin-top: 20px; display: block; cursor: pointer; }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
     .loading-arrows { display: flex; gap: 10px; }
-    .arrow {
-      width: 12px; height: 12px;
-      background: linear-gradient(135deg, #f97316, #fbbf24);
-      border-radius: 2px;
-      animation: arrowPulse 1.2s infinite ease-in-out both;
-      transform: rotate(45deg);
-      box-shadow: 0 0 10px var(--accent);
-    }
-    .arrow:nth-child(1) { animation-delay: 0s; }
-    .arrow:nth-child(2) { animation-delay: 0.15s; }
-    .arrow:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes arrowPulse {
-      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
-      50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
-    }
-    .hidden { display: none !important; }
+    .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
+    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h2>
-      <svg viewBox="0 0 24 24">
-        <defs><linearGradient id="simIcon" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs>
-        <polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" stroke="url(#simIcon)" fill="none"/>
-      </svg>
-      Путь к совершенству
-    </h2>
-    <a class="back-btn" href="/">← На главную</a>
+<div class="stars" id="starsContainer"></div>
+<div class="app-container" id="app">
+  <!-- Главное LMS-меню -->
+  <div id="lmsMenu">
+    <h2>Путь к совершенству</h2>
+    <div class="lms-grid">
+      <div class="lms-card" onclick="openModule('trainer')">
+        <div class="icon">🤖</div>
+        <div class="title">AI-Тренажёр</div>
+        <div class="desc">Практикуй навыки общения с интеллектуальным собеседником</div>
+      </div>
+      <div class="lms-card" onclick="openModule('quiz')">
+        <div class="icon">🏆</div>
+        <div class="title">Кармический миллионер</div>
+        <div class="desc">Игра-викторина по продажам с персональными вопросами</div>
+      </div>
+    </div>
+    <a href="/" class="back-link">← Вернуться в Кармический банк</a>
   </div>
 
-  <!-- Панель выбора (показывается до старта) -->
-  <div class="setup-panel" id="setupPanel">
-    <div class="scenario-selector" id="scenarioSelector">
-      <button class="scenario-btn active" data-scenario="sales_manager">Руководитель отдела продаж</button>
-      <button class="scenario-btn" data-scenario="sales">Менеджер по продажам</button>
+  <!-- Модуль: AI-Тренажёр -->
+  <div id="moduleTrainer" class="hidden">
+    <button class="btn back-btn" onclick="openModule('menu')">← Назад к списку</button>
+    <h3>AI-Тренажёр</h3>
+    <div id="trainerSetup" class="setup-panel">
+      <div class="scenario-selector" id="scenarioSelector">
+        <button class="scenario-btn active" data-scenario="sales_manager">Руководитель отдела продаж</button>
+        <button class="scenario-btn" data-scenario="sales">Менеджер по продажам</button>
+      </div>
+      <div class="level-selector">
+        <select id="levelSelect">
+          <option value="1">Уровень 1 — Искра</option>
+          <option value="2">Уровень 2 — Луч</option>
+          <option value="3" selected>Уровень 3 — Созвездие</option>
+          <option value="4">Уровень 4 — Галактика</option>
+          <option value="5">Уровень 5 — Вселенная</option>
+          <option value="6">Уровень 6 — Абсолют</option>
+        </select>
+      </div>
+      <button class="start-btn" onclick="startTraining()">Начать тренировку</button>
     </div>
-    <div class="level-selector">
-      <select id="levelSelect">
-        <option value="1">Уровень 1 — Искра</option>
-        <option value="2">Уровень 2 — Луч</option>
-        <option value="3" selected>Уровень 3 — Созвездие</option>
-        <option value="4">Уровень 4 — Галактика</option>
-        <option value="5">Уровень 5 — Вселенная</option>
-        <option value="6">Уровень 6 — Абсолют</option>
-      </select>
+    <div id="trainerChat" class="chat-container hidden">
+      <div class="chat-box" id="chatBox"></div>
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ваше сообщение...">
+        <button onclick="sendMessage()">➤</button>
+        <button class="evaluate-btn" onclick="confirmEvaluate()">Завершить</button>
+      </div>
     </div>
-    <button class="start-btn" onclick="startTraining()">
-      <svg viewBox="0 0 24 24"><polygon points="12 2 15 8 22 9 17 14 18 21 12 17 6 21 7 14 2 9 9 8"/></svg>
-      Начать тренировку
-    </button>
   </div>
 
-  <!-- Чат (скрыт до начала) -->
-  <div class="chat-container hidden" id="chatContainer">
-    <div class="chat-box" id="chatBox"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Ваше сообщение...">
-      <button onclick="sendMessage()">➤</button>
-      <button class="evaluate-btn" onclick="confirmEvaluate()">Завершить</button>
+  <!-- Модуль: Кармический миллионер -->
+  <div id="moduleQuiz" class="hidden">
+    <button class="btn back-btn" onclick="openModule('menu')">← Назад к списку</button>
+    <h3>Кармический миллионер</h3>
+    <div id="quizStartScreen">
+      <div class="host-message">
+        <div class="host-avatar">🐿️</div>
+        <p>Это новое испытание! Ответь на вопросы по продажам и о себе. У тебя 3 жизни, Кармический щит и шанс рискнуть. Готов?</p>
+      </div>
+      <button class="btn" id="startQuizBtn">Начать игру</button>
+    </div>
+    <div id="quizGameScreen" class="hidden">
+      <div class="timer" id="timer">15</div>
+      <div class="score">Вопрос <span id="questionNum">1</span> из <span id="totalQuestions">15</span> • Баллов: <span id="points">0</span></div>
+      <div class="lives" id="livesContainer"></div>
+      <div class="question-card" id="questionText">Загрузка вопроса...</div>
+      <div id="riskPanel" class="risk-panel hidden">Риск-вопрос! Можно удвоить очки, но ошибка обнулит раунд.</div>
+      <div class="options-grid" id="optionsGrid"></div>
+      <button class="btn shield-btn hidden" id="shieldBtn" onclick="useShield()">🛡️ Кармический щит (1 раз)</button>
+      <div class="host-message" id="hostComment" style="display:none;"></div>
+    </div>
+    <div id="quizResultScreen" class="hidden">
+      <h2 id="resultTitle"></h2>
+      <div class="host-message" id="resultMessage"></div>
+      <div class="score" style="font-size: 1.5rem;">Итоговый балл: <span id="finalScore">0</span></div>
+      <button class="btn" onclick="restartQuiz()">Играть снова</button>
+      <h3 style="margin-top: 24px;">🏆 Рейтинг</h3>
+      <table class="rating-table" id="ratingTable"></table>
     </div>
   </div>
+</div>
 
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    const login = localStorage.getItem('karmabank_login') || 'anonymous';
-    let currentScenario = 'sales_manager';
-    let currentLevel = '3';
-    let messages = [];
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+  const login = localStorage.getItem('karmabank_login') || 'anonymous';
 
-    // Выбор сценария
-    document.querySelectorAll('.scenario-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentScenario = btn.dataset.scenario;
+  // ========== Навигация LMS ==========
+  function openModule(name) {
+    document.getElementById('lmsMenu').classList.toggle('hidden', name !== 'menu');
+    document.getElementById('moduleTrainer').classList.toggle('hidden', name !== 'trainer');
+    document.getElementById('moduleQuiz').classList.toggle('hidden', name !== 'quiz');
+  }
+
+  // ========== Звёзды ==========
+  function createStars() {
+    const container = document.getElementById('starsContainer');
+    for (let i=0; i<80; i++) {
+      const star = document.createElement('div'); star.className='star';
+      star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px';
+      star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+      star.style.animationDelay = Math.random()*3+'s';
+      container.appendChild(star);
+    }
+  }
+  createStars();
+
+  // ========== ТРЕНАЖЁР ==========
+  let currentScenario = 'sales_manager';
+  let currentLevel = '3';
+  let trainerMessages = [];
+  let trainerActive = false;
+
+  document.querySelectorAll('#scenarioSelector .scenario-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#scenarioSelector .scenario-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentScenario = btn.dataset.scenario;
+    });
+  });
+  document.getElementById('levelSelect').addEventListener('change', (e) => { currentLevel = e.target.value; });
+
+  function showLoading() {
+    const overlay = document.createElement('div'); overlay.className='loading-overlay';
+    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
+    document.body.appendChild(overlay);
+  }
+  function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
+
+  async function startTraining() {
+    document.getElementById('trainerSetup').classList.add('hidden');
+    document.getElementById('trainerChat').classList.remove('hidden');
+    trainerMessages = [];
+    document.getElementById('chatBox').innerHTML = '';
+    showLoading();
+    try {
+      const res = await fetch(`${API_URL}?action=simulatorChat`, {
+        method: 'POST',
+        body: new URLSearchParams({ mode: 'start', scenario: currentScenario, level: currentLevel, login })
       });
-    });
+      const data = await res.json();
+      hideLoading();
+      if (data.message) addTrainerMessage('bot', data.message);
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка соединения.'); }
+  }
 
-    document.getElementById('levelSelect').addEventListener('change', (e) => {
-      currentLevel = e.target.value;
-    });
+  function addTrainerMessage(role, text) {
+    trainerMessages.push({ role, text });
+    const div = document.createElement('div');
+    div.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
+    div.textContent = text;
+    document.getElementById('chatBox').appendChild(div);
+    document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+  }
 
-    function showLoading() {
-      const overlay = document.createElement('div');
-      overlay.className = 'loading-overlay';
-      overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
-      document.body.appendChild(overlay);
-    }
-    function hideLoading() {
-      const overlay = document.querySelector('.loading-overlay');
-      if (overlay) overlay.remove();
-    }
+  async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text || trainerActive) return;
+    addTrainerMessage('user', text); input.value = '';
+    const formData = new URLSearchParams({ mode: 'continue', scenario: currentScenario, level: currentLevel, message: text, history: JSON.stringify(trainerMessages), login });
+    showLoading();
+    try {
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
+      const data = await res.json();
+      hideLoading();
+      if (data.message) addTrainerMessage('bot', data.message);
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка соединения.'); }
+  }
 
-    // Запуск тренировки
-    async function startTraining() {
-      document.getElementById('setupPanel').classList.add('hidden');
-      document.getElementById('chatContainer').classList.remove('hidden');
-      messages = [];
-      document.getElementById('chatBox').innerHTML = '';
+  function confirmEvaluate() { if (confirm('Завершить тренировку и получить оценку?')) evaluateSession(); }
 
-      showLoading();
-      const formData = new URLSearchParams();
-      formData.append('mode', 'start');
-      formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel);
-      formData.append('login', login);
+  async function evaluateSession() {
+    trainerActive = true;
+    const formData = new URLSearchParams({ mode: 'evaluate', scenario: currentScenario, level: currentLevel, history: JSON.stringify(trainerMessages), login });
+    showLoading();
+    try {
+      const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
+      const data = await res.json();
+      hideLoading();
+      const modal = document.createElement('div'); modal.className='loading-overlay'; modal.style.zIndex='10000';
+      modal.innerHTML = `<div style="background:linear-gradient(145deg,#1a2f4a 0%,#0f1f35 100%);border:1px solid var(--accent);border-radius:24px;padding:30px;max-width:500px;width:90%;text-align:center;color:white;box-shadow:0 0 60px rgba(249,115,22,0.6)">
+        <h3>Результат тренировки</h3><p>${data.feedback || 'Оценка недоступна'}</p>
+        ${data.scores ? `<p>Навыки: ${Object.entries(data.scores).map(([k,v])=>`${k}: ${v}`).join(', ')}</p>` : ''}
+        <button style="margin-top:20px;background:var(--accent);border:none;color:white;padding:10px 20px;border-radius:14px;cursor:pointer" onclick="this.closest('.loading-overlay').remove();resetTrainer()">Попробовать ещё раз</button>
+      </div>`;
+      document.body.appendChild(modal);
+    } catch(e) { hideLoading(); alert('Ошибка при оценке.'); }
+  }
 
-      try {
-        const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
-        const data = await res.json();
-        hideLoading();
-        if (data.message) addMessage('bot', data.message);
-      } catch (e) {
-        hideLoading();
-        addMessage('bot', 'Ошибка соединения.');
+  function resetTrainer() {
+    document.getElementById('trainerSetup').classList.remove('hidden');
+    document.getElementById('trainerChat').classList.add('hidden');
+    trainerMessages = [];
+    trainerActive = false;
+    document.getElementById('chatBox').innerHTML = '';
+  }
+
+  document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+  // ========== ВИКТОРИНА ==========
+  let timerInterval, timeLeft, quizCurrent = 0, totalPoints = 0, gameActive = false;
+  let lives = 3, shieldUsed = false, questions = [], userData = null;
+
+  function switchQuizScreen(id) {
+    document.getElementById('quizStartScreen').classList.add('hidden');
+    document.getElementById('quizGameScreen').classList.add('hidden');
+    document.getElementById('quizResultScreen').classList.add('hidden');
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  async function startQuiz() {
+    switchQuizScreen('quizGameScreen');
+    lives = 3; shieldUsed = false; totalPoints = 0; quizCurrent = 0;
+    document.getElementById('points').textContent = '0';
+    document.getElementById('shieldBtn').classList.add('hidden');
+    try {
+      const [profileRes, employeesRes, questionsRes] = await Promise.all([
+        fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`),
+        fetch(`${API_URL}?action=getAllEmployees`),
+        fetch(`${API_URL}?action=getMillionaireQuestions&login=${encodeURIComponent(login)}`)
+      ]);
+      userData = await profileRes.json();
+      const allEmployees = await employeesRes.json();
+      const aiQuestions = await questionsRes.json();
+
+      let managerName = null;
+      for (const emp of allEmployees) {
+        if (emp.login === login && emp.managerLogin) {
+          const manager = allEmployees.find(e => e.login === emp.managerLogin);
+          if (manager) managerName = manager.name;
+        }
       }
-    }
-
-    function addMessage(role, text) {
-      messages.push({ role, text });
-      const div = document.createElement('div');
-      div.className = `message ${role === 'user' ? 'user-msg' : 'bot-msg'}`;
-      div.textContent = text;
-      document.getElementById('chatBox').appendChild(div);
-      document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById('userInput');
-      const text = input.value.trim();
-      if (!text) return;
-      addMessage('user', text);
-      input.value = '';
-
-      const formData = new URLSearchParams();
-      formData.append('mode', 'continue');
-      formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel);
-      formData.append('message', text);
-      formData.append('history', JSON.stringify(messages));
-      formData.append('login', login);
-
-      showLoading();
-      try {
-        const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
-        const data = await res.json();
-        hideLoading();
-        if (data.message) addMessage('bot', data.message);
-      } catch (e) {
-        hideLoading();
-        addMessage('bot', 'Ошибка соединения.');
+      const personalQuestions = [];
+      if (managerName) personalQuestions.push({ question: "Как зовут твоего руководителя?", options: [managerName, "Не знаю", allEmployees[0]?.name || "Артур", "HRDNK"], correct: 0, personal: true });
+      if (userData) {
+        personalQuestions.push({ question: "В каком отделе ты работаешь?", options: [userData.department || "Отдел продаж", "Маркетинг", "Разработка", "HR"], correct: 0, personal: true });
+        personalQuestions.push({ question: "Сколько у тебя сейчас кармиков?", options: [String(userData.points || 0), "100", "500", "1000"], correct: 0, personal: true });
       }
+      questions = [...aiQuestions].sort(() => Math.random() - 0.5);
+      personalQuestions.forEach(q => questions.splice(Math.floor(Math.random()*(questions.length+1)), 0, q));
+      document.getElementById('totalQuestions').textContent = questions.length;
+      updateLivesDisplay();
+      gameActive = true;
+      loadQuizQuestion();
+    } catch(e) { alert('Ошибка загрузки викторины'); }
+  }
+
+  function loadQuizQuestion() {
+    if (!gameActive || quizCurrent >= questions.length) { endQuiz(true); return; }
+    const q = questions[quizCurrent];
+    document.getElementById('questionNum').textContent = quizCurrent + 1;
+    document.getElementById('questionText').textContent = q.question;
+    document.getElementById('optionsGrid').innerHTML = q.options.map((opt,idx) => `<button class="option-btn" onclick="answerQuiz(${idx})">${opt}</button>`).join('');
+    document.getElementById('riskPanel').classList.toggle('hidden', q.personal || quizCurrent%4!==0);
+    document.getElementById('shieldBtn').classList.toggle('hidden', shieldUsed || lives<=1);
+    let seconds = q.personal ? 5 : (quizCurrent<5 ? 15 : (quizCurrent<10 ? 10 : 6));
+    startQuizTimer(seconds);
+  }
+
+  function startQuizTimer(seconds) {
+    timeLeft = seconds; document.getElementById('timer').textContent = timeLeft;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => { timeLeft--; document.getElementById('timer').textContent = timeLeft; if(timeLeft<=0) { clearInterval(timerInterval); answerQuiz(-1); } }, 1000);
+  }
+
+  function answerQuiz(selected) {
+    if (!gameActive) return;
+    clearInterval(timerInterval); gameActive = false;
+    const q = questions[quizCurrent];
+    let pointsEarned = 0;
+    document.querySelectorAll('.option-btn').forEach((btn,idx) => { btn.disabled=true; if(idx===q.correct) btn.classList.add('correct'); if(idx===selected && selected!==q.correct) btn.classList.add('wrong'); });
+    if (selected === q.correct) {
+      pointsEarned = 100 + timeLeft*5;
+      if (!q.personal && quizCurrent%4===0) pointsEarned*=2;
+      totalPoints += pointsEarned;
+    } else {
+      lives--;
+      updateLivesDisplay();
+      if (!q.personal && quizCurrent%4===0) totalPoints = Math.max(0, totalPoints-50);
     }
+    document.getElementById('points').textContent = totalPoints;
+    if (lives <= 0) { setTimeout(() => endQuiz(false), 2000); return; }
+    quizCurrent++;
+    setTimeout(() => { gameActive = true; loadQuizQuestion(); }, 1500);
+  }
 
-    function confirmEvaluate() {
-      if (confirm('Завершить тренировку и получить оценку?')) evaluateSession();
-    }
+  function useShield() {
+    if (shieldUsed || lives<=1) return;
+    shieldUsed = true; document.getElementById('shieldBtn').classList.add('hidden');
+    quizCurrent++;
+    gameActive = true; loadQuizQuestion();
+  }
 
-    async function evaluateSession() {
-      const formData = new URLSearchParams();
-      formData.append('mode', 'evaluate');
-      formData.append('scenario', currentScenario);
-      formData.append('level', currentLevel);
-      formData.append('history', JSON.stringify(messages));
-      formData.append('login', login);
+  function updateLivesDisplay() {
+    document.getElementById('livesContainer').innerHTML = Array.from({length:lives}, ()=>'<span class="life">❤️</span>').join('');
+  }
 
-      showLoading();
-      try {
-        const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
-        const data = await res.json();
-        hideLoading();
-        // Показываем результат в модальном окне
-        const modal = document.createElement('div');
-        modal.className = 'loading-overlay';
-        modal.style.zIndex = '10000';
-        modal.innerHTML = `
-          <div style="background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 500px; width: 90%; text-align: center; color: white; box-shadow: 0 0 60px rgba(249,115,22,0.6);">
-            <h3>Результат тренировки</h3>
-            <p>${data.feedback || 'Оценка недоступна'}</p>
-            ${data.scores ? `<p>Навыки: ${Object.entries(data.scores).map(([k,v]) => `${k}: ${v}`).join(', ')}</p>` : ''}
-            <button style="margin-top:20px; background: var(--accent); border: none; color: white; padding: 10px 20px; border-radius: 14px; cursor: pointer;" onclick="this.closest('.loading-overlay').remove(); resetSimulator();">Попробовать ещё раз</button>
-            <button style="margin-top:10px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 10px 20px; border-radius: 14px; cursor: pointer;" onclick="this.closest('.loading-overlay').remove(); window.location.href='/';">Вернуться на главную</button>
-          </div>
-        `;
-        document.body.appendChild(modal);
-      } catch (e) {
-        hideLoading();
-        alert('Ошибка при оценке.');
-      }
-    }
+  function endQuiz(won) {
+    clearInterval(timerInterval);
+    document.getElementById('finalScore').textContent = totalPoints;
+    document.getElementById('resultTitle').textContent = won ? '🎉 Поздравляем!' : 'Игра завершена';
+    document.getElementById('resultMessage').innerHTML = `<div class="host-avatar">🐿️</div><p>Ты набрал ${totalPoints} баллов.</p>`;
+    updateRating();
+    switchQuizScreen('quizResultScreen');
+  }
 
-    function resetSimulator() {
-      document.getElementById('setupPanel').classList.remove('hidden');
-      document.getElementById('chatContainer').classList.add('hidden');
-      messages = [];
-      document.getElementById('chatBox').innerHTML = '';
-    }
+  function updateRating() {
+    let rating = JSON.parse(localStorage.getItem('millionaireRatingV2') || '[]');
+    rating.push({ name: login, points: totalPoints, date: new Date().toLocaleDateString('ru-RU') });
+    rating.sort((a,b) => b.points - a.points);
+    rating = rating.slice(0,10);
+    localStorage.setItem('millionaireRatingV2', JSON.stringify(rating));
+    document.getElementById('ratingTable').innerHTML = rating.map((r,i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.points}</td><td>${r.date}</td></tr>`).join('');
+  }
 
-    document.getElementById('userInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-  </script>
+  function restartQuiz() { switchQuizScreen('quizStartScreen'); }
+
+  document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+  (function loadRating() { const rating = JSON.parse(localStorage.getItem('millionaireRatingV2') || '[]'); document.getElementById('ratingTable').innerHTML = rating.map((r,i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.points}</td><td>${r.date}</td></tr>`).join(''); })();
+</script>
 </body>
 </html>
