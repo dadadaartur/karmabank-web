@@ -16,7 +16,7 @@
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     h2 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 24px; position: relative; z-index: 2; filter: drop-shadow(0 0 6px rgba(249,115,22,0.5)); }
     .filter-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; position: relative; z-index: 2; flex-wrap: wrap; }
-    .filter-label { font-size: 0.85rem; color: var(--text-secondary); }
+    .filter-label { font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, #c084fc, #38bdf8); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .custom-select { position: relative; background: rgba(21,38,56,0.6); border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px; color: var(--text-primary); font-size: 0.9rem; backdrop-filter: blur(4px); cursor: pointer; transition: all 0.2s; min-width: 120px; }
     .custom-select:hover { border-color: var(--accent); }
     .custom-select select { background: transparent; border: none; color: inherit; font-size: inherit; font-family: inherit; outline: none; width: 100%; appearance: none; cursor: pointer; padding-right: 20px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 4px center; }
@@ -54,7 +54,7 @@
   <h2>Мои покупки</h2>
 
   <div class="filter-bar">
-    <span class="filter-label">📅 Период:</span>
+    <span class="filter-label">✨ Фильтр по дате</span>
     <div class="custom-select">
       <select id="monthSelect">
         <option value="all">Любой месяц</option>
@@ -70,7 +70,7 @@
         <option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option>
       </select>
     </div>
-    <button class="btn" onclick="applyFilter()">Показать</button>
+    <button class="btn" onclick="applyFilter()" style="padding: 10px 24px;">Показать</button>
   </div>
 
   <div class="purchases-grid" id="purchasesList">Загрузка...</div>
@@ -113,15 +113,17 @@
     async function loadPurchases() {
       showLoading();
       try {
-        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}`);
+        const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}&t=${Date.now()}`);
         if (!res.ok) throw new Error('Ошибка сервера');
         const data = await res.json();
+        console.log('Сырые данные от API:', data);
         hideLoading();
         allPurchases = Array.isArray(data) ? data : [];
         renderPurchases(allPurchases);
       } catch(e) {
         hideLoading();
         document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ ${e.message}</div>`;
+        console.error(e);
       }
     }
 
@@ -133,13 +135,14 @@
       if (month !== 'all' || year !== 'all') {
         filtered = allPurchases.filter(p => {
           const dateStr = p.date || '';
+          // Разбираем дату в формате "дд.мм.гггг, чч:мм:сс"
           const parts = dateStr.split('.');
-          if (parts.length < 3) return true;
+          if (parts.length < 3) return true; // если дата не распознана, оставляем
           const purchaseMonth = parts[1];
-          const purchaseYear = parts[2].split(',')[0];
+          const purchaseYear = (parts[2] || '').split(',')[0];
           let keep = true;
-          if (month !== 'all') keep = keep && purchaseMonth === month;
-          if (year !== 'all') keep = keep && purchaseYear === year;
+          if (month !== 'all') keep = keep && (purchaseMonth === month);
+          if (year !== 'all') keep = keep && (purchaseYear === year);
           return keep;
         });
       }
@@ -161,7 +164,12 @@
         } else if (isUsed && p.canRefund) {
           buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName.replace(/'/g, "\\'")}',${p.cost})">Вернуть</button>`;
         }
-        return `<div class="purchase-card"><div class="reward-name">${p.rewardName}${usedHtml}</div><div class="reward-cost">${p.cost} карм.</div><div class="reward-date">${p.date}</div><div class="purchase-actions">${buttonsHtml}</div></div>`;
+        return `<div class="purchase-card">
+          <div class="reward-name">${p.rewardName}${usedHtml}</div>
+          <div class="reward-cost">${p.cost} карм.</div>
+          <div class="reward-date">${p.date}</div>
+          <div class="purchase-actions">${buttonsHtml}</div>
+        </div>`;
       }).join('');
     }
 
