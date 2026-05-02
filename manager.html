@@ -17,14 +17,11 @@
       font-family: 'Inter', sans-serif;
       background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
       color: var(--text-primary); min-height: 100vh; padding: 20px;
-      position: relative; overflow-x: hidden; user-select: none;
+      position: relative; overflow-x: hidden; cursor: default;
     }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
-    @keyframes twinkle {
-      0% { opacity: 0.3; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
-    }
+    @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; } }
     .header {
       background: rgba(21,38,56,0.7); backdrop-filter: blur(10px);
       border: 1px solid var(--border); border-radius: 20px; padding: 16px 24px; margin-bottom: 24px;
@@ -56,13 +53,11 @@
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border: 1px solid var(--border); border-radius: 20px; padding: 20px;
       display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px);
+      cursor: pointer;
     }
     .employee-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .emp-header { display: flex; align-items: center; gap: 10px; }
-    .emp-avatar {
-      width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
-      display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white;
-    }
+    .emp-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white; }
     .emp-name { font-weight: 700; }
     .emp-dept { font-size: 0.8rem; color: var(--text-secondary); }
     .metrics-row { display: flex; gap: 12px; }
@@ -77,24 +72,29 @@
       color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
     .verify-btn:hover { background: var(--success); color: white; }
-    .notifications-panel {
-      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 24px;
-      backdrop-filter: blur(4px); position: relative; z-index: 2;
+    /* Уведомления */
+    .notif-icon {
+      position: relative; cursor: pointer; margin-left: auto;
+      display: flex; align-items: center;
     }
-    .notif-list { max-height: 200px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary); }
-    .notif-list::-webkit-scrollbar { width: 4px; }
-    .notif-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
-    .notif-item { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; color: var(--text-secondary); }
-    .show-all { display: block; text-align: center; margin-top: 8px; color: var(--accent); cursor: pointer; font-size: 0.8rem; }
-    .show-all:hover { text-decoration: underline; }
+    .notif-icon svg { width: 24px; height: 24px; stroke: var(--text-secondary); transition: 0.2s; }
+    .notif-icon:hover svg { stroke: var(--accent); }
+    .notif-badge {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--accent); color: white; border-radius: 50%; font-size: 0.7rem;
+      width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
+      font-weight: bold;
+    }
+    /* Модальные окна */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
     .modal-content {
       background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
       border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-      max-width: 420px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6); color: var(--text-primary);
+      max-width: 500px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6); color: var(--text-primary);
+      animation: modalPop 0.3s ease;
     }
+    @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .modal-content input, .modal-content select, .modal-content textarea {
       width: 100%; padding: 10px; margin: 8px 0 16px;
       border-radius: 12px; border: 1px solid var(--border);
@@ -108,11 +108,36 @@
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     .modal-buttons .btn.cancel { background: transparent; border-color: var(--border); -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary); }
-    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .loading-overlay {
+      position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;
+    }
     .loading-arrows { display: flex; gap: 10px; }
     .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
     .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
     @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid var(--accent); border-radius: 40px; padding: 12px 30px;
+      color: var(--text-primary); font-weight: 500; box-shadow: 0 0 30px rgba(249,115,22,0.5);
+      z-index: 10000; animation: toastIn 0.4s ease, toastOut 0.4s 2.5s ease forwards;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+    .dashboard {
+      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; position: relative; z-index: 2;
+    }
+    .dashboard-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px;
+      flex: 1; min-width: 130px; backdrop-filter: blur(4px);
+    }
+    .dashboard-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .dashboard-value { font-size: 1.4rem; font-weight: 700; }
+    .dashboard-value.income { color: var(--success); } .dashboard-value.expense { color: var(--danger); }
+    .rating-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .rating-table th, .rating-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .rating-table th { color: var(--text-secondary); font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -120,43 +145,63 @@
 
 <div class="header">
   <h2>Моя команда</h2>
-  <div style="display: flex; gap: 10px;">
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <div class="notif-icon" id="notifBell" onclick="openNotifications()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="notif-badge hidden" id="notifBadge">0</span>
+    </div>
     <a href="/" class="back-btn">← На главную</a>
     <button class="action-btn" onclick="logout()" style="border-color:var(--danger); -webkit-background-clip:unset; background:var(--danger); color:white; padding:8px 16px;">Выйти</button>
   </div>
 </div>
 
 <div class="main-bar">
-  <button class="action-btn" onclick="openCreateTaskModal()">➕ Создать задание</button>
-  <button class="action-btn" onclick="openAwardModal()">💰 Начислить кармики</button>
+  <button class="action-btn" onclick="openModal('addEmployeeModal')">➕ Сотрудник</button>
+  <button class="action-btn" onclick="openModal('createTaskModal')">📋 Задание</button>
+  <button class="action-btn" onclick="openModal('awardModal')">💰 Кармики</button>
+  <button class="action-btn" onclick="openModal('addRewardModal')">🛒 Товар</button>
+  <button class="action-btn" onclick="openModal('addLmsModuleModal')">🧠 AI Тест</button>
 </div>
 
-<div class="notifications-panel">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <span style="font-weight:600;">Уведомления</span>
-    <span class="show-all" id="showAllBtn" onclick="openAllNotifications()" style="display:none;">Показать все</span>
-  </div>
-  <div class="notif-list" id="notificationsList">Нет новых уведомлений</div>
-</div>
+<!-- Дашборд -->
+<div class="dashboard" id="dashboard"></div>
 
-<div class="section-title">Сотрудники</div>
+<!-- Рейтинг -->
+<div class="section-title">🏆 Рейтинг</div>
+<table class="rating-table" id="ratingTable"><thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th><th>Энергия</th></tr></thead><tbody></tbody></table>
+
+<div class="section-title" style="margin-top: 24px;">Сотрудники</div>
 <div class="grid" id="teamGrid">Загрузка...</div>
 
-<!-- Модальное окно Создать задание -->
+<!-- Модальные окна -->
+<div id="addEmployeeModal" class="modal">
+  <div class="modal-content">
+    <h3>Новый сотрудник</h3>
+    <input type="text" id="newName" placeholder="Имя">
+    <input type="text" id="newLogin" placeholder="Логин">
+    <input type="text" id="newDepartment" placeholder="Отдел">
+    <input type="text" id="newPosition" placeholder="Должность">
+    <div class="modal-buttons">
+      <button class="btn cancel" onclick="closeModal('addEmployeeModal')">Отмена</button>
+      <button class="btn" onclick="addEmployee()">Создать</button>
+    </div>
+  </div>
+</div>
+
 <div id="createTaskModal" class="modal">
   <div class="modal-content">
-    <h3 style="margin-bottom:12px;">Новое задание</h3>
-    <label>Тип задания</label>
+    <h3>Новое задание</h3>
+    <label>Тип</label>
     <select id="taskType" onchange="toggleEmployeeSelect()">
       <option value="personal">Персональное</option>
       <option value="global">Общее</option>
     </select>
-    <label>Сотрудник</label>
     <select id="taskEmployeeSelect"></select>
-    <label>Название (до 45 символов)</label>
-    <input type="text" id="taskName" maxlength="45" placeholder="Название задания">
-    <label>Баллы</label>
-    <input type="number" id="taskPoints" placeholder="50">
+    <input type="text" id="taskName" maxlength="45" placeholder="Название">
+    <input type="number" id="taskPoints" placeholder="Кармики">
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('createTaskModal')">Отмена</button>
       <button class="btn" onclick="createTask()">Создать</button>
@@ -164,16 +209,22 @@
   </div>
 </div>
 
-<!-- Модальное окно Начислить кармики -->
 <div id="awardModal" class="modal">
   <div class="modal-content">
-    <h3 style="margin-bottom:12px;">Начислить кармики</h3>
-    <label>Сотрудник</label>
-    <select id="awardEmployeeSelect"></select>
-    <label>Сумма</label>
-    <input type="number" id="awardAmount" placeholder="100">
-    <label>Комментарий (обязательно)</label>
-    <input type="text" id="awardComment" placeholder="За что">
+    <h3>Начислить кармики</h3>
+    <label>Кому</label>
+    <select id="awardTarget" onchange="toggleAwardSelect()">
+      <option value="all">Всем</option>
+      <option value="newcomers">Новичкам (энергия < 100)</option>
+      <option value="experienced">Опытным (энергия >= 500)</option>
+      <option value="specific">Выбрать</option>
+    </select>
+    <div id="awardSpecific" class="hidden">
+      <label>Сотрудники (логины через запятую)</label>
+      <input type="text" id="awardEmployeeLogins" placeholder="login1, login2">
+    </div>
+    <input type="number" id="awardAmount" placeholder="Сумма">
+    <input type="text" id="awardComment" placeholder="Комментарий">
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('awardModal')">Отмена</button>
       <button class="btn" onclick="awardPoints()">Начислить</button>
@@ -181,7 +232,53 @@
   </div>
 </div>
 
-<!-- Модалка для подтверждения проверки задания -->
+<div id="addRewardModal" class="modal">
+  <div class="modal-content">
+    <h3>Новый товар</h3>
+    <input type="text" id="rewardName" placeholder="Название">
+    <input type="number" id="rewardCost" placeholder="Стоимость (кармики)">
+    <label>Для кого</label>
+    <select id="rewardTarget">
+      <option value="all">Все</option>
+      <option value="newcomers">Новички</option>
+      <option value="experienced">Опытные</option>
+      <option value="specific">Конкретные (логины)</option>
+    </select>
+    <div class="modal-buttons">
+      <button class="btn cancel" onclick="closeModal('addRewardModal')">Отмена</button>
+      <button class="btn" onclick="addReward()">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<div id="addLmsModuleModal" class="modal">
+  <div class="modal-content">
+    <h3>Создать AI тест</h3>
+    <input type="text" id="lmsTitle" placeholder="Название модуля">
+    <input type="text" id="lmsDescription" placeholder="Описание">
+    <label>Для кого</label>
+    <select id="lmsTarget">
+      <option value="all">Все</option>
+      <option value="newcomers">Новички</option>
+      <option value="experienced">Опытные</option>
+      <option value="specific">Конкретные логины</option>
+    </select>
+    <textarea id="lmsAiPrompt" rows="3" placeholder="Инструкция для AI (промпт)"></textarea>
+    <div class="modal-buttons">
+      <button class="btn cancel" onclick="closeModal('addLmsModuleModal')">Отмена</button>
+      <button class="btn" onclick="addLmsModule()">Создать</button>
+    </div>
+  </div>
+</div>
+
+<div id="profileModal" class="modal">
+  <div class="modal-content" id="profileModalContent"></div>
+</div>
+
+<div id="notificationsModal" class="modal">
+  <div class="modal-content" id="notificationsModalContent"></div>
+</div>
+
 <div id="verifyModal" class="modal">
   <div class="modal-content" id="verifyModalContent"></div>
 </div>
@@ -189,200 +286,246 @@
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
-  let allNotificationsCache = [];
+  if (!currentLogin) window.location.href = '/';
 
-  function createStars() {
-    const container = document.getElementById('starsContainer');
-    const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
-    for (let i = 0; i < 80; i++) {
-      const star = document.createElement('div'); star.className = 'star';
-      const size = Math.random()*3+1;
-      star.style.width = size+'px'; star.style.height = size+'px';
-      star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
-      star.style.background = colors[Math.floor(Math.random()*colors.length)];
-      star.style.animationDelay = Math.random()*3+'s';
-      container.appendChild(star);
-    }
-  }
+  // Звёзды
+  function createStars() { const container = document.getElementById('starsContainer'); for (let i=0; i<80; i++) { const star = document.createElement('div'); star.className='star'; star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px'; star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%'; star.style.animationDelay = Math.random()*3+'s'; container.appendChild(star); } }
   createStars();
 
-  function showLoading() {
-    const overlay = document.createElement('div'); overlay.className='loading-overlay';
-    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
-    document.body.appendChild(overlay);
-  }
-  function hideLoading() { const o = document.querySelector('.loading-overlay'); if(o) o.remove(); }
+  function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
+  function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
+  function openModal(id) { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-  function openCreateTaskModal() {
-    document.getElementById('createTaskModal').classList.add('active');
-    loadEmployeeSelects();
-    toggleEmployeeSelect();
-  }
-  function openAwardModal() {
-    document.getElementById('awardModal').classList.add('active');
-    loadEmployeeSelects();
+  // Кастомное уведомление
+  function showToast(message, success=true) {
+    const toast = document.createElement('div'); toast.className='toast';
+    toast.textContent = (success ? '✅ ' : '❌ ') + message;
+    document.body.appendChild(toast);
+    setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000);
   }
 
-  function toggleEmployeeSelect() {
-    const type = document.getElementById('taskType').value;
-    document.getElementById('taskEmployeeSelect').style.display = type === 'personal' ? 'block' : 'none';
-  }
-
-  async function loadEmployeeSelects() {
-    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
-    const team = await res.json();
-    const options = team.map(e => `<option value="${e.login}">${e.name} (${e.department || '—'})</option>`).join('');
-    document.getElementById('taskEmployeeSelect').innerHTML = options;
-    document.getElementById('awardEmployeeSelect').innerHTML = options;
-  }
-
-  async function createTask() {
-    const type = document.getElementById('taskType').value;
-    const employee = type === 'personal' ? document.getElementById('taskEmployeeSelect').value : 'all';
-    const taskName = document.getElementById('taskName').value.trim();
-    const points = parseInt(document.getElementById('taskPoints').value) || 0;
-    if (!taskName) return alert('Введите название');
-    showLoading();
-    const res = await fetch(`${API_URL}?action=createTask&managerLogin=${encodeURIComponent(currentLogin)}&taskName=${encodeURIComponent(taskName)}&points=${points}&employeeLogin=${encodeURIComponent(employee)}`);
-    const result = await res.json();
-    hideLoading();
-    alert(result.message);
-    closeModal('createTaskModal');
-    loadTeam();
-  }
-
-  async function awardPoints() {
-    const employee = document.getElementById('awardEmployeeSelect').value;
-    const amount = parseInt(document.getElementById('awardAmount').value) || 0;
-    const comment = document.getElementById('awardComment').value.trim();
-    if (!employee || amount <= 0 || !comment) return alert('Заполните все поля');
-    showLoading();
-    const res = await fetch(`${API_URL}?action=awardPoints&managerLogin=${encodeURIComponent(currentLogin)}&employeeLogin=${encodeURIComponent(employee)}&amount=${amount}&comment=${encodeURIComponent(comment)}`);
-    const result = await res.json();
-    hideLoading();
-    alert(result.message);
-    closeModal('awardModal');
-    loadTeam();
-  }
-
-  // Исправленная загрузка команды с гарантированным отображением заданий на проверке
+  // Загрузка команды
   async function loadTeam() {
     showLoading();
-    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
-    const team = await res.json();
-    hideLoading();
-    const grid = document.getElementById('teamGrid');
-    if (!team || team.length === 0) {
-      grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>';
-      return;
-    }
+    try {
+      const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
+      const team = await res.json();
+      hideLoading();
+      renderTeam(team);
+      renderRating(team);
+      renderDashboard(team);
+      loadNotifications();
+    } catch(e) { hideLoading(); showToast('Ошибка загрузки', false); }
+  }
 
+  function renderTeam(team) {
+    const grid = document.getElementById('teamGrid');
+    if (!team || team.length === 0) { grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>'; return; }
     grid.innerHTML = team.map(emp => `
-      <div class="employee-card" id="card-${emp.login}">
+      <div class="employee-card" onclick="openProfile('${emp.login}')">
         <div class="emp-header">
           <div class="emp-avatar">${emp.name.charAt(0)}</div>
-          <div>
-            <div class="emp-name">${emp.name}</div>
-            <div class="emp-dept">${emp.department || '—'}</div>
-          </div>
+          <div><div class="emp-name">${emp.name}</div><div class="emp-dept">${emp.department || '—'}</div></div>
         </div>
         <div class="metrics-row">
           <div class="metric"><div class="val success">${emp.points}</div><div class="lbl">кармиков</div></div>
           <div class="metric"><div class="val accent">${emp.energy}</div><div class="lbl">энергии</div></div>
           <div class="metric"><div class="val warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="lbl">заданий</div></div>
         </div>
-        <div class="task-review" id="review-${emp.login}">
-          <span style="color:var(--text-secondary); font-size:0.8rem;">Загрузка...</span>
-        </div>
+        <div class="task-review" id="review-${emp.login}">Загрузка...</div>
       </div>
     `).join('');
-
-    // Загружаем задания для каждого сотрудника
+    // Загружаем задания на проверке
     team.forEach(emp => {
       fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
         .then(r => r.json())
         .then(tasks => {
+          if (!Array.isArray(tasks)) tasks = [];
+          const review = tasks.filter(t => t.status === 'На проверке');
           const section = document.getElementById('review-' + emp.login);
-          if (!section) return;
-          // Убедимся, что tasks — массив
-          if (!Array.isArray(tasks)) {
-            section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Ошибка данных</span>';
-            return;
+          if (section) {
+            section.innerHTML = review.length === 0 ? '<span style="color:var(--text-secondary);">Нет заданий на проверке</span>' :
+              review.map(t => `<div class="review-item"><span>${t.task} (${t.points} карм.)</span><button class="verify-btn" onclick="event.stopPropagation(); openVerifyModal('${t.task.replace(/'/g, "\\'")}','${emp.login}')">✓</button></div>`).join('');
           }
-          const reviewTasks = tasks.filter(t => t.status === 'На проверке');
-          if (reviewTasks.length === 0) {
-            section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Нет заданий на проверке</span>';
-          } else {
-            section.innerHTML = reviewTasks.map(t => `
-              <div class="review-item">
-                <span>${t.task} (${t.points} карм.) ${t.comment ? '— ' + t.comment : ''}</span>
-                <button class="verify-btn" onclick="openVerifyModal('${t.task.replace(/'/g, "\\'")}', '${emp.login}', '${(t.comment || '').replace(/'/g, "\\'")}')">✓</button>
-              </div>
-            `).join('');
-          }
-        })
-        .catch(() => {
-          const section = document.getElementById('review-' + emp.login);
-          if (section) section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Ошибка загрузки</span>';
-        });
+        }).catch(() => {});
     });
   }
 
-  function openVerifyModal(taskName, login, comment) {
+  function openVerifyModal(task, login) {
     const modal = document.getElementById('verifyModal');
     modal.classList.add('active');
     document.getElementById('verifyModalContent').innerHTML = `
       <h3>Подтверждение</h3>
-      <p style="margin:12px 0;"><b>Задание:</b> ${taskName}</p>
-      <p style="margin:12px 0;"><b>Комментарий:</b> ${comment || 'нет'}</p>
+      <p>${task} (${login})</p>
       <div class="modal-buttons">
         <button class="btn cancel" onclick="closeModal('verifyModal')">Отмена</button>
-        <button class="btn" onclick="verifyTask('${taskName}', '${login}')">Подтвердить</button>
-      </div>
-    `;
+        <button class="btn" onclick="verifyTask('${task}','${login}')">Подтвердить</button>
+      </div>`;
   }
-
-  async function verifyTask(taskName, login) {
+  async function verifyTask(task, login) {
     showLoading();
-    const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(taskName)}&login=${encodeURIComponent(login)}&managerLogin=${encodeURIComponent(currentLogin)}`);
+    const res = await fetch(`${API_URL}?action=verifyTask&task=${encodeURIComponent(task)}&login=${login}&managerLogin=${currentLogin}`);
     const result = await res.json();
     hideLoading();
-    alert(result.message);
+    showToast(result.message, result.success);
     closeModal('verifyModal');
     loadTeam();
   }
 
-  async function loadNotifications() {
-    const res = await fetch(`${API_URL}?action=getNotifications&managerLogin=${encodeURIComponent(currentLogin)}`);
-    allNotificationsCache = await res.json();
-    const container = document.getElementById('notificationsList');
-    if (allNotificationsCache.length) {
-      container.innerHTML = allNotificationsCache.slice(0,3).map(n => `<div class="notif-item">${n.employee} — «${n.reward}» • ${n.date}</div>`).join('');
-      document.getElementById('showAllBtn').style.display = 'block';
-    } else {
-      container.innerHTML = 'Нет новых уведомлений';
-      document.getElementById('showAllBtn').style.display = 'none';
-    }
+  function renderRating(team) {
+    const sorted = [...team].sort((a,b) => b.points - a.points);
+    document.querySelector('#ratingTable tbody').innerHTML = sorted.map((e,i) => `<tr><td>${i+1}</td><td>${e.name}</td><td>${e.department}</td><td>${e.points}</td><td>${e.energy}</td></tr>`).join('');
   }
 
-  function openAllNotifications() {
-    const modal = document.createElement('div'); modal.className = 'modal active';
-    let html = '<div class="modal-content"><h3>Все уведомления</h3><div style="max-height: 300px; overflow-y: auto; margin: 12px 0;">';
-    html += allNotificationsCache.map(n => `<p style="margin:4px 0;">${n.employee} — «${n.reward}» • ${n.date}</p>`).join('');
-    html += '</div><button class="btn cancel" onclick="this.closest(\'.modal\').remove()">Закрыть</button></div>';
-    modal.innerHTML = html;
-    document.body.appendChild(modal);
+  function renderDashboard(team) {
+    const total = team.length;
+    const totalPoints = team.reduce((s,e) => s+e.points, 0);
+    const totalEnergy = team.reduce((s,e) => s+e.energy, 0);
+    document.getElementById('dashboard').innerHTML = `
+      <div class="dashboard-card"><div class="dashboard-label">Сотрудников</div><div class="dashboard-value income">${total}</div></div>
+      <div class="dashboard-card"><div class="dashboard-label">Всего кармиков</div><div class="dashboard-value income">${totalPoints}</div></div>
+      <div class="dashboard-card"><div class="dashboard-label">Всего энергии</div><div class="dashboard-value income">${totalEnergy}</div></div>
+    `;
+  }
+
+  // Уведомления
+  async function loadNotifications() {
+    const res = await fetch(`${API_URL}?action=getNotifications&managerLogin=${encodeURIComponent(currentLogin)}`);
+    const notifs = await res.json();
+    const badge = document.getElementById('notifBadge');
+    if (notifs.length > 0) { badge.textContent = notifs.length; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+    window._notifications = notifs;
+  }
+
+  function openNotifications() {
+    const modal = document.getElementById('notificationsModal');
+    const notifs = window._notifications || [];
+    document.getElementById('notificationsModalContent').innerHTML = `
+      <h3>Уведомления</h3>
+      ${notifs.length === 0 ? '<p>Нет новых уведомлений</p>' : notifs.map(n => `<p style="margin:4px 0; font-size:0.9rem;">${n.employee} — ${n.reward} (${n.date})</p>`).join('')}
+      <button class="btn cancel" onclick="closeModal('notificationsModal')" style="margin-top:12px;">Закрыть</button>
+    `;
+    modal.classList.add('active');
+  }
+
+  // Анкета сотрудника
+  async function openProfile(login) {
+    showLoading();
+    const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
+    const user = await res.json();
+    hideLoading();
+    if (!user) { showToast('Пользователь не найден', false); return; }
+    const modal = document.getElementById('profileModal');
+    document.getElementById('profileModalContent').innerHTML = `
+      <h3>${user.name}</h3>
+      <p><b>Отдел:</b> ${user.department || '—'}</p>
+      <p><b>Должность:</b> ${user.position || '—'}</p>
+      <p><b>Кармики:</b> ${user.points}</p>
+      <p><b>Энергия:</b> ${user.energy}</p>
+      <p><b>Паспорт:</b> ${user.passport}</p>
+      <button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>
+    `;
+    modal.classList.add('active');
+  }
+
+  // Создание сотрудника
+  async function addEmployee() {
+    const name = document.getElementById('newName').value.trim();
+    const login = document.getElementById('newLogin').value.trim();
+    const department = document.getElementById('newDepartment').value.trim();
+    const position = document.getElementById('newPosition').value.trim();
+    if (!name || !login) { showToast('Заполните имя и логин', false); return; }
+    showLoading();
+    const res = await fetch(`${API_URL}?action=addEmployee&managerLogin=${currentLogin}&name=${encodeURIComponent(name)}&login=${encodeURIComponent(login)}&department=${encodeURIComponent(department)}&position=${encodeURIComponent(position)}`);
+    const result = await res.json();
+    hideLoading();
+    showToast(result.message, result.success);
+    if (result.success) { closeModal('addEmployeeModal'); loadTeam(); }
+  }
+
+  // Создание задания
+  async function createTask() {
+    const type = document.getElementById('taskType').value;
+    const employee = type === 'personal' ? document.getElementById('taskEmployeeSelect').value : 'all';
+    const taskName = document.getElementById('taskName').value.trim();
+    const points = parseInt(document.getElementById('taskPoints').value) || 0;
+    if (!taskName) { showToast('Введите название', false); return; }
+    showLoading();
+    const res = await fetch(`${API_URL}?action=createTask&managerLogin=${currentLogin}&taskName=${encodeURIComponent(taskName)}&points=${points}&employeeLogin=${employee}`);
+    const result = await res.json();
+    hideLoading();
+    showToast(result.message, result.success);
+    closeModal('createTaskModal');
+    loadTeam();
+  }
+
+  // Начисление кармиков
+  async function awardPoints() {
+    const target = document.getElementById('awardTarget').value;
+    const employeeLogins = target === 'specific' ? document.getElementById('awardEmployeeLogins').value : '';
+    const amount = parseInt(document.getElementById('awardAmount').value) || 0;
+    const comment = document.getElementById('awardComment').value.trim();
+    if (amount <= 0 || !comment) { showToast('Заполните сумму и комментарий', false); return; }
+    showLoading();
+    const res = await fetch(`${API_URL}?action=awardPointsFiltered&managerLogin=${currentLogin}&target=${target}&employeeLogins=${encodeURIComponent(employeeLogins)}&amount=${amount}&comment=${encodeURIComponent(comment)}`);
+    const result = await res.json();
+    hideLoading();
+    showToast(result.message, result.success);
+    closeModal('awardModal');
+    loadTeam();
+  }
+
+  // Добавление товара
+  async function addReward() {
+    const name = document.getElementById('rewardName').value.trim();
+    const cost = parseInt(document.getElementById('rewardCost').value) || 0;
+    const target = document.getElementById('rewardTarget').value;
+    if (!name || cost <= 0) { showToast('Заполните название и стоимость', false); return; }
+    showLoading();
+    const res = await fetch(`${API_URL}?action=addReward&managerLogin=${currentLogin}&name=${encodeURIComponent(name)}&cost=${cost}&target=${target}`);
+    const result = await res.json();
+    hideLoading();
+    showToast(result.message, result.success);
+    closeModal('addRewardModal');
+  }
+
+  // Создание AI теста (LMS модуля)
+  async function addLmsModule() {
+    const title = document.getElementById('lmsTitle').value.trim();
+    const description = document.getElementById('lmsDescription').value.trim();
+    const target = document.getElementById('lmsTarget').value;
+    const aiPrompt = document.getElementById('lmsAiPrompt').value.trim();
+    if (!title) { showToast('Введите название', false); return; }
+    showLoading();
+    const res = await fetch(`${API_URL}?action=addLmsModule&managerLogin=${currentLogin}&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&target=${target}&aiPrompt=${encodeURIComponent(aiPrompt)}`);
+    const result = await res.json();
+    hideLoading();
+    showToast(result.message, result.success);
+    closeModal('addLmsModuleModal');
+  }
+
+  function toggleEmployeeSelect() {
+    document.getElementById('taskEmployeeSelect').style.display = document.getElementById('taskType').value === 'personal' ? 'block' : 'none';
+  }
+  function toggleAwardSelect() {
+    document.getElementById('awardSpecific').classList.toggle('hidden', document.getElementById('awardTarget').value !== 'specific');
+  }
+
+  async function loadEmployeeSelects() {
+    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${currentLogin}`);
+    const team = await res.json();
+    const opts = team.map(e => `<option value="${e.login}">${e.name}</option>`).join('');
+    document.getElementById('taskEmployeeSelect').innerHTML = opts;
   }
 
   function logout() { localStorage.removeItem('karmabank_manager_login'); location.reload(); }
 
-  if (currentLogin) {
-    loadTeam();
-    loadNotifications();
-  } else {
-    window.location.href = '/';
-  }
+  // Старт
+  loadTeam();
+  loadEmployeeSelects();
+  document.getElementById('taskEmployeeSelect').style.display = 'block';
 </script>
 </body>
 </html>
