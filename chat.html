@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -18,16 +17,22 @@
       overflow: hidden;
     }
     .sidebar {
-      width: 220px; background: var(--bg-card); border-right: 1px solid var(--border);
+      width: 240px; background: var(--bg-card); border-right: 1px solid var(--border);
       padding: 16px; overflow-y: auto;
     }
     .sidebar h3 { margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
     .sidebar h3 svg { width: 18px; height: 18px; stroke: var(--accent); }
     .member {
-      padding: 8px; display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;
       cursor: pointer; border-radius: 8px; transition: all 0.2s;
     }
     .member:hover { background: var(--bg-secondary); }
+    .member-name { font-weight: 500; }
+    .member-profile-btn {
+      background: none; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; cursor: pointer;
+    }
+    .member-profile-btn:hover { border-color: var(--accent); color: var(--accent); }
     .main-chat { flex: 1; display: flex; flex-direction: column; }
     .chat-header {
       padding: 16px; background: var(--bg-card); border-bottom: 1px solid var(--border);
@@ -94,7 +99,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="7" r="3"/><circle cx="18" cy="7" r="3"/><path d="M3 21v-2a4 4 0 0 1 4-4h2"/><path d="M21 21v-2a4 4 0 0 0-4-4h-2"/></svg>
       Участники
     </h3>
-    <div id="membersList"></div>
+    <div id="membersList">Загрузка...</div>
   </div>
   <div class="main-chat">
     <div class="chat-header">
@@ -113,29 +118,31 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
     const currentUser = localStorage.getItem('karmabank_login') || 'anonymous';
+    let userDisplayName = currentUser;
 
-    async function loadMembers() {
-      const res = await fetch(`${API_URL}?action=getAllEmployees`);
-      const employees = await res.json();
-      document.getElementById('membersList').innerHTML = employees.map(e => `
-        <div class="member" onclick="showMemberCard('${e.name}', '${e.department || ''}', '${e.energy || 0}')">
-          <span>${e.name}</span>
-        </div>
-      `).join('');
+    async function loadUserInfo() {
+      try {
+        const res = await fetch(`${API_URL}?action=getUser&login=${encodeURIComponent(currentUser)}`);
+        const user = await res.json();
+        if (user && user.name) {
+          userDisplayName = user.name;
+        }
+      } catch(e) { console.error(e); }
     }
 
-    function showMemberCard(name, dept, energy) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <h3>${name}</h3>
-          <p>Отдел: ${dept || '—'}</p>
-          <p>Энергия: ${energy}</p>
-          <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
-        </div>
-      `;
-      document.body.appendChild(modal);
+    async function loadMembers() {
+      try {
+        const res = await fetch(`${API_URL}?action=getPublicEmployees`);
+        const employees = await res.json();
+        document.getElementById('membersList').innerHTML = employees.map(e => `
+          <div class="member">
+            <span class="member-name">${e.name}</span>
+            <button class="member-profile-btn" onclick="event.stopPropagation(); window.location.href='/profile.html?user=${e.login}'">Профиль</button>
+          </div>
+        `).join('');
+      } catch(e) {
+        document.getElementById('membersList').innerHTML = 'Ошибка загрузки';
+      }
     }
 
     function addMessage(sender, text, cls) {
@@ -150,7 +157,7 @@
       const input = document.getElementById('userInput');
       const text = input.value.trim();
       if (!text) return;
-      addMessage(currentUser, text, 'user');
+      addMessage(userDisplayName, text, 'user');
       input.value = '';
       try {
         await fetch(`${API_URL}?action=sendMessage&sender=${encodeURIComponent(currentUser)}&text=${encodeURIComponent(text)}`);
@@ -188,7 +195,7 @@
       document.getElementById('cancelBtn').onclick = () => modal.remove();
     }
 
-    loadMembers();
+    loadUserInfo().then(() => loadMembers());
   </script>
 </body>
 </html>
