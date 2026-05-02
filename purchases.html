@@ -16,13 +16,38 @@
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     h2 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 24px; position: relative; z-index: 2; filter: drop-shadow(0 0 6px rgba(249,115,22,0.5)); }
     .filter-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; position: relative; z-index: 2; flex-wrap: wrap; }
-    .filter-label { font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, #c084fc, #38bdf8); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .custom-select { position: relative; background: rgba(21,38,56,0.6); border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px; color: var(--text-primary); font-size: 0.9rem; backdrop-filter: blur(4px); cursor: pointer; transition: all 0.2s; min-width: 120px; }
-    .custom-select:hover { border-color: var(--accent); }
+    .filter-label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-right: 4px; }
+    /* Селекты в стиле кнопок */
+    .custom-select {
+      background: rgba(21,38,56,0.6);
+      border: 1px solid var(--accent);
+      border-radius: 30px;
+      padding: 6px 16px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      transition: all 0.3s;
+      min-width: 130px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: padding-box;
+      background-clip: padding-box;
+      border: 1px solid transparent;
+      background-origin: border-box;
+      box-shadow: 0 0 8px rgba(249,115,22,0.2);
+    }
+    .custom-select:hover {
+      border-color: #c084fc;
+      box-shadow: var(--hologram-glow);
+      transform: scale(1.02);
+    }
     .custom-select select {
       background: transparent;
       border: none;
-      color: var(--text-primary);
+      color: inherit;
       font-size: inherit;
       font-family: inherit;
       outline: none;
@@ -30,14 +55,11 @@
       appearance: none;
       cursor: pointer;
       padding-right: 20px;
-      /* Принудительно яркий цвет текста */
       -webkit-text-fill-color: var(--text-primary);
-      /* Стрелка */
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa9c1' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 4px center;
+      background-position: right 2px center;
     }
-    /* Чтобы текст выбранной опции не был серым */
     .custom-select select option {
       background: var(--bg-primary);
       color: var(--text-primary);
@@ -45,6 +67,7 @@
     .purchases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; position: relative; z-index: 2; }
     .purchase-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 20px; padding: 20px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: all 0.3s; backdrop-filter: blur(5px); animation: fadeInUp 0.4s ease forwards; opacity: 0; }
     .purchase-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(249,115,22,0.3); }
+    .purchase-card.used { opacity: 0.65; border-color: var(--border); }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     .purchase-card .reward-name { font-weight: 600; font-size: 1rem; }
     .purchase-card .reward-cost { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
@@ -55,6 +78,27 @@
     .btn:hover { border-color: #c084fc; box-shadow: 0 0 14px rgba(249,115,22,0.6); transform: scale(1.03); }
     .btn.use { background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: var(--success); }
     .btn.refund { background: linear-gradient(135deg, #f97316, #e65c00); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: var(--danger); }
+    .btn.toggle-used {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn.toggle-used.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(249,115,22,0.1);
+    }
+    .btn.toggle-used:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 10px rgba(249,115,22,0.3);
+    }
     .empty-message { text-align: center; color: var(--text-secondary); padding: 40px; font-size: 1.1rem; }
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; display: flex; align-items: center; justify-content: center; }
     .loading-arrows { display: flex; gap: 10px; }
@@ -76,7 +120,7 @@
   <h2>Мои покупки</h2>
 
   <div class="filter-bar">
-    <span class="filter-label">✨ Фильтр по дате</span>
+    <span class="filter-label">Фильтр по дате</span>
     <div class="custom-select">
       <select id="monthSelect">
         <option value="all">Любой месяц</option>
@@ -93,9 +137,10 @@
       </select>
     </div>
     <button class="btn" onclick="applyFilter()" style="padding: 10px 24px;">Показать</button>
+    <button class="btn toggle-used" id="toggleUsedBtn" onclick="toggleUsed()">Скрыть использованные</button>
   </div>
 
-  <div class="purchases-grid" id="purchasesList">Загрузка...</div>
+  <div class="purchases-grid" id="purchasesList"></div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
@@ -103,6 +148,7 @@
     if (!currentLogin) window.location.href = '/';
 
     let allPurchases = [];
+    let hideUsed = false;
 
     function createStars() {
       const container = document.getElementById('starsContainer');
@@ -138,15 +184,27 @@
         const res = await fetch(`${API_URL}?action=getPurchases&login=${encodeURIComponent(currentLogin)}&t=${Date.now()}`);
         if (!res.ok) throw new Error('Ошибка сервера');
         const data = await res.json();
-        console.log('Данные от API:', data);
         hideLoading();
         allPurchases = Array.isArray(data) ? data : [];
-        renderPurchases(allPurchases);
+        applyFilter(); // применяем фильтр при первой загрузке (по умолчанию без ограничений)
       } catch(e) {
         hideLoading();
         document.getElementById('purchasesList').innerHTML = `<div class="empty-message">❌ ${e.message}</div>`;
         console.error(e);
       }
+    }
+
+    function toggleUsed() {
+      hideUsed = !hideUsed;
+      const btn = document.getElementById('toggleUsedBtn');
+      if (hideUsed) {
+        btn.textContent = 'Показать все';
+        btn.classList.add('active');
+      } else {
+        btn.textContent = 'Скрыть использованные';
+        btn.classList.remove('active');
+      }
+      applyFilter();
     }
 
     function applyFilter() {
@@ -155,19 +213,23 @@
       let filtered = allPurchases;
 
       if (month !== 'all' || year !== 'all') {
-        filtered = allPurchases.filter(p => {
+        filtered = filtered.filter(p => {
           const dateStr = p.date || '';
-          // Разбираем дату формата "дд.мм.гггг, ..."
           const parts = dateStr.split('.');
-          if (parts.length < 3) return true; // если дата нестандартная, оставляем
-          const purchaseMonth = parseInt(parts[1], 10); // месяц числом
-          const purchaseYear = parts[2].split(',')[0].trim(); // год как строка
+          if (parts.length < 3) return true;
+          const purchaseMonth = parseInt(parts[1], 10);
+          const purchaseYear = parts[2].split(',')[0].trim();
           let keep = true;
           if (month !== 'all') keep = keep && (purchaseMonth === parseInt(month, 10));
           if (year !== 'all') keep = keep && (purchaseYear === year);
           return keep;
         });
       }
+
+      if (hideUsed) {
+        filtered = filtered.filter(p => !p.usedDate);
+      }
+
       renderPurchases(filtered);
     }
 
@@ -186,7 +248,7 @@
         } else if (isUsed && p.canRefund) {
           buttonsHtml = `<button class="btn refund" onclick="openRefundModal('${p.id}','${p.rewardName.replace(/'/g, "\\'")}',${p.cost})">Вернуть</button>`;
         }
-        return `<div class="purchase-card">
+        return `<div class="purchase-card ${isUsed ? 'used' : ''}">
           <div class="reward-name">${p.rewardName}${usedHtml}</div>
           <div class="reward-cost">${p.cost} карм.</div>
           <div class="reward-date">${p.date}</div>
