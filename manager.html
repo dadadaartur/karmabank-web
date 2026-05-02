@@ -6,55 +6,22 @@
   <title>Панель руководителя — Кармический банк</title>
   <link rel="icon" type="image/png" href="astralsk.png">
   <style>
-    :root {
-      --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
-      --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350;
-      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
-    }
+    :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%);
-      color: var(--text-primary); min-height: 100vh; padding: 20px;
-      position: relative; overflow-x: hidden; cursor: default;
-    }
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; cursor: default; }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
     @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; } }
-    .header {
-      background: rgba(21,38,56,0.7); backdrop-filter: blur(10px);
-      border: 1px solid var(--border); border-radius: 20px; padding: 16px 24px; margin-bottom: 24px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-      position: relative; z-index: 2;
-    }
-    .header h2 {
-      font-size: 1.4rem; font-weight: 800;
-      background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none;
-    }
+    .header { background: rgba(21,38,56,0.7); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 20px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: relative; z-index: 2; }
+    .header h2 { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; text-decoration: none; }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
     .main-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; position: relative; z-index: 2; }
-    .action-btn {
-      background: transparent; border: 1px solid var(--accent); border-radius: 40px;
-      padding: 10px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
-      transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    .action-btn { background: transparent; border: 1px solid var(--accent); border-radius: 40px; padding: 10px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .action-btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02); }
     .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; position: relative; z-index: 2; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; position: relative; z-index: 2; }
-    .employee-card {
-      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 20px; padding: 20px;
-      display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px);
-      cursor: pointer;
-    }
+    .employee-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; backdrop-filter: blur(4px); cursor: pointer; }
     .employee-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .emp-header { display: flex; align-items: center; gap: 10px; }
     .emp-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white; }
@@ -67,71 +34,31 @@
     .metric .lbl { font-size: 0.7rem; color: var(--text-secondary); }
     .task-review { border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .review-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
-    .verify-btn {
-      background: transparent; border: 1px solid var(--success); border-radius: 12px;
-      color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
+    .verify-btn { background: transparent; border: 1px solid var(--success); border-radius: 12px; color: var(--success); padding: 4px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .verify-btn:hover { background: var(--success); color: white; }
-    /* Уведомления */
-    .notif-icon {
-      position: relative; cursor: pointer; margin-left: auto;
-      display: flex; align-items: center;
-    }
+    .notif-icon { position: relative; cursor: pointer; margin-left: auto; display: flex; align-items: center; }
     .notif-icon svg { width: 24px; height: 24px; stroke: var(--text-secondary); transition: 0.2s; }
     .notif-icon:hover svg { stroke: var(--accent); }
-    .notif-badge {
-      position: absolute; top: -6px; right: -6px;
-      background: var(--accent); color: white; border-radius: 50%; font-size: 0.7rem;
-      width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
-      font-weight: bold;
-    }
-    /* Модальные окна */
+    .notif-badge { position: absolute; top: -6px; right: -6px; background: var(--accent); color: white; border-radius: 50%; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
-    .modal-content {
-      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
-      border: 1px solid var(--accent); border-radius: 24px; padding: 30px;
-      max-width: 500px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6); color: var(--text-primary);
-      animation: modalPop 0.3s ease;
-    }
+    .modal-content { background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 24px; padding: 30px; max-width: 500px; width: 90%; text-align: left; box-shadow: 0 0 60px rgba(249,115,22,0.6); color: var(--text-primary); animation: modalPop 0.3s ease; }
     @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .modal-content input, .modal-content select, .modal-content textarea {
-      width: 100%; padding: 10px; margin: 8px 0 16px;
-      border-radius: 12px; border: 1px solid var(--border);
-      background: var(--bg-primary); color: var(--text-primary); font-size: 0.95rem; outline: none;
-    }
+    .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary); font-size: 0.95rem; outline: none; }
+    .modal-content select[multiple] { height: 120px; }
     .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
-    .modal-buttons .btn {
-      background: transparent; border: 1px solid var(--accent); border-radius: 30px;
-      padding: 8px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
-      transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    .modal-buttons .btn { background: transparent; border: 1px solid var(--accent); border-radius: 30px; padding: 8px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .modal-buttons .btn.cancel { background: transparent; border-color: var(--border); -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary); }
-    .loading-overlay {
-      position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;
-    }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
     .loading-arrows { display: flex; gap: 10px; }
     .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
     .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
     @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
-    .toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
-      border: 1px solid var(--accent); border-radius: 40px; padding: 12px 30px;
-      color: var(--text-primary); font-weight: 500; box-shadow: 0 0 30px rgba(249,115,22,0.5);
-      z-index: 10000; animation: toastIn 0.4s ease, toastOut 0.4s 2.5s ease forwards;
-    }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 40px; padding: 12px 30px; color: var(--text-primary); font-weight: 500; box-shadow: 0 0 30px rgba(249,115,22,0.5); z-index: 10000; animation: toastIn 0.4s ease, toastOut 0.4s 2.5s ease forwards; }
     @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
-    .dashboard {
-      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; position: relative; z-index: 2;
-    }
-    .dashboard-card {
-      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
-      border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px;
-      flex: 1; min-width: 130px; backdrop-filter: blur(4px);
-    }
+    .dashboard { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; position: relative; z-index: 2; }
+    .dashboard-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px; flex: 1; min-width: 130px; backdrop-filter: blur(4px); }
     .dashboard-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
     .dashboard-value { font-size: 1.4rem; font-weight: 700; }
     .dashboard-value.income { color: var(--success); } .dashboard-value.expense { color: var(--danger); }
@@ -142,15 +69,11 @@
 </head>
 <body>
 <div class="stars" id="starsContainer"></div>
-
 <div class="header">
   <h2>Моя команда</h2>
   <div style="display: flex; gap: 10px; align-items: center;">
     <div class="notif-icon" id="notifBell" onclick="openNotifications()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="notif-badge hidden" id="notifBadge">0</span>
     </div>
     <a href="/" class="back-btn">← На главную</a>
@@ -166,13 +89,8 @@
   <button class="action-btn" onclick="openModal('addLmsModuleModal')">🧠 AI Тест</button>
 </div>
 
-<!-- Дашборд -->
 <div class="dashboard" id="dashboard"></div>
-
-<!-- Рейтинг -->
-<div class="section-title">🏆 Рейтинг</div>
 <table class="rating-table" id="ratingTable"><thead><tr><th>#</th><th>Имя</th><th>Отдел</th><th>Кармики</th><th>Энергия</th></tr></thead><tbody></tbody></table>
-
 <div class="section-title" style="margin-top: 24px;">Сотрудники</div>
 <div class="grid" id="teamGrid">Загрузка...</div>
 
@@ -181,9 +99,8 @@
   <div class="modal-content">
     <h3>Новый сотрудник</h3>
     <input type="text" id="newName" placeholder="Имя">
-    <input type="text" id="newLogin" placeholder="Логин">
-    <input type="text" id="newDepartment" placeholder="Отдел">
-    <input type="text" id="newPosition" placeholder="Должность">
+    <select id="newDepartment"></select>
+    <select id="newPosition"></select>
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('addEmployeeModal')">Отмена</button>
       <button class="btn" onclick="addEmployee()">Создать</button>
@@ -194,7 +111,6 @@
 <div id="createTaskModal" class="modal">
   <div class="modal-content">
     <h3>Новое задание</h3>
-    <label>Тип</label>
     <select id="taskType" onchange="toggleEmployeeSelect()">
       <option value="personal">Персональное</option>
       <option value="global">Общее</option>
@@ -220,8 +136,8 @@
       <option value="specific">Выбрать</option>
     </select>
     <div id="awardSpecific" class="hidden">
-      <label>Сотрудники (логины через запятую)</label>
-      <input type="text" id="awardEmployeeLogins" placeholder="login1, login2">
+      <label>Сотрудники</label>
+      <select id="awardEmployeeSelect" multiple></select>
     </div>
     <input type="number" id="awardAmount" placeholder="Сумма">
     <input type="text" id="awardComment" placeholder="Комментарий">
@@ -242,7 +158,7 @@
       <option value="all">Все</option>
       <option value="newcomers">Новички</option>
       <option value="experienced">Опытные</option>
-      <option value="specific">Конкретные (логины)</option>
+      <option value="specific">Конкретные</option>
     </select>
     <div class="modal-buttons">
       <button class="btn cancel" onclick="closeModal('addRewardModal')">Отмена</button>
@@ -271,24 +187,15 @@
   </div>
 </div>
 
-<div id="profileModal" class="modal">
-  <div class="modal-content" id="profileModalContent"></div>
-</div>
-
-<div id="notificationsModal" class="modal">
-  <div class="modal-content" id="notificationsModalContent"></div>
-</div>
-
-<div id="verifyModal" class="modal">
-  <div class="modal-content" id="verifyModalContent"></div>
-</div>
+<div id="profileModal" class="modal"><div class="modal-content" id="profileModalContent"></div></div>
+<div id="notificationsModal" class="modal"><div class="modal-content" id="notificationsModalContent"></div></div>
+<div id="verifyModal" class="modal"><div class="modal-content" id="verifyModalContent"></div></div>
 
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   let currentLogin = localStorage.getItem('karmabank_manager_login') || '';
   if (!currentLogin) window.location.href = '/';
 
-  // Звёзды
   function createStars() { const container = document.getElementById('starsContainer'); for (let i=0; i<80; i++) { const star = document.createElement('div'); star.className='star'; star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px'; star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%'; star.style.animationDelay = Math.random()*3+'s'; container.appendChild(star); } }
   createStars();
 
@@ -296,8 +203,6 @@
   function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
   function openModal(id) { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-  // Кастомное уведомление
   function showToast(message, success=true) {
     const toast = document.createElement('div'); toast.className='toast';
     toast.textContent = (success ? '✅ ' : '❌ ') + message;
@@ -305,7 +210,23 @@
     setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000);
   }
 
-  // Загрузка команды
+  // Загрузка отделов и должностей для выпадающих списков
+  async function loadFormData() {
+    const res = await fetch(`${API_URL}?action=getAllEmployees`);
+    const employees = await res.json();
+    const departments = [...new Set(employees.map(e => e.department).filter(Boolean))];
+    const positions = [...new Set(employees.map(e => e.position || e.department).filter(Boolean))];
+    const deptSelect = document.getElementById('newDepartment');
+    const posSelect = document.getElementById('newPosition');
+    deptSelect.innerHTML = departments.map(d => `<option value="${d}">${d}</option>`).join('');
+    posSelect.innerHTML = positions.map(p => `<option value="${p}">${p}</option>`).join('');
+    // Для начисления кармиков: заполняем список сотрудников
+    const awardSelect = document.getElementById('awardEmployeeSelect');
+    const team = await (await fetch(`${API_URL}?action=getTeam&managerLogin=${currentLogin}`)).json();
+    awardSelect.innerHTML = team.map(e => `<option value="${e.login}">${e.name}</option>`).join('');
+  }
+  loadFormData();
+
   async function loadTeam() {
     showLoading();
     try {
@@ -324,10 +245,7 @@
     if (!team || team.length === 0) { grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>'; return; }
     grid.innerHTML = team.map(emp => `
       <div class="employee-card" onclick="openProfile('${emp.login}')">
-        <div class="emp-header">
-          <div class="emp-avatar">${emp.name.charAt(0)}</div>
-          <div><div class="emp-name">${emp.name}</div><div class="emp-dept">${emp.department || '—'}</div></div>
-        </div>
+        <div class="emp-header"><div class="emp-avatar">${emp.name.charAt(0)}</div><div><div class="emp-name">${emp.name}</div><div class="emp-dept">${emp.department || '—'}</div></div></div>
         <div class="metrics-row">
           <div class="metric"><div class="val success">${emp.points}</div><div class="lbl">кармиков</div></div>
           <div class="metric"><div class="val accent">${emp.energy}</div><div class="lbl">энергии</div></div>
@@ -336,7 +254,6 @@
         <div class="task-review" id="review-${emp.login}">Загрузка...</div>
       </div>
     `).join('');
-    // Загружаем задания на проверке
     team.forEach(emp => {
       fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
         .then(r => r.json())
@@ -353,15 +270,8 @@
   }
 
   function openVerifyModal(task, login) {
-    const modal = document.getElementById('verifyModal');
-    modal.classList.add('active');
-    document.getElementById('verifyModalContent').innerHTML = `
-      <h3>Подтверждение</h3>
-      <p>${task} (${login})</p>
-      <div class="modal-buttons">
-        <button class="btn cancel" onclick="closeModal('verifyModal')">Отмена</button>
-        <button class="btn" onclick="verifyTask('${task}','${login}')">Подтвердить</button>
-      </div>`;
+    document.getElementById('verifyModal').classList.add('active');
+    document.getElementById('verifyModalContent').innerHTML = `<h3>Подтверждение</h3><p>${task} (${login})</p><div class="modal-buttons"><button class="btn cancel" onclick="closeModal('verifyModal')">Отмена</button><button class="btn" onclick="verifyTask('${task}','${login}')">Подтвердить</button></div>`;
   }
   async function verifyTask(task, login) {
     showLoading();
@@ -377,7 +287,6 @@
     const sorted = [...team].sort((a,b) => b.points - a.points);
     document.querySelector('#ratingTable tbody').innerHTML = sorted.map((e,i) => `<tr><td>${i+1}</td><td>${e.name}</td><td>${e.department}</td><td>${e.points}</td><td>${e.energy}</td></tr>`).join('');
   }
-
   function renderDashboard(team) {
     const total = team.length;
     const totalPoints = team.reduce((s,e) => s+e.points, 0);
@@ -389,7 +298,6 @@
     `;
   }
 
-  // Уведомления
   async function loadNotifications() {
     const res = await fetch(`${API_URL}?action=getNotifications&managerLogin=${encodeURIComponent(currentLogin)}`);
     const notifs = await res.json();
@@ -398,54 +306,46 @@
     else badge.classList.add('hidden');
     window._notifications = notifs;
   }
-
   function openNotifications() {
     const modal = document.getElementById('notificationsModal');
     const notifs = window._notifications || [];
-    document.getElementById('notificationsModalContent').innerHTML = `
-      <h3>Уведомления</h3>
-      ${notifs.length === 0 ? '<p>Нет новых уведомлений</p>' : notifs.map(n => `<p style="margin:4px 0; font-size:0.9rem;">${n.employee} — ${n.reward} (${n.date})</p>`).join('')}
-      <button class="btn cancel" onclick="closeModal('notificationsModal')" style="margin-top:12px;">Закрыть</button>
-    `;
+    document.getElementById('notificationsModalContent').innerHTML = `<h3>Уведомления</h3>${notifs.length === 0 ? '<p>Нет новых уведомлений</p>' : notifs.map(n => `<p style="margin:4px 0; font-size:0.9rem;">${n.employee} — ${n.reward} (${n.date})</p>`).join('')}<button class="btn cancel" onclick="closeModal('notificationsModal')" style="margin-top:12px;">Закрыть</button>`;
     modal.classList.add('active');
   }
 
-  // Анкета сотрудника
   async function openProfile(login) {
     showLoading();
     const res = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`);
     const user = await res.json();
     hideLoading();
     if (!user) { showToast('Пользователь не найден', false); return; }
-    const modal = document.getElementById('profileModal');
-    document.getElementById('profileModalContent').innerHTML = `
-      <h3>${user.name}</h3>
-      <p><b>Отдел:</b> ${user.department || '—'}</p>
-      <p><b>Должность:</b> ${user.position || '—'}</p>
-      <p><b>Кармики:</b> ${user.points}</p>
-      <p><b>Энергия:</b> ${user.energy}</p>
-      <p><b>Паспорт:</b> ${user.passport}</p>
-      <button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>
-    `;
-    modal.classList.add('active');
+    document.getElementById('profileModal').classList.add('active');
+    document.getElementById('profileModalContent').innerHTML = `<h3>${user.name}</h3><p><b>Отдел:</b> ${user.department || '—'}</p><p><b>Должность:</b> ${user.position || '—'}</p><p><b>Кармики:</b> ${user.points}</p><p><b>Энергия:</b> ${user.energy}</p><p><b>Паспорт:</b> ${user.passport}</p><button class="btn cancel" onclick="closeModal('profileModal')">Закрыть</button>`;
   }
 
-  // Создание сотрудника
+  // Добавление сотрудника
   async function addEmployee() {
     const name = document.getElementById('newName').value.trim();
-    const login = document.getElementById('newLogin').value.trim();
-    const department = document.getElementById('newDepartment').value.trim();
-    const position = document.getElementById('newPosition').value.trim();
-    if (!name || !login) { showToast('Заполните имя и логин', false); return; }
+    const department = document.getElementById('newDepartment').value;
+    const position = document.getElementById('newPosition').value;
+    if (!name) { showToast('Введите имя', false); return; }
     showLoading();
-    const res = await fetch(`${API_URL}?action=addEmployee&managerLogin=${currentLogin}&name=${encodeURIComponent(name)}&login=${encodeURIComponent(login)}&department=${encodeURIComponent(department)}&position=${encodeURIComponent(position)}`);
+    const res = await fetch(`${API_URL}?action=addEmployee&managerLogin=${currentLogin}&name=${encodeURIComponent(name)}&department=${encodeURIComponent(department)}&position=${encodeURIComponent(position)}`);
     const result = await res.json();
     hideLoading();
     showToast(result.message, result.success);
     if (result.success) { closeModal('addEmployeeModal'); loadTeam(); }
   }
 
-  // Создание задания
+  // Задание
+  function toggleEmployeeSelect() {
+    document.getElementById('taskEmployeeSelect').style.display = document.getElementById('taskType').value === 'personal' ? 'block' : 'none';
+  }
+  async function loadEmployeeSelects() {
+    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${currentLogin}`);
+    const team = await res.json();
+    document.getElementById('taskEmployeeSelect').innerHTML = team.map(e => `<option value="${e.login}">${e.name}</option>`).join('');
+  }
   async function createTask() {
     const type = document.getElementById('taskType').value;
     const employee = type === 'personal' ? document.getElementById('taskEmployeeSelect').value : 'all';
@@ -457,14 +357,21 @@
     const result = await res.json();
     hideLoading();
     showToast(result.message, result.success);
-    closeModal('createTaskModal');
-    loadTeam();
+    closeModal('createTaskModal'); loadTeam();
   }
 
   // Начисление кармиков
+  function toggleAwardSelect() {
+    document.getElementById('awardSpecific').classList.toggle('hidden', document.getElementById('awardTarget').value !== 'specific');
+  }
   async function awardPoints() {
     const target = document.getElementById('awardTarget').value;
-    const employeeLogins = target === 'specific' ? document.getElementById('awardEmployeeLogins').value : '';
+    let employeeLogins = '';
+    if (target === 'specific') {
+      const select = document.getElementById('awardEmployeeSelect');
+      employeeLogins = Array.from(select.selectedOptions).map(opt => opt.value).join(',');
+      if (!employeeLogins) { showToast('Выберите сотрудников', false); return; }
+    }
     const amount = parseInt(document.getElementById('awardAmount').value) || 0;
     const comment = document.getElementById('awardComment').value.trim();
     if (amount <= 0 || !comment) { showToast('Заполните сумму и комментарий', false); return; }
@@ -473,11 +380,10 @@
     const result = await res.json();
     hideLoading();
     showToast(result.message, result.success);
-    closeModal('awardModal');
-    loadTeam();
+    closeModal('awardModal'); loadTeam();
   }
 
-  // Добавление товара
+  // Товар
   async function addReward() {
     const name = document.getElementById('rewardName').value.trim();
     const cost = parseInt(document.getElementById('rewardCost').value) || 0;
@@ -491,7 +397,7 @@
     closeModal('addRewardModal');
   }
 
-  // Создание AI теста (LMS модуля)
+  // AI тест
   async function addLmsModule() {
     const title = document.getElementById('lmsTitle').value.trim();
     const description = document.getElementById('lmsDescription').value.trim();
@@ -506,26 +412,13 @@
     closeModal('addLmsModuleModal');
   }
 
-  function toggleEmployeeSelect() {
-    document.getElementById('taskEmployeeSelect').style.display = document.getElementById('taskType').value === 'personal' ? 'block' : 'none';
-  }
-  function toggleAwardSelect() {
-    document.getElementById('awardSpecific').classList.toggle('hidden', document.getElementById('awardTarget').value !== 'specific');
-  }
-
-  async function loadEmployeeSelects() {
-    const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${currentLogin}`);
-    const team = await res.json();
-    const opts = team.map(e => `<option value="${e.login}">${e.name}</option>`).join('');
-    document.getElementById('taskEmployeeSelect').innerHTML = opts;
-  }
-
   function logout() { localStorage.removeItem('karmabank_manager_login'); location.reload(); }
 
   // Старт
   loadTeam();
   loadEmployeeSelects();
   document.getElementById('taskEmployeeSelect').style.display = 'block';
+  document.getElementById('awardSpecific').classList.add('hidden');
 </script>
 </body>
 </html>
