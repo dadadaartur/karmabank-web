@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Панель руководителя — Кармический банк</title>
-  <link rel="icon" type="image/png" href="belchonok.png">
+  <link rel="icon" type="image/png" href="astralsk.png">
   <style>
     :root {
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
@@ -61,9 +61,7 @@
       transition: all 0.3s; background: linear-gradient(135deg, #f97316, #c084fc);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    .action-btn:hover {
-      border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02);
-    }
+    .action-btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.02); }
     .section-title {
       font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;
       color: var(--text-primary); position: relative; z-index: 2;
@@ -321,16 +319,20 @@
     loadTeam();
   }
 
-  // Загрузка команды
+  // Загрузка команды (с исправленной загрузкой заданий на проверку)
   async function loadTeam() {
     showLoading();
     const res = await fetch(`${API_URL}?action=getTeam&managerLogin=${encodeURIComponent(currentLogin)}`);
     const team = await res.json();
     hideLoading();
     const grid = document.getElementById('teamGrid');
-    if (!team.length) { grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>'; return; }
+    if (!team || team.length === 0) {
+      grid.innerHTML = '<div style="color:var(--text-secondary); padding:20px;">Нет подчинённых.</div>';
+      return;
+    }
+
     grid.innerHTML = team.map(emp => `
-      <div class="employee-card">
+      <div class="employee-card" id="card-${emp.login}">
         <div class="emp-header">
           <div class="emp-avatar">${emp.name.charAt(0)}</div>
           <div>
@@ -343,21 +345,29 @@
           <div class="metric"><div class="val accent">${emp.energy}</div><div class="lbl">энергии</div></div>
           <div class="metric"><div class="val warning">${emp.completedTasks}/${emp.totalTasks}</div><div class="lbl">заданий</div></div>
         </div>
-        <div class="task-review" id="review-${emp.login}">Загрузка...</div>
+        <div class="task-review" id="review-${emp.login}">
+          <span style="color:var(--text-secondary); font-size:0.8rem;">Загрузка...</span>
+        </div>
       </div>
     `).join('');
+
+    // Загружаем задания для каждого сотрудника отдельно
     team.forEach(emp => {
       fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(emp.login)}`)
-        .then(r => r.json()).then(tasks => {
-          const review = tasks.filter(t => t.status === 'На проверке');
+        .then(r => r.json())
+        .then(tasks => {
+          const reviewTasks = tasks.filter(t => t.status === 'На проверке');
           const section = document.getElementById('review-' + emp.login);
-          if (!review.length) { section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Нет заданий на проверке</span>'; return; }
-          section.innerHTML = review.map(t => `
-            <div class="review-item">
-              <span>${t.task} (${t.points} карм.) ${t.comment ? '— ' + t.comment : ''}</span>
-              <button class="verify-btn" onclick="openVerifyModal('${t.task}', '${emp.login}', '${(t.comment||'').replace(/'/g, "\\'")}')">✓</button>
-            </div>
-          `).join('');
+          if (reviewTasks.length === 0) {
+            section.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Нет заданий на проверке</span>';
+          } else {
+            section.innerHTML = reviewTasks.map(t => `
+              <div class="review-item">
+                <span>${t.task} (${t.points} карм.) ${t.comment ? '— ' + t.comment : ''}</span>
+                <button class="verify-btn" onclick="openVerifyModal('${t.task.replace(/'/g, "\\'")}', '${emp.login}', '${(t.comment || '').replace(/'/g, "\\'")}')">✓</button>
+              </div>
+            `).join('');
+          }
         });
     });
   }
