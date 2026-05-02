@@ -9,7 +9,7 @@
     :root {
       --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238;
       --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316;
-      --success: #10b981; --warning: #f59e0b; --border: #1f3350;
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350;
       --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,18 +20,9 @@
       align-items: center; justify-content: center; padding: 20px;
       position: relative; overflow-x: hidden;
     }
-    .stars {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 0; pointer-events: none;
-    }
-    .star {
-      position: absolute; background: white; border-radius: 50%;
-      animation: twinkle 2s infinite alternate; opacity: 0.7;
-    }
-    @keyframes twinkle {
-      0% { opacity: 0.3; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; }
-    }
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
+    @keyframes twinkle { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px #f97316, 0 0 12px #c084fc; } }
     .game-container {
       max-width: 700px; width: 100%; position: relative; z-index: 2;
       background: radial-gradient(circle at 20% 30%, #1a2f4a 0%, #0f1f35 100%);
@@ -52,10 +43,7 @@
       border-radius: 16px; padding: 16px; margin: 20px 0;
       display: flex; align-items: center; gap: 12px;
     }
-    .host-avatar {
-      width: 40px; height: 40px; background: var(--accent); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-    }
+    .host-avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
     .question-card {
       background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
       border: 1px solid var(--border); border-radius: 20px;
@@ -77,6 +65,10 @@
       font-size: 1.2rem; margin: 8px 0;
     }
     .score span { color: var(--accent); font-weight: 700; }
+    .lives {
+      display: flex; justify-content: center; gap: 6px; margin: 8px 0;
+    }
+    .life { font-size: 1.5rem; }
     .btn {
       background: transparent; border: 1px solid var(--accent); border-radius: 40px;
       padding: 12px 36px; font-weight: 800; font-size: 1rem; cursor: pointer;
@@ -84,12 +76,13 @@
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     .btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.03); }
-    .rating-table {
-      width: 100%; border-collapse: collapse; margin: 20px 0;
+    .btn.shield-btn { border-color: var(--success); color: var(--success); background: rgba(16,185,129,0.1); }
+    .risk-panel {
+      background: rgba(249,115,22,0.1); border: 1px solid var(--accent); border-radius: 16px;
+      padding: 12px; margin: 12px 0; font-weight: 600; color: var(--accent);
     }
-    .rating-table th, .rating-table td {
-      padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border);
-    }
+    .rating-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .rating-table th, .rating-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
     .rating-table th { color: var(--text-secondary); font-weight: 500; font-size: 0.85rem; }
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
@@ -98,36 +91,32 @@
       text-decoration: none; margin-top: 20px;
     }
     .back-btn:hover { background: var(--border); color: var(--text-primary); }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 <div class="stars" id="starsContainer"></div>
 <div class="game-container">
-  <!-- Стартовый экран -->
   <div class="game-screen active" id="startScreen">
     <h2>Кармический миллионер</h2>
     <div class="host-message">
       <div class="host-avatar">🐿️</div>
-      <p>Добро пожаловать на викторину по продажам! Я твой ведущий. Проверим твои навыки? 5 вопросов, и ты в рейтинге!</p>
+      <p>Это новое испытание! Ответь на вопросы по продажам и о себе. У тебя 3 жизни, Кармический щит и шанс рискнуть. Готов?</p>
     </div>
-    <button class="btn" onclick="startGame()">Начать игру</button>
+    <button class="btn" id="startBtn">Начать игру</button>
   </div>
 
-  <!-- Экран игры -->
   <div class="game-screen" id="gameScreen">
-    <div class="timer" id="timer">30</div>
-    <div class="score">Вопрос <span id="questionNum">1</span> из 5 • Баллов: <span id="points">0</span></div>
+    <div class="timer" id="timer">15</div>
+    <div class="score">Вопрос <span id="questionNum">1</span> из <span id="totalQuestions">15</span> • Баллов: <span id="points">0</span></div>
+    <div class="lives" id="livesContainer"></div>
     <div class="question-card" id="questionText">Загрузка вопроса...</div>
-    <div class="options-grid" id="optionsGrid">
-      <button class="option-btn">A</button>
-      <button class="option-btn">B</button>
-      <button class="option-btn">C</button>
-      <button class="option-btn">D</button>
-    </div>
+    <div id="riskPanel" class="risk-panel hidden">Риск-вопрос! Можно удвоить очки, но ошибка обнулит раунд.</div>
+    <div class="options-grid" id="optionsGrid"></div>
+    <button class="btn shield-btn hidden" id="shieldBtn" onclick="useShield()">🛡️ Кармический щит (1 раз)</button>
     <div class="host-message" id="hostComment" style="display:none;"></div>
   </div>
 
-  <!-- Экран результата -->
   <div class="game-screen" id="resultScreen">
     <h2 id="resultTitle"></h2>
     <div class="host-message" id="resultMessage"></div>
@@ -140,49 +129,22 @@
 </div>
 
 <script>
-  const QUESTIONS = [
-    {
-      question: "Какой этап продаж самый важный для установления доверия?",
-      options: ["Презентация", "Работа с возражениями", "Установление контакта", "Закрытие сделки"],
-      correct: 2
-    },
-    {
-      question: "Что такое СПИН в продажах?",
-      options: ["Метод активного слушания", "Техника задавания вопросов", "Способ презентации", "Метод закрытия сделки"],
-      correct: 1
-    },
-    {
-      question: "Какая техника помогает выявить скрытые потребности клиента?",
-      options: ["AIDA", "SMART", "СПИН", "GROW"],
-      correct: 2
-    },
-    {
-      question: "Что такое 'холодный звонок'?",
-      options: ["Звонок недовольному клиенту", "Звонок без предварительного контакта", "Звонок после встречи", "Звонок в холодную погоду"],
-      correct: 1
-    },
-    {
-      question: "Какой показатель отражает среднюю сумму чека?",
-      options: ["Конверсия", "Средний чек", "LTV", "ROI"],
-      correct: 1
-    }
-  ];
-
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   const currentLogin = localStorage.getItem('karmabank_login') || 'anonymous';
+  let timerInterval, timeLeft, currentQuestionIndex = 0, totalPoints = 0, gameActive = false;
+  let lives = 3, shieldUsed = false, questions = [], userData = null;
 
-  let timerInterval, timeLeft, currentQuestion = 0, totalPoints = 0, gameActive = false;
-
+  // Звёздное небо
   function createStars() {
     const container = document.getElementById('starsContainer');
     const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc'];
-    for (let i = 0; i < 80; i++) {
-      const star = document.createElement('div'); star.className = 'star';
-      const size = Math.random() * 3 + 1;
-      star.style.width = size + 'px'; star.style.height = size + 'px';
-      star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
-      star.style.background = colors[Math.floor(Math.random() * colors.length)];
-      star.style.animationDelay = Math.random() * 3 + 's';
+    for (let i=0; i<80; i++) {
+      const star = document.createElement('div'); star.className='star';
+      const size = Math.random()*3+1;
+      star.style.width = size+'px'; star.style.height = size+'px';
+      star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+      star.style.background = colors[Math.floor(Math.random()*colors.length)];
+      star.style.animationDelay = Math.random()*3+'s';
       container.appendChild(star);
     }
   }
@@ -193,36 +155,106 @@
     document.getElementById(screenId).classList.add('active');
   }
 
-  function startGame() {
-    currentQuestion = 0;
-    totalPoints = 0;
-    gameActive = true;
-    document.getElementById('hostComment').style.display = 'none';
+  // Загрузка пользовательских данных и вопросов
+  async function startGame() {
     switchScreen('gameScreen');
-    loadQuestion();
+    gameActive = false;
+    lives = 3;
+    shieldUsed = false;
+    totalPoints = 0;
+    currentQuestionIndex = 0;
+    document.getElementById('points').textContent = '0';
+    document.getElementById('shieldBtn').classList.add('hidden');
+    try {
+      // Получаем профиль текущего пользователя и список всех сотрудников
+      const [profileRes, employeesRes, aiQuestionsRes] = await Promise.all([
+        fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`),
+        fetch(`${API_URL}?action=getAllEmployees`),
+        fetch(`${API_URL}?action=getMillionaireQuestions&login=${encodeURIComponent(currentLogin)}`)
+      ]);
+      userData = await profileRes.json();
+      const allEmployees = await employeesRes.json();
+      const aiQuestions = await aiQuestionsRes.json();
+
+      // Находим руководителя текущего пользователя
+      let managerName = null;
+      for (const emp of allEmployees) {
+        if (emp.login === currentLogin && emp.managerLogin) {
+          const manager = allEmployees.find(e => e.login === emp.managerLogin);
+          if (manager) managerName = manager.name;
+        }
+      }
+
+      // Собираем персональные вопросы
+      const personalQuestions = [];
+      if (managerName) {
+        personalQuestions.push({
+          question: `Как зовут твоего руководителя?`,
+          options: [managerName, "Не знаю", allEmployees[0]?.name || "Артур", "HRDNK"],
+          correct: 0,
+          personal: true
+        });
+      }
+      if (userData) {
+        personalQuestions.push({
+          question: `В каком отделе ты работаешь?`,
+          options: [userData.department || "Отдел продаж", "Маркетинг", "Разработка", "HR"],
+          correct: 0,
+          personal: true
+        });
+        personalQuestions.push({
+          question: `Сколько у тебя сейчас кармиков?`,
+          options: [String(userData.points || 0), "100", "500", "1000"],
+          correct: 0,
+          personal: true
+        });
+      }
+
+      // Перемешиваем AI вопросы и добавляем персональные в случайные позиции
+      questions = [...aiQuestions].sort(() => Math.random() - 0.5);
+      personalQuestions.forEach(q => {
+        const pos = Math.floor(Math.random() * (questions.length + 1));
+        questions.splice(pos, 0, q);
+      });
+      document.getElementById('totalQuestions').textContent = questions.length;
+      updateLivesDisplay();
+      gameActive = true;
+      loadQuestion();
+    } catch(e) {
+      document.getElementById('questionText').textContent = 'Ошибка загрузки вопросов. Попробуй позже.';
+      console.error(e);
+    }
   }
 
   function loadQuestion() {
-    if (currentQuestion >= QUESTIONS.length) {
+    if (!gameActive || currentQuestionIndex >= questions.length) {
       endGame(true);
       return;
     }
-    const q = QUESTIONS[currentQuestion];
-    document.getElementById('questionNum').textContent = currentQuestion + 1;
+    const q = questions[currentQuestionIndex];
+    document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
     document.getElementById('questionText').textContent = q.question;
-    document.getElementById('points').textContent = totalPoints;
-    const btns = document.querySelectorAll('#optionsGrid .option-btn');
-    btns.forEach((btn, idx) => {
-      btn.textContent = q.options[idx];
-      btn.className = 'option-btn';
-      btn.disabled = false;
-      btn.onclick = () => answerQuestion(idx);
-    });
-    startTimer();
+    const optionsGrid = document.getElementById('optionsGrid');
+    optionsGrid.innerHTML = q.options.map((opt, idx) => 
+      `<button class="option-btn" onclick="answerQuestion(${idx})">${opt}</button>`
+    ).join('');
+    
+    // Риск-вопрос (каждый 4-й и только если не персональный)
+    document.getElementById('riskPanel').classList.toggle('hidden', q.personal || (currentQuestionIndex % 4 !== 0));
+    // Показать кнопку щита, если не использован и есть жизни
+    document.getElementById('shieldBtn').classList.toggle('hidden', shieldUsed || lives <= 1);
+    
+    // Уровень сложности и время
+    let seconds = 15;
+    if (q.personal) seconds = 5;
+    else if (currentQuestionIndex < 5) seconds = 15;
+    else if (currentQuestionIndex < 10) seconds = 10;
+    else seconds = 6;
+    startTimer(seconds);
   }
 
-  function startTimer() {
-    timeLeft = 30;
+  function startTimer(seconds) {
+    timeLeft = seconds;
     document.getElementById('timer').textContent = timeLeft;
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -236,36 +268,66 @@
   }
 
   function timeOut() {
-    gameActive = false;
-    showHostComment('⏰ Время вышло! Игра окончена.');
-    setTimeout(() => endGame(false), 1500);
+    showHostComment('⏰ Время вышло!');
+    answerQuestion(-1); // -1 означает тайм-аут
   }
 
   async function answerQuestion(selected) {
     if (!gameActive) return;
     clearInterval(timerInterval);
     gameActive = false;
-    const q = QUESTIONS[currentQuestion];
-    const btns = document.querySelectorAll('#optionsGrid .option-btn');
-    btns.forEach(b => b.disabled = true);
+    const q = questions[currentQuestionIndex];
+    const isRisk = !q.personal && (currentQuestionIndex % 4 === 0);
+    let pointsEarned = 0;
+
+    // Подсветка правильного ответа
+    document.querySelectorAll('.option-btn').forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === q.correct) btn.classList.add('correct');
+      if (idx === selected && selected !== q.correct) btn.classList.add('wrong');
+    });
 
     if (selected === q.correct) {
-      btns[selected].classList.add('correct');
-      const points = 100 + timeLeft * 5;
-      totalPoints += points;
+      pointsEarned = 100 + timeLeft * 5;
+      if (isRisk) pointsEarned *= 2;
+      totalPoints += pointsEarned;
       document.getElementById('points').textContent = totalPoints;
-      await showHostComment(`✅ Правильно! +${points} баллов за скорость.`);
-      currentQuestion++;
-      setTimeout(() => {
-        gameActive = true;
-        loadQuestion();
-      }, 1500);
+      showHostComment(`✅ Правильно! +${pointsEarned} баллов.`);
     } else {
-      btns[selected].classList.add('wrong');
-      btns[q.correct].classList.add('correct');
-      await showHostComment('❌ Неправильно. Но не расстраивайся, попробуй снова!');
-      setTimeout(() => endGame(false), 2000);
+      lives--;
+      updateLivesDisplay();
+      if (isRisk) totalPoints = Math.max(0, totalPoints - 50); // потеря при риске
+      document.getElementById('points').textContent = totalPoints;
+      showHostComment(`❌ Неправильно. ${lives > 0 ? 'Осталось жизней: ' + lives : 'Игра окончена.'}`);
     }
+
+    if (lives <= 0) {
+      setTimeout(() => endGame(false), 2000);
+      return;
+    }
+
+    currentQuestionIndex++;
+    setTimeout(() => {
+      gameActive = true;
+      loadQuestion();
+    }, 1500);
+  }
+
+  function useShield() {
+    if (shieldUsed || lives <= 1 || !gameActive) return;
+    shieldUsed = true;
+    document.getElementById('shieldBtn').classList.add('hidden');
+    showHostComment('🛡️ Кармический щит активирован! Этот вопрос засчитан.');
+    // Пропускаем текущий вопрос без потерь
+    clearInterval(timerInterval);
+    currentQuestionIndex++;
+    gameActive = true;
+    loadQuestion();
+  }
+
+  function updateLivesDisplay() {
+    const container = document.getElementById('livesContainer');
+    container.innerHTML = Array.from({length: lives}, () => '<span class="life">❤️</span>').join('');
   }
 
   async function showHostComment(text) {
@@ -277,27 +339,29 @@
   function endGame(won) {
     clearInterval(timerInterval);
     document.getElementById('finalScore').textContent = totalPoints;
-    document.getElementById('resultTitle').textContent = won ? '🎉 Поздравляем!' : 'Конец игры';
-    document.getElementById('resultMessage').innerHTML = `<div class="host-avatar">🐿️</div><p>Ты набрал ${totalPoints} баллов. ${won ? 'Отличный результат!' : 'Приходи ещё!'}</p>`;
+    document.getElementById('resultTitle').textContent = won ? '🎉 Поздравляем!' : 'Игра завершена';
+    document.getElementById('resultMessage').innerHTML = `<div class="host-avatar">🐿️</div><p>Ты набрал ${totalPoints} баллов. ${won ? 'Отличная работа!' : 'Приходи ещё!'}</p>`;
     updateRating();
     switchScreen('resultScreen');
   }
 
   function updateRating() {
-    let rating = JSON.parse(localStorage.getItem('millionaireRating') || '[]');
+    let rating = JSON.parse(localStorage.getItem('millionaireRatingV2') || '[]');
     rating.push({ name: currentLogin, points: totalPoints, date: new Date().toLocaleDateString('ru-RU') });
     rating.sort((a, b) => b.points - a.points);
     rating = rating.slice(0, 10);
-    localStorage.setItem('millionaireRating', JSON.stringify(rating));
+    localStorage.setItem('millionaireRatingV2', JSON.stringify(rating));
     const table = document.getElementById('ratingTable');
     table.innerHTML = rating.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.points}</td><td>${r.date}</td></tr>`).join('');
   }
 
   // Загрузка рейтинга при открытии
   (function loadRating() {
-    const rating = JSON.parse(localStorage.getItem('millionaireRating') || '[]');
+    const rating = JSON.parse(localStorage.getItem('millionaireRatingV2') || '[]');
     document.getElementById('ratingTable').innerHTML = rating.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.points}</td><td>${r.date}</td></tr>`).join('');
   })();
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
 </script>
 </body>
 </html>
