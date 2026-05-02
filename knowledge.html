@@ -42,7 +42,7 @@
   </div>
   <div class="chat-container">
     <div class="chat-box" id="chatBox">
-      <div class="message bot-message"><img src="belchonok.png"><div class="text">Привет! Я бельчонок-помощник. Спрашивай о платформе, кармиках, энергии, заданиях.</div></div>
+      <div class="message bot-message"><img src="belchonok.png"><div class="text">Привет! Я бельчонок-помощник. Загружаю базу знаний...</div></div>
     </div>
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Введи вопрос...">
@@ -51,8 +51,10 @@
   </div>
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
+    
     function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
     function hideLoading() { const overlay = document.querySelector('.loading-overlay'); if (overlay) overlay.remove(); }
+    
     function addMessage(role, text) {
       const chatBox = document.getElementById('chatBox'); const div = document.createElement('div');
       div.className = 'message ' + (role === 'user' ? 'user-message' : 'bot-message');
@@ -60,6 +62,7 @@
       else div.textContent = text;
       chatBox.appendChild(div); chatBox.scrollTop = chatBox.scrollHeight;
     }
+    
     async function sendMessage() {
       const input = document.getElementById('userInput'); const text = input.value.trim();
       if (!text) return;
@@ -72,6 +75,23 @@
         addMessage('bot', data.reply || 'Извини, я не смог найти ответ.');
       } catch (e) { hideLoading(); addMessage('bot', 'Ошибка соединения.'); }
     }
+
+    // Подгружаем статус базы знаний при старте
+    async function initKnowledgeBase() {
+      try {
+        const res = await fetch(`${API_URL}?action=getKnowledgeStatus`);
+        const data = await res.json();
+        if (data.status === 'ok') {
+          document.querySelector('.bot-message .text').textContent = 'Привет! Я Путеводная звезда. База знаний активна. Спрашивай о платформе, кармиках, энергии, заданиях.';
+        } else {
+          document.querySelector('.bot-message .text').textContent = 'Привет! Я бельчонок-помощник. (Локальный режим)';
+        }
+      } catch(e) {
+        document.querySelector('.bot-message .text').textContent = 'Привет! Я бельчонок-помощник. Спрашивай о платформе, кармиках, энергии, заданиях.';
+      }
+    }
+    
+    initKnowledgeBase();
     document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
   </script>
 </body>
