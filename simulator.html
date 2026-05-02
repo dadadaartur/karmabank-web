@@ -8,7 +8,9 @@
   <link rel="apple-touch-icon" href="astralsk.png">
   <style>
     :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg-primary); }
+    *::-webkit-scrollbar { width: 4px; }
+    *::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
     body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow-x: hidden; cursor: default; }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
@@ -41,6 +43,9 @@
     .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
     .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
     @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%); border: 1px solid var(--accent); border-radius: 40px; padding: 12px 30px; color: var(--text-primary); font-weight: 500; box-shadow: 0 0 30px rgba(249,115,22,0.5); z-index: 10000; animation: toastIn 0.4s ease, toastOut 0.4s 2.5s ease forwards; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
   </style>
 </head>
 <body>
@@ -84,6 +89,7 @@
     <a href="/millionaire.html" class="btn" target="_blank">Открыть викторину</a>
   </div>
 
+  <!-- Динамический модуль AI-теста -->
   <div id="moduleDynamic" class="hidden">
     <button class="btn back-btn" onclick="openModule('menu')">← Назад к списку</button>
     <h3 id="dynamicModuleTitle"></h3>
@@ -107,7 +113,14 @@
   createStars();
   function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
   function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
+  function showToast(message, success=true) {
+    const toast = document.createElement('div'); toast.className='toast';
+    toast.textContent = (success ? '✅ ' : '❌ ') + message;
+    document.body.appendChild(toast);
+    setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000);
+  }
 
+  // Загрузка модулей LMS
   async function loadLmsModules() {
     try {
       const res = await fetch(`${API_URL}?action=getLmsModules`);
@@ -135,13 +148,9 @@
     document.getElementById('moduleTrainer').classList.add('hidden');
     document.getElementById('moduleQuiz').classList.add('hidden');
     document.getElementById('moduleDynamic').classList.add('hidden');
-    if (name === 'menu') {
-      document.getElementById('lmsMenu').classList.remove('hidden');
-    } else if (name === 'trainer') {
-      document.getElementById('moduleTrainer').classList.remove('hidden');
-    } else if (name === 'quiz') {
-      document.getElementById('moduleQuiz').classList.remove('hidden');
-    }
+    if (name === 'menu') document.getElementById('lmsMenu').classList.remove('hidden');
+    else if (name === 'trainer') document.getElementById('moduleTrainer').classList.remove('hidden');
+    else if (name === 'quiz') document.getElementById('moduleQuiz').classList.remove('hidden');
   }
 
   function openDynamicModule(title, description, aiPrompt) {
@@ -174,17 +183,19 @@
       });
       const data = await res.json();
       if (data.message) addDynamicMessage('bot', data.message);
-    } catch(e) { addDynamicMessage('bot', 'Ошибка связи.'); }
+      else addDynamicMessage('bot', 'Отличный вопрос! Дай мне ещё немного информации, чтобы ответить точнее.');
+    } catch(e) { addDynamicMessage('bot', 'Произошла небольшая заминка. Попробуем ещё раз?'); }
   }
   function endDynamicSession() {
     openModule('menu');
   }
   async function deleteModule(title) {
-    if (!confirm('Удалить модуль "' + title + '"?')) return;
-    try {
-      await fetch(`${API_URL}?action=deleteLmsModule&managerLogin=${login}&title=${encodeURIComponent(title)}`);
-      loadLmsModules();
-    } catch(e) { alert('Ошибка удаления'); }
+    if (confirm('Удалить модуль "' + title + '"?')) {
+      try {
+        await fetch(`${API_URL}?action=deleteLmsModule&managerLogin=${login}&title=${encodeURIComponent(title)}`);
+        loadLmsModules();
+      } catch(e) { alert('Ошибка удаления'); }
+    }
   }
 
   // Базовый тренажёр
@@ -211,7 +222,7 @@
       hideLoading();
       if (data.message) addTrainerMessage('bot', data.message);
       else addTrainerMessage('bot', 'Привет! Я готов к тренировке.');
-    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка соединения.'); }
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка соединения. Попробуй позже.'); }
   }
   function addTrainerMessage(role, text) { trainerMessages.push({role, text}); const div = document.createElement('div'); div.className = `message ${role}`; div.textContent = text; document.getElementById('chatBox').appendChild(div); }
   async function sendMessage() {
@@ -224,9 +235,20 @@
       const data = await res.json();
       hideLoading();
       if (data.message) addTrainerMessage('bot', data.message);
-    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка.'); }
+      else addTrainerMessage('bot', 'Уточни, пожалуйста, что ты имеешь в виду?');
+    } catch(e) { hideLoading(); addTrainerMessage('bot', 'Ошибка связи.'); }
   }
-  function confirmEvaluate() { if (confirm('Завершить тренировку?')) evaluateSession(); }
+  function confirmEvaluate() {
+    showConfirm('Завершить тренировку и получить оценку?', evaluateSession);
+  }
+  // Кастомный confirm
+  function showConfirm(message, onYes) {
+    const modal = document.createElement('div'); modal.className='modal active';
+    modal.innerHTML = `<div class="modal-content" style="text-align:center;"><p>${message}</p><div class="modal-buttons" style="justify-content:center; margin-top:16px;"><button class="btn cancel" id="modalNo">Отмена</button><button class="btn" id="modalYes">Да</button></div></div>`;
+    document.body.appendChild(modal);
+    document.getElementById('modalYes').onclick = () => { modal.remove(); onYes(); };
+    document.getElementById('modalNo').onclick = () => modal.remove();
+  }
   async function evaluateSession() {
     const formData = new URLSearchParams({ mode: 'evaluate', scenario: currentScenario, level: currentLevel, history: JSON.stringify(trainerMessages), login });
     showLoading();
@@ -234,12 +256,12 @@
       const res = await fetch(`${API_URL}?action=simulatorChat`, { method: 'POST', body: formData });
       const data = await res.json();
       hideLoading();
-      alert(data.feedback || 'Оценка завершена.');
+      showToast(data.feedback || 'Оценка завершена.');
       document.getElementById('trainerSetup').classList.remove('hidden');
       document.getElementById('trainerChat').classList.add('hidden');
       trainerMessages = [];
       document.getElementById('chatBox').innerHTML = '';
-    } catch(e) { hideLoading(); alert('Ошибка оценки.'); }
+    } catch(e) { hideLoading(); showToast('Ошибка оценки.', false); }
   }
   document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 </script>
