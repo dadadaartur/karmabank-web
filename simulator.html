@@ -18,7 +18,7 @@
     h2 { font-size: 2rem; font-weight: 800; margin-bottom: 20px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 6px rgba(249,115,22,0.5)); }
     h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
-    .lms-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 24px; padding: 30px 20px; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px); }
+    .lms-card { background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%); border: 1px solid var(--border); border-radius: 24px; padding: 30px 20px; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px); position: relative; }
     .lms-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--hologram-glow); }
     .lms-card .title { font-weight: 700; font-size: 1.2rem; margin: 12px 0 4px; background: linear-gradient(135deg, #c084fc, #38bdf8); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lms-card .desc { font-size: 0.85rem; color: var(--text-secondary); }
@@ -27,7 +27,20 @@
     .btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: scale(1.03); }
     .btn.back-btn { background: transparent; border-color: var(--border); -webkit-background-clip: unset; background-clip: unset; color: var(--text-secondary); margin-bottom: 20px; }
     .btn.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .delete-module-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 12px; border-radius: 14px; font-size: 0.75rem; cursor: pointer; position: absolute; top: 10px; right: 10px; opacity: 0.7; }
+    .delete-module-btn:hover { opacity: 1; background: rgba(239,68,68,0.1); }
+    .chat-box { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; padding: 0 4px; }
+    .message { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.4; }
+    .message.user { align-self: flex-end; background: var(--accent); color: white; }
+    .message.bot { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border); }
+    .input-area { display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--border); padding-top: 16px; }
+    .input-area input { flex: 1; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; outline: none; }
     .back-link { color: var(--text-secondary); margin-top: 20px; display: inline-flex; align-items: center; gap: 6px; }
+    .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .loading-arrows { display: flex; gap: 10px; }
+    .arrow { width: 12px; height: 12px; background: linear-gradient(135deg, #f97316, #fbbf24); border-radius: 2px; animation: arrowPulse 1.2s infinite ease-in-out both; transform: rotate(45deg); box-shadow: 0 0 10px var(--accent); }
+    .arrow:nth-child(1) { animation-delay: 0s; } .arrow:nth-child(2) { animation-delay: 0.15s; } .arrow:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes arrowPulse { 0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); } 50% { opacity: 1; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
   </style>
 </head>
 <body>
@@ -35,9 +48,7 @@
 <div class="app-container" id="app">
   <div id="lmsMenu">
     <h2>Путь к совершенству</h2>
-    <div class="lms-grid" id="lmsModulesGrid">
-      <!-- Статические модули и динамические AI тесты будут здесь -->
-    </div>
+    <div class="lms-grid" id="lmsModulesGrid"></div>
     <a href="/" class="back-link">← Вернуться в Кармический банк</a>
   </div>
 
@@ -73,7 +84,6 @@
     <a href="/millionaire.html" class="btn" target="_blank">Открыть викторину</a>
   </div>
 
-  <!-- Общий контейнер для динамического модуля -->
   <div id="moduleDynamic" class="hidden">
     <button class="btn back-btn" onclick="openModule('menu')">← Назад к списку</button>
     <h3 id="dynamicModuleTitle"></h3>
@@ -90,13 +100,14 @@
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
   const login = localStorage.getItem('karmabank_login') || 'anonymous';
+  let dynamicAiPrompt = '';
+  let dynamicMessages = [];
 
   function createStars() { const container = document.getElementById('starsContainer'); for (let i=0; i<80; i++) { const star = document.createElement('div'); star.className='star'; star.style.width = (Math.random()*3+1)+'px'; star.style.height = (Math.random()*3+1)+'px'; star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%'; star.style.animationDelay = Math.random()*3+'s'; container.appendChild(star); } }
   createStars();
   function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
   function hideLoading() { const o=document.querySelector('.loading-overlay'); if(o)o.remove(); }
 
-  // Загрузка модулей LMS
   async function loadLmsModules() {
     try {
       const res = await fetch(`${API_URL}?action=getLmsModules`);
@@ -109,9 +120,8 @@
       const grid = document.getElementById('lmsModulesGrid');
       grid.innerHTML = allModules.map(mod => `
         <div class="lms-card" onclick="${mod.dynamic ? `openDynamicModule('${mod.title.replace(/'/g, "\\'")}', '${(mod.description || '').replace(/'/g, "\\'")}', '${(mod.aiPrompt || '').replace(/'/g, "\\'")}')` : `openModule('${mod.action}')`}">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
+          ${mod.dynamic ? `<button class="delete-module-btn" onclick="event.stopPropagation(); deleteModule('${mod.title.replace(/'/g, "\\'")}')">Удалить</button>` : ''}
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           <div class="title">${mod.title}</div>
           <div class="desc">${mod.desc || mod.description || ''}</div>
         </div>
@@ -134,8 +144,6 @@
     }
   }
 
-  let dynamicAiPrompt = '';
-  let dynamicMessages = [];
   function openDynamicModule(title, description, aiPrompt) {
     document.getElementById('lmsMenu').classList.add('hidden');
     document.getElementById('moduleDynamic').classList.remove('hidden');
@@ -159,14 +167,27 @@
     if (!text) return;
     addDynamicMessage('user', text);
     input.value = '';
-    // Здесь должен быть вызов API с AI промптом, но для MVP просто эхо
-    addDynamicMessage('bot', 'Ответ AI-тренера на ваш запрос: ' + text);
+    try {
+      const res = await fetch(`${API_URL}?action=simulatorChat`, {
+        method: 'POST',
+        body: new URLSearchParams({ mode: 'continue', scenario: 'custom', level: '3', message: text, history: JSON.stringify(dynamicMessages), login, customSystemPrompt: dynamicAiPrompt })
+      });
+      const data = await res.json();
+      if (data.message) addDynamicMessage('bot', data.message);
+    } catch(e) { addDynamicMessage('bot', 'Ошибка связи.'); }
   }
   function endDynamicSession() {
     openModule('menu');
   }
+  async function deleteModule(title) {
+    if (!confirm('Удалить модуль "' + title + '"?')) return;
+    try {
+      await fetch(`${API_URL}?action=deleteLmsModule&managerLogin=${login}&title=${encodeURIComponent(title)}`);
+      loadLmsModules();
+    } catch(e) { alert('Ошибка удаления'); }
+  }
 
-  // Остальной код тренажёра (старый) оставлен без изменений, но скрыт
+  // Базовый тренажёр
   let currentScenario = 'sales_manager';
   let currentLevel = '3';
   let trainerMessages = [];
