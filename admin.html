@@ -41,8 +41,8 @@
     .login-form { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 40px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; }
     .login-form h2 { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
-    .login-form input[type="text"] { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; margin-bottom: 16px; outline: none; }
-    .login-form input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+    .login-form input[type="password"] { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; margin-bottom: 16px; outline: none; }
+    .login-form input[type="password"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
     .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00); color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; }
     .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); }
     .login-error { color: var(--danger); margin-top: 12px; font-weight: 500; }
@@ -57,8 +57,8 @@
   <div id="loginScreen" class="login-screen">
     <div class="login-form">
       <h2><img src="belchonok.png" style="height: 2.5rem; vertical-align: middle;" alt="Бельчонок"> Командный центр</h2>
-      <p>Введите логин администратора</p>
-      <input type="text" id="loginInput" placeholder="Логин" />
+      <p>Введите пароль администратора</p>
+      <input type="password" id="loginInput" placeholder="Пароль" />
       <button class="login-btn" onclick="login()">Войти</button>
       <div id="loginError" class="login-error"></div>
     </div>
@@ -87,9 +87,7 @@
   </div>
 
   <script>
-    // ==================== ИСПРАВЛЕННЫЙ API URL ====================
     const API_URL = 'https://script.google.com/macros/s/AKfycbxMxCJG_mEO-WaV_Jw76_nF37VCisQ5tdJHW9lvaoET42sv548S4t_4IZdGai-e4xoQ/exec';
-    const ADMIN_LOGIN = 'adminboss';
     let levelsCache = [];
 
     function showLoading() { const overlay = document.createElement('div'); overlay.className='loading-overlay'; overlay.innerHTML='<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>'; document.body.appendChild(overlay); }
@@ -102,18 +100,32 @@
       } catch(e) { console.error(e); } 
     }
 
-    function login() {
-      const login = document.getElementById('loginInput').value.trim();
-      if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
-      if (login !== ADMIN_LOGIN) { document.getElementById('loginError').textContent = 'Доступ запрещён'; return; }
-      localStorage.setItem('karmabank_admin_login', login);
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'flex';
-      loadLevels().then(() => { fetchData(); setInterval(fetchData, 30000); });
+    async function login() {
+      const password = document.getElementById('loginInput').value.trim();
+      if (!password) { document.getElementById('loginError').textContent = 'Введите пароль'; return; }
+      
+      showLoading();
+      try {
+        const res = await fetch(`${API_URL}?action=adminAuth&password=${encodeURIComponent(password)}`);
+        const data = await res.json();
+        hideLoading();
+        
+        if (data.success) {
+          localStorage.setItem('karmabank_admin_token', data.token);
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('mainScreen').style.display = 'flex';
+          loadLevels().then(() => { fetchData(); setInterval(fetchData, 30000); });
+        } else {
+          document.getElementById('loginError').textContent = data.message || 'Доступ запрещён';
+        }
+      } catch(e) {
+        hideLoading();
+        document.getElementById('loginError').textContent = 'Ошибка соединения';
+      }
     }
 
     function logout() {
-      localStorage.removeItem('karmabank_admin_login');
+      localStorage.removeItem('karmabank_admin_token');
       document.getElementById('mainScreen').style.display = 'none';
       document.getElementById('loginScreen').style.display = 'flex';
       document.getElementById('loginInput').value = '';
@@ -123,10 +135,11 @@
     async function fetchData() {
       showLoading();
       try {
+        const token = localStorage.getItem('karmabank_admin_token');
         const [employees, tasks, rewards] = await Promise.all([
-          fetch(`${API_URL}?action=getAllEmployees`).then(r => r.json()),
-          fetch(`${API_URL}?action=getAllTasks`).then(r => r.json()),
-          fetch(`${API_URL}?action=getRewards`).then(r => r.json())
+          fetch(`${API_URL}?action=getAllEmployees&token=${token}`).then(r => r.json()),
+          fetch(`${API_URL}?action=getAllTasks&token=${token}`).then(r => r.json()),
+          fetch(`${API_URL}?action=getRewards&token=${token}`).then(r => r.json())
         ]);
         updateMetrics(employees, tasks);
         updateRating(employees);
@@ -162,11 +175,16 @@
       document.getElementById('rewardList').innerHTML = rewards.map(r => `<div class="reward-item"><span>${r.name}</span><span>${r.cost} карм.</span></div>`).join('');
     }
 
-    if (localStorage.getItem('karmabank_admin_login') === ADMIN_LOGIN) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'flex';
-      loadLevels().then(() => { fetchData(); setInterval(fetchData, 30000); });
-    }
+    // Проверка при загрузке
+    (function init() {
+      const token = localStorage.getItem('karmabank_admin_token');
+      if (token) {
+        // Можно добавить проверку валидности токена, но пока просто показываем панель
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainScreen').style.display = 'flex';
+        loadLevels().then(() => { fetchData(); setInterval(fetchData, 30000); });
+      }
+    })();
   </script>
 </body>
 </html>
