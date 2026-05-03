@@ -8,7 +8,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root { --bg-primary: #0a1628; --bg-secondary: #0f1f35; --bg-card: #152238; --text-primary: #eaf0fb; --text-secondary: #9aa9c1; --accent: #f97316; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --border: #1f3350; --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4); }
-    * { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Убираем текстовый курсор (каретку) везде, кроме полей ввода */
+    * {
+      caret-color: transparent;
+    }
+    input, textarea, [contenteditable] {
+      caret-color: auto;
+    }
     body { font-family: 'Inter', sans-serif; background: radial-gradient(ellipse at 30% 40%, #0f1f35 0%, #0a1628 70%); color: var(--text-primary); min-height: 100vh; padding: 20px; position: relative; overflow-x: hidden; }
     .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite alternate; opacity: 0.7; }
@@ -111,6 +118,16 @@
     .rating-table { width: 100%; border-collapse: collapse; margin-top: 10px; position: relative; z-index: 2; }
     .rating-table th, .rating-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
     .rating-table th { color: var(--text-secondary); font-size: 0.8rem; }
+    /* Возвращаем нормальные курсоры для интерактивных элементов */
+    button, select, input[type="text"], input[type="number"], textarea, .btn, .action-btn, .back-btn, .verify-btn, .crm-link, .notif-badge {
+      cursor: pointer;
+    }
+    input[type="text"], input[type="number"], textarea, select {
+      cursor: text;
+    }
+    a, .back-btn, .crm-link {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -322,7 +339,7 @@
   function openModal(id) { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-  // Новое голографическое уведомление вместо toast
+  // Замена всех toast на голографическое уведомление
   function showHologramAlert(message, isSuccess = true) {
     const alert = document.createElement('div');
     alert.className = 'hologram-alert';
