@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Путеводная звезда — 3D</title>
+  <style>
+    body {
+      margin: 0; overflow: hidden;
+      background: radial-gradient(ellipse at center, #1a2a45 0%, #0a1628 70%);
+      font-family: 'Inter', sans-serif;
+      cursor: grab;
+    }
+    body:active { cursor: grabbing; }
+    canvas { display: block; }
+    .title {
+      position: absolute; bottom: 30px; width: 100%; text-align: center;
+      font-size: 2.5rem; font-weight: 800; letter-spacing: 6px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 0 20px rgba(249,115,22,0.5));
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="title">ПУТЕВОДНАЯ ЗВЕЗДА</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // --- Сцена ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a1628);
+    scene.fog = new THREE.FogExp2(0x0a1628, 0.0003);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0.3, 4.5);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setClearColor(0x0a1628);
+    document.body.appendChild(renderer.domElement);
+
+    // --- Загрузка текстуры ---
+    const textureLoader = new THREE.TextureLoader();
+    const astralskTexture = textureLoader.load('astralsk.png');
+
+    // --- Создание объёмного барельефа из картинки ---
+    // Группа для персонажа
+    const characterGroup = new THREE.Group();
+    scene.add(characterGroup);
+
+    // Плоскость с картой высот (displacement map)
+    // Используем саму же текстуру как карту смещения — светлые участки будут выступать вперёд.
+    const geometry = new THREE.PlaneGeometry(1.8, 1.8, 64, 64);
+    const material = new THREE.MeshStandardMaterial({
+      map: astralskTexture,
+      displacementMap: astralskTexture,   // <-- это создаст эффект объёма!
+      displacementScale: 0.3,
+      roughness: 0.2,
+      metalness: 0.1,
+      emissive: new THREE.Color(0x331100),
+    });
+
+    const relief = new THREE.Mesh(geometry, material);
+    relief.castShadow = true;
+    relief.receiveShadow = true;
+    characterGroup.add(relief);
+
+    // --- Свечение позади персонажа (ореол) ---
+    const haloGeometry = new THREE.SphereGeometry(1.2, 32, 32);
+    const haloMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uColor1: { value: new THREE.Color(0xf97316) },
+        uColor2: { value: new THREE.Color(0xc084fc) },
+        uTime: { value: 0 },
+      },
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        uniform float uTime;
+        uniform vec3 uColor1;
+        uniform vec3 uColor2;
+        void main() {
+          float fresnel = dot(vNormal, vec3(0.0, 0.0, 1.0));
+          fresnel = pow(1.0 - abs(fresnel), 3.0);
+          float pulse = sin(uTime * 2.0) * 0.5 + 0.5;
+          vec3 haloColor = mix(uColor1, uColor2, pulse);
+          gl_FragColor = vec4(haloColor, fresnel * 0.7);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+    scene.add(halo);
+
+    // --- Частицы (звёздная пыль) ---
+    const particlesCount = 400;
+    const particlesPositions = new Float32Array(particlesCount * 3);
+    for (let i = 0; i < particlesCount * 3; i += 3) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 1.4 + Math.random() * 0.8;
+      const height = (Math.random() - 0.5) * 2.5;
+      particlesPositions[i] = Math.cos(angle) * radius;
+      particlesPositions[i + 1] = height;
+      particlesPositions[i + 2] = Math.sin(angle) * radius;
+    }
+    const particlesGeometry = new THREE.BufferGeometry();
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlesPositions, 3));
+    const particlesMaterial = new THREE.PointsMaterial({
+      color: 0xfbbf24,
+      size: 0.03,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      map: (() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 8; canvas.height = 8;
+        const ctx = canvas.getContext('2d');
+        ctx.beginPath(); ctx.arc(4, 4, 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'white'; ctx.fill();
+        return new THREE.CanvasTexture(canvas);
+      })(),
+    });
+    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particles);
+
+    // --- Освещение ---
+    scene.add(new THREE.AmbientLight(0x404060));
+    const keyLight = new THREE.DirectionalLight(0xf97316, 1.4);
+    keyLight.position.set(2, 3, 4);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+    const fillLight = new THREE.PointLight(0xc084fc, 0.8);
+    fillLight.position.set(-2, -1, -2);
+    scene.add(fillLight);
+
+    // --- Управление ---
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.rotateSpeed = 0.5;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 2.0;
+    controls.enableZoom = true;
+    controls.zoomSpeed = 0.8;
+    controls.enablePan = false;
+    controls.target.set(0, 0, 0);
+
+    // --- Анимация ---
+    const clock = new THREE.Clock();
+    function animate() {
+      const elapsedTime = performance.now() * 0.001;
+      haloMaterial.uniforms.uTime.value = elapsedTime;
+      particles.rotation.y += 0.0004;
+      particles.rotation.x += 0.0001;
+      // Лёгкое покачивание персонажа
+      characterGroup.rotation.y = Math.sin(elapsedTime * 1.5) * 0.05;
+      characterGroup.rotation.x = Math.cos(elapsedTime * 2.0) * 0.02;
+
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
