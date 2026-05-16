@@ -1,230 +1,714 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кармический банк</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #fff4e6;
-            color: #1a2634;
-            min-height: 100vh;
-            user-select: none;
-        }
-        .bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(180deg, #87CEEB 0%, #FFDAB9 60%, #FFE4B5 100%);
-        }
-        .sun {
-            position: fixed; top: 25px; right: 70px; width: 100px; height: 100px;
-            background: #FFD700; border-radius: 50%;
-            box-shadow: 0 0 120px 30px #FFA500, 0 0 200px 60px #FF8C00;
-            cursor: pointer; transition: transform 0.15s;
-        }
-        .sun.alive { animation: bounce 0.4s ease; }
-        @keyframes bounce {
-            0% { transform: scale(1); } 30% { transform: scale(1.15); }
-            60% { transform: scale(0.95); } 100% { transform: scale(1); }
-        }
-        .sun-face {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; transition: opacity 0.3s; pointer-events: none;
-        }
-        .sun-eye {
-            position: absolute; width: 12px; height: 12px;
-            background: #1a2634; border-radius: 50%; top: 30px;
-        }
-        .sun-eye.left { left: 26px; } .sun-eye.right { right: 26px; }
-        .sun-eye::after {
-            content: ''; position: absolute;
-            width: 4px; height: 4px; background: white;
-            border-radius: 50%; top: 3px; left: 3px;
-        }
-        .sun-mouth {
-            position: absolute; bottom: 32px; left: 50%;
-            transform: translateX(-50%); width: 28px; height: 14px;
-            border-bottom: 3px solid #1a2634; border-radius: 0 0 14px 14px;
-        }
-        .sun-blush {
-            position: absolute; width: 10px; height: 6px;
-            background: rgba(255,100,100,0.6); border-radius: 50%; top: 44px;
-        }
-        .sun-blush.left { left: 20px; } .sun-blush.right { right: 20px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Кармический банк</title>
+  <link rel="icon" type="image/png" href="astralsk.png">
+  <link rel="apple-touch-icon" href="astralsk.png">
+  <style>
+    .right-dashboard .dash-card h3 {
+  background: linear-gradient(135deg, #c084fc, #38bdf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+    :root {
+      --bg-primary: #0a1628;
+      --bg-secondary: #0f1f35;
+      --bg-card: #152238;
+      --text-primary: #eaf0fb;
+      --text-secondary: #9aa9c1;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #1f3350;
+      --shadow: 0 20px 40px rgba(0,0,0,0.5);
+      --hologram-glow: 0 0 8px rgba(249,115,22,0.6), 0 0 16px rgba(192,132,252,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(145deg, #0a1628 0%, #0f1f35 50%, #0c1b30 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    input, textarea { user-select: text; }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
-        .card {
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);
-            border-radius: 32px; padding: 30px; margin-bottom: 30px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5);
-        }
-        .btn {
-            padding: 14px 32px; border-radius: 40px; font-weight: 700; font-size: 16px;
-            cursor: pointer; border: none; transition: all 0.25s;
-            background: linear-gradient(135deg, #A5D6A7, #FFB74D);
-            color: #1a2634; letter-spacing: 0.3px;
-            position: relative; z-index: 1;
-            display: inline-flex; align-items: center; gap: 8px;
-            margin: 6px; text-decoration: none;
-        }
-        .btn::before {
-            content: ''; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
-            border-radius: 43px;
-            background: linear-gradient(45deg, #FFD700, #FF8C00, #FFD700, #FF8C00);
-            background-size: 300% 300%; z-index: -1; animation: hologram 3s ease infinite; opacity: 0.35;
-        }
-        @keyframes hologram {
-            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
-        }
-        .btn:hover { transform: translateY(-2px); }
-        input {
-            padding: 16px 20px; border-radius: 30px; border: 2px solid #FFD700;
-            font-size: 16px; width: 100%; max-width: 280px; outline: none;
-            background: rgba(255,255,255,0.9); color: #1a2634;
-            text-align: center;
-        }
-        .balance-grid { display: flex; gap: 15px; flex-wrap: wrap; margin: 20px 0; }
-        .balance-item {
-            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.15));
-            border-radius: 20px; padding: 20px; flex: 1; min-width: 130px;
-            text-align: center; font-weight: 700;
-        }
-        .task {
-            background: rgba(255,255,255,0.6); border-radius: 16px;
-            padding: 15px; margin: 10px 0; display: flex;
-            justify-content: space-between; align-items: center;
-        }
-        .nav-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-    </style>
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes softGlow {
+      0% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.2)); }
+      50% { filter: drop-shadow(0 0 4px rgba(16,185,129,0.4)) drop-shadow(0 0 2px #34d399); }
+      100% { filter: drop-shadow(0 0 1px rgba(16,185,129,0.2)); }
+    }
+    @keyframes starTwinkle {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 6px #f97316); }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+    @keyframes heartPulse {
+      0% { transform: scale(1); fill: rgba(249,115,22,0.3); }
+      50% { transform: scale(1.15); fill: rgba(249,115,22,0.6); filter: drop-shadow(0 0 6px #f97316); }
+      100% { transform: scale(1); fill: rgba(249,115,22,0.3); }
+    }
+    @keyframes aurora {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes borderShine {
+      0% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0.2); }
+      50% { border-color: rgba(192,132,252,0.8); box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
+      100% { border-color: rgba(249,115,22,0.4); box-shadow: 0 0 0 0 rgba(249,115,22,0); }
+    }
+    @keyframes arrowPulse {
+      0%, 100% { opacity: 0.4; transform: rotate(45deg) scale(0.8); box-shadow: 0 0 8px var(--accent); }
+      50% { opacity: 1; transform: rotate(45deg) scale(1.2); box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
+    }
+    @keyframes mascotFloat {
+      0% { transform: translateY(0); filter: drop-shadow(0 0 4px #f97316); }
+      50% { transform: translateY(-3px); filter: drop-shadow(0 0 12px #c084fc); }
+      100% { transform: translateY(0); filter: drop-shadow(0 0 4px #f97316); }
+    }
+    .mascot-icon {
+      animation: mascotFloat 3s ease-in-out infinite;
+      transition: transform 0.3s;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .mascot-icon:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .loading-arrows { display: flex; gap: 12px; align-items: center; justify-content: center; }
+    .arrow {
+      width: 14px; height: 14px;
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      border-radius: 2px;
+      animation: arrowPulse 1.2s infinite ease-in-out both;
+      transform: rotate(45deg);
+      box-shadow: 0 0 6px var(--accent);
+    }
+    .arrow:nth-child(1) { animation-delay: 0s; }
+    .arrow:nth-child(2) { animation-delay: 0.15s; }
+    .arrow:nth-child(3) { animation-delay: 0.3s; }
+    .loading-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
+    }
+
+    .stars-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    .star-dot {
+      position: absolute; background: white; border-radius: 50%;
+      animation: twinkleStar 2.5s infinite alternate; opacity: 0.6;
+    }
+    @keyframes twinkleStar {
+      0% { opacity: 0.25; transform: scale(0.7); }
+      100% { opacity: 0.9; transform: scale(1.2); }
+    }
+
+    /* Логин */
+    .login-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .login-form {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid var(--accent); border-radius: 24px; padding: 40px 30px;
+      box-shadow: 0 0 40px rgba(249,115,22,0.4), 0 15px 30px rgba(0,0,0,0.5);
+      width: 100%; max-width: 400px; text-align: center; animation: fadeInUp 0.6s ease;
+      position: relative; overflow: hidden;
+    }
+    .login-form::before {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(16,185,129,0.1) 0%, transparent 40%);
+      background-size: 200% 200%; animation: aurora 8s ease infinite; pointer-events: none;
+    }
+    .login-form > * { position: relative; z-index: 1; }
+    .login-form .login-avatar {
+      width: 48px; height: 48px; margin: 0 auto 16px;
+      border-radius: 50%; object-fit: cover; animation: starTwinkle 2s infinite;
+    }
+    .login-form h2 { font-size: 2rem; margin-bottom: 8px; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .login-form p { color: var(--text-secondary); margin-bottom: 24px; }
+    .login-form input {
+      width: 100%; padding: 14px 16px; border: 1px solid rgba(249,115,22,0.5);
+      border-radius: 14px; background: var(--bg-secondary); color: var(--text-primary);
+      font-size: 1rem; margin-bottom: 16px; outline: none;
+    }
+    .login-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+    .login-btn {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #e65c00);
+      color: white; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .login-btn:hover { background: linear-gradient(135deg, var(--accent-hover), #cc5200); transform: scale(1.02); }
+    .login-error { color: var(--danger); margin-top: 12px; }
+
+    .main-screen { display: none; flex-direction: column; flex: 1; position: relative; z-index: 1; }
+    .header {
+      background: rgba(21, 38, 56, 0.7); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .header h1 { font-size: 1.4rem; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, #f97316, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .user-name-link {
+      font-weight: 700; font-size: 1rem; cursor: pointer;
+      background: linear-gradient(135deg, #c084fc, #818cf8, #38bdf8);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .user-dept {
+      color: #c084fc; font-weight: 500; font-size: 0.85rem;
+      background: rgba(139, 92, 246, 0.1); padding: 4px 12px; border-radius: 20px;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .chat-header-btn, .path-to-perfect, .health-btn {
+      background: rgba(21,38,56,0.6); border: 1px solid rgba(249,115,22,0.8); border-radius: 40px;
+      padding: 6px 18px; font-weight: 600; font-size: 0.85rem; display: inline-flex;
+      align-items: center; gap: 8px; transition: all 0.3s; cursor: pointer; color: var(--text-primary);
+    }
+    .path-to-perfect { gap: 0; }
+    .health-btn svg { width: 20px; height: 20px; }
+    .health-btn .heart-path { fill: rgba(249,115,22,0.3); stroke: #f97316; animation: heartPulse 2s infinite; }
+    .chat-header-btn:hover, .path-to-perfect:hover, .health-btn:hover {
+      box-shadow: var(--hologram-glow); border-color: #c084fc; transform: translateY(-2px);
+    }
+    .chat-text-glow {
+      font-weight: 600; font-size: 0.85rem;
+      background: linear-gradient(135deg, #c084fc, #38bdf8);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: softGlow 4s ease-in-out infinite;
+    }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center;
+      gap: 6px; font-size: 0.85rem;
+    }
+    .logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+
+    .container {
+      max-width: 1300px; width: 100%; margin: 0 auto;
+      padding: 24px; display: grid;
+      grid-template-columns: 420px 1fr; gap: 32px; align-items: start;
+    }
+    .left-column { display: flex; flex-direction: column; gap: 20px; }
+
+    .balance-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border-radius: 24px; padding: 28px 20px 20px; text-align: center;
+      border: 1px solid var(--border); position: relative;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4); overflow: hidden;
+    }
+    .balance-card::before {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.1) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 40%);
+      background-size: 200% 200%; animation: aurora 12s ease infinite; pointer-events: none;
+    }
+    .balance-card > * { position: relative; z-index: 1; }
+    .balance-label {
+      font-size: 1.2rem; letter-spacing: 2px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: softGlow 4s ease-in-out infinite; margin-bottom: 4px; font-weight: 700;
+    }
+    .balance-value {
+      font-size: 3.6rem; font-weight: 800;
+      background: linear-gradient(135deg, #10b981, #34d399, #059669);
+      background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: softGlow 4s ease-in-out infinite; line-height: 1; margin-bottom: 4px;
+      filter: drop-shadow(0 0 2px rgba(16,185,129,0.3));
+    }
+    .balance-sub {
+      font-size: 1.2rem; font-weight: 700;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: softGlow 4s ease-in-out infinite; margin-bottom: 22px;
+    }
+    .energy-line-wide {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 1rem; font-weight: 600; color: var(--accent);
+      margin-bottom: 20px; padding: 8px; border-radius: 12px;
+      background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.15);
+    }
+    .energy-icon {
+      width: 20px; height: 20px; stroke: #f97316; fill: none;
+      filter: drop-shadow(0 0 4px #f97316); animation: softGlow 2s infinite;
+    }
+    .balance-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .action-btn {
+      background: var(--bg-card); border: 1px solid rgba(249,115,22,0.5); border-radius: 20px;
+      padding: 14px 18px; cursor: pointer; transition: all 0.3s ease;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      min-width: 100px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      animation: borderShine 4s infinite;
+    }
+    .action-btn .icon-wrapper { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+    .action-btn svg { width: 26px; height: 26px; filter: drop-shadow(0 0 2px var(--accent)); transition: all 0.3s; }
+    .action-btn span { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+    .action-btn:hover { border-color: var(--accent); box-shadow: var(--hologram-glow); transform: translateY(-3px); }
+
+    .wide-btn {
+      background: var(--bg-card); border: 1px solid rgba(249,115,22,0.5); border-radius: 20px;
+      padding: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; color: white;
+      animation: borderShine 4s infinite;
+    }
+    .wide-btn svg { width: 24px; height: 24px; stroke: #f97316; fill: none; }
+    .wide-btn:hover { border-color: var(--accent); box-shadow: var(--hologram-glow); background: rgba(249,115,22,0.1); }
+
+    /* ПРАВАЯ КОЛОНКА */
+    .right-dashboard {
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .dash-card {
+      background: radial-gradient(circle at 20% 30%, #1a2a45 0%, #0a1628 70%);
+      border: 1px solid rgba(249,115,22,0.5); border-radius: 20px;
+      padding: 20px; transition: all 0.3s;
+      backdrop-filter: blur(4px);
+      animation: borderShine 4s infinite;
+    }
+    .dash-card h3 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;
+      background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .energy-bar-container {
+      margin: 12px 0 6px; background: var(--border); border-radius: 10px;
+      height: 10px; overflow: hidden;
+    }
+    .energy-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent), #c084fc);
+      border-radius: 10px; transition: width 0.8s;
+    }
+    .active-count {
+      font-size: 2.2rem; font-weight: 800; color: var(--warning);
+      display: block; margin: 8px 0;
+    }
+    .metric-row {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .goals-list { list-style: none; padding: 0; margin: 8px 0; }
+    .goals-list li { font-size: 0.85rem; color: var(--text-secondary); padding: 4px 0; border-bottom: 1px solid var(--border); }
+    .goals-list li:last-child { border-bottom: none; }
+    .rating-badge {
+      display: inline-block; background: rgba(16,185,129,0.15); color: var(--success);
+      padding: 4px 12px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;
+    }
+
+    .premium-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; justify-content: space-between; }
+    .premium-feature-btn {
+      flex: 1; min-width: 140px; background: rgba(21,38,56,0.5); backdrop-filter: blur(4px);
+      border: 1px solid rgba(249,115,22,0.7); border-radius: 60px; padding: 10px 12px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      cursor: default; transition: all 0.3s; animation: borderShine 3s infinite;
+    }
+    .premium-feature-btn svg { width: 24px; height: 24px; filter: drop-shadow(0 0 3px #f97316); animation: softGlow 2s infinite; }
+    .premium-feature-btn span { font-weight: 600; font-size: 0.8rem; color: var(--text-primary); }
+    .premium-feature-btn:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: translateY(-2px); }
+
+    .knowledge-fab {
+      position: fixed; bottom: 24px; right: 24px; background: rgba(21,38,56,0.7); backdrop-filter: blur(12px);
+      border: 1px solid rgba(249,115,22,0.9); border-radius: 60px; padding: 12px 28px;
+      display: flex; align-items: center; gap: 12px; cursor: pointer; font-weight: 700; font-size: 1rem;
+      z-index: 1000; transition: all 0.3s; color: var(--text-primary);
+    }
+    .knowledge-fab img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; animation: starTwinkle 2s infinite; }
+    .knowledge-fab:hover { border-color: #c084fc; box-shadow: var(--hologram-glow); transform: translateY(-4px); }
+
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: linear-gradient(145deg, #1a2f4a 0%, #0f1f35 100%);
+      border: 1px solid var(--accent); border-radius: 28px; padding: 36px;
+      max-width: 440px; width: 90%; text-align: center;
+      box-shadow: 0 0 60px rgba(249,115,22,0.6); animation: modalPop 0.4s ease;
+    }
+    .modal-content input, .modal-content textarea {
+      width: 100%; padding: 12px 16px; margin: 12px 0; border-radius: 16px;
+      border: 1px solid rgba(249,115,22,0.5); background: var(--bg-secondary);
+      color: var(--text-primary); font-size: 1rem; outline: none; transition: 0.2s;
+    }
+    .modal-content input:focus, .modal-content textarea:focus { border-color: #c084fc; box-shadow: 0 0 0 2px rgba(249,115,22,0.3); }
+    .modal-content input[type="number"] { -moz-appearance: textfield; }
+    .modal-content input[type="number"]::-webkit-inner-spin-button,
+    .modal-content input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .modal-content .btn-task {
+      margin-top: 12px; background: linear-gradient(135deg, #f97316, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      border: 1px solid var(--accent); padding: 10px 24px; font-weight: 800;
+    }
+    .modal-close-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 10px 24px; border-radius: 40px; cursor: pointer; margin-top: 16px; transition: 0.2s;
+    }
+    .modal-close-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; padding: 16px; }
+      .balance-actions { gap: 12px; }
+      .action-btn { min-width: 80px; padding: 12px 12px; }
+      .premium-row { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-<div class="bg"></div>
-<div class="sun" id="sun">
-    <div class="sun-face" id="sunFace">
-        <div class="sun-eye left"></div><div class="sun-eye right"></div>
-        <div class="sun-mouth"></div>
-        <div class="sun-blush left"></div><div class="sun-blush right"></div>
-    </div>
+<div class="stars-bg" id="starsBackground"></div>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-form">
+    <img src="astralsk.png" class="login-avatar mascot-icon" alt="Астралиск">
+    <h2>Кармический банк</h2>
+    <p>Введите ваш логин, чтобы продолжить</p>
+    <input type="text" id="loginInput" placeholder="Логин (например, arthur)" />
+    <button class="login-btn" onclick="login()">Войти</button>
+    <div id="loginError" class="login-error"></div>
+  </div>
 </div>
 
-<div class="container">
-    <!-- Экран входа -->
-    <div id="loginScreen" class="card">
-        <h1>🌴 Кармический банк</h1>
-        <p style="margin: 20px 0;">Войдите, чтобы увидеть баланс и задания</p>
-        <input type="text" id="loginInput" placeholder="Ваш логин" autofocus>
-        <button class="btn" onclick="login()">Войти</button>
-        <p id="loginError" style="color:#FF4500; margin-top:10px;"></p>
+<div id="mainScreen" class="main-screen">
+  <div class="header">
+    <div class="header-left-group">
+      <h1 onclick="location.reload()">Кармический банк</h1>
+      <button class="path-to-perfect" onclick="window.location.href='/simulator.html'">
+        Путь к совершенству
+      </button>
+      <button class="health-btn">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path class="heart-path" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          <circle cx="12" cy="9" r="2.5" fill="rgba(16,185,129,0.3)" stroke="#10b981"/>
+        </svg>
+        Забота о здоровье
+      </button>
     </div>
-
-    <!-- Экран дашборда (скрыт) -->
-    <div id="dashboardScreen" style="display:none;">
-        <div class="card">
-            <h1 id="greeting">Привет!</h1>
-            <div class="balance-grid">
-                <div class="balance-item">🪙 Кармики<br><span id="karma">0</span></div>
-                <div class="balance-item">⚡ Энергия<br><span id="energy">0</span></div>
-                <div class="balance-item">💰 Рубли<br><span id="rubles">0</span></div>
-            </div>
-            <div class="nav-links">
-                <a href="tasks.html" class="btn">📋 Задания</a>
-                <a href="history.html" class="btn">📜 История</a>
-                <a href="shop.html" class="btn">🛒 Магазин</a>
-                <a href="profile.html" class="btn">👤 Профиль</a>
-                <a href="millionaire.html" class="btn">🎮 Миллионер</a>
-                <a href="admin.html" class="btn">⚙️ Админка</a>
-            </div>
-            <button class="btn" onclick="logout()" style="background:#EF9A9A; margin-top:15px;">Выйти</button>
-        </div>
-
-        <div class="card">
-            <h2>📌 Активные задания</h2>
-            <div id="tasksList">Загрузка...</div>
-        </div>
+    <div class="user-info">
+      <span id="userNameDisplay" class="user-name-link" onclick="window.location.href='/profile.html'"></span>
+      <span class="user-dept" id="userDept"></span>
+      <button class="chat-header-btn" onclick="window.location.href='/chat.html'">
+        <span class="chat-text-glow">Чат</span>
+      </button>
+      <button class="logout-btn" onclick="logout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Выйти
+      </button>
     </div>
+  </div>
+  <div class="container">
+    <div class="left-column">
+      <div class="balance-card">
+        <div class="balance-label">Баланс</div>
+        <div class="balance-value" id="userPoints">0</div>
+        <div class="balance-sub">кармиков</div>
+        <div class="energy-line-wide" id="energyDisplay"></div>
+        <div class="balance-actions">
+          <button class="action-btn" onclick="openTransferModal()">
+            <span class="icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none">
+                <defs><linearGradient id="gradTransfer" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs>
+                <path d="M7 16 L17 8 M17 8 L13 8 M17 8 L17 12" stroke="url(#gradTransfer)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M17 16 L7 8 M7 8 L11 8 M7 8 L7 12" stroke="url(#gradTransfer)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span>Перевести</span>
+          </button>
+          <button class="action-btn" onclick="window.location.href='/spend.html'">
+            <span class="icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none">
+                <defs><linearGradient id="gradShop" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+                <path d="M6 7 L18 7 L17 20 L7 20 Z" stroke="url(#gradShop)" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M9 7 L9 5 C9 3.5 10.5 2 12 2 C13.5 2 15 3.5 15 5 L15 7" stroke="url(#gradShop)" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="10" cy="12" r="0.8" fill="url(#gradShop)"/>
+                <circle cx="14" cy="12" r="0.8" fill="url(#gradShop)"/>
+              </svg>
+            </span>
+            <span>Магазин</span>
+          </button>
+          <button class="action-btn" onclick="window.location.href='/history.html'">
+            <span class="icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none">
+                <defs><linearGradient id="gradHistory" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs>
+                <rect x="4" y="5" width="16" height="15" rx="2" stroke="url(#gradHistory)" stroke-width="1.8"/>
+                <path d="M8 10 L16 10 M8 14 L14 14" stroke="url(#gradHistory)" stroke-width="1.8" stroke-linecap="round"/>
+                <polyline points="16 8 10 13 7 11" stroke="url(#gradHistory)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span>Операции</span>
+          </button>
+        </div>
+        <button class="wide-btn" onclick="window.location.href='/purchases.html'">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1 13H6L5 7z" stroke="#f97316"/><path d="M9 7V5a2 2 0 0 1 4 0v2" stroke="#f97316"/></svg>
+          Мои покупки
+        </button>
+      </div>
+    </div>
+    <div class="right-dashboard">
+      <div class="dash-card">
+        <h3>Твой путь</h3>
+        <div class="metric-row">
+          <span style="font-size: 0.9rem; color: var(--text-secondary);">Рейтинг</span>
+          <span class="rating-badge" id="ratingBadge">0</span>
+        </div>
+        <div class="metric-row" style="margin-top: 12px;">
+          <span style="font-size: 0.9rem; color: var(--text-secondary);">Энергия</span>
+          <span style="font-weight: 700;" id="energyDashValue">0</span>
+        </div>
+        <div class="energy-bar-container">
+          <div class="energy-bar-fill" id="energyDashBar" style="width: 0%;"></div>
+        </div>
+        <div class="metric-row" style="margin-top: 6px;">
+          <span style="font-size: 0.75rem; color: var(--text-secondary);">до <span id="nextLevelName">Созвездия</span></span>
+          <span style="font-size: 0.75rem; color: var(--accent);" id="energyRemaining">—</span>
+        </div>
+        <div style="margin-top: 20px;">
+          <span style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 8px;">Цели</span>
+          <ul class="goals-list" id="goalsList">
+            <li>Пройти 3 тренинга по продажам</li>
+            <li>Закрыть 10 сделок в этом месяце</li>
+            <li>Достичь уровня «Созвездие»</li>
+          </ul>
+        </div>
+      </div>
+      <button class="wide-btn" onclick="window.location.href='/tasks.html'">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Перейти к заданиям
+      </button>
+      <div class="premium-row">
+        <div class="premium-feature-btn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#f97316" stroke-width="1.5"/><circle cx="9" cy="7" r="3" stroke="#f97316" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="#c084fc" stroke-width="1.5"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#c084fc" stroke-width="1.5"/></svg>
+          <span>Задания от партнёров</span>
+        </div>
+        <div class="premium-feature-btn">
+          <svg viewBox="0 0 24 24" fill="none" style="width:24px; height:24px;">
+            <path d="M8 3h8l-2 4H10L8 3z" stroke="#fbbf24" stroke-width="1.5"/>
+            <path d="M10 7v2a3 3 0 0 0 6 0V7" stroke="#fbbf24" stroke-width="1.5" fill="rgba(251,191,36,0.15)"/>
+            <circle cx="12" cy="12" r="1" fill="#fbbf24"/>
+          </svg>
+          <span>Турниры</span>
+        </div>
+        <div class="premium-feature-btn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="#c084fc" stroke-width="1.5"/><circle cx="16" cy="10" r="1" fill="#c084fc"/><circle cx="12" cy="10" r="1" fill="#c084fc"/><circle cx="8" cy="10" r="1" fill="#c084fc"/></svg>
+          <span>Обсуждения</span>
+        </div>
+        <div class="premium-feature-btn">
+          <svg viewBox="0 0 24 24" fill="none" style="width:24px; height:24px;">
+            <circle cx="12" cy="12" r="5.5" stroke="#f97316" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="1" fill="#f97316"/>
+            <ellipse cx="12" cy="12" rx="8.5" ry="2.5" stroke="#f97316" stroke-width="1.2" fill="none" transform="rotate(-15 12 12)"/>
+          </svg>
+          <span>Гороскопы</span>
+        </div>
+        <div class="premium-feature-btn">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#38bdf8" stroke-width="1.5"/><path d="M7 9h10" stroke="#38bdf8" stroke-width="2"/><path d="M7 13h8" stroke="#38bdf8" stroke-width="2"/><path d="M7 17h6" stroke="#38bdf8" stroke-width="2"/></svg>
+          <span>Новости</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="knowledge-fab" onclick="window.location.href='/knowledge.html'">
+    <img src="astralsk.png" alt="База знаний">
+    <span>База знаний</span>
+  </div>
+</div>
+
+<div id="transferModal" class="modal">
+  <div class="modal-content">
+    <h2 style="margin-bottom:16px;">Перевод кармиков</h2>
+    <input type="text" id="receiverLogin" placeholder="Логин получателя">
+    <input type="number" id="transferAmount" placeholder="Сумма">
+    <input type="text" id="transferComment" placeholder="Комментарий (необязательно)">
+    <button class="btn-task" onclick="executeTransfer()">Отправить</button>
+    <button class="modal-close-btn" onclick="closeTransferModal()">Отмена</button>
+    <div id="transferError" style="color:var(--danger); margin-top:12px"></div>
+  </div>
 </div>
 
 <script>
-const API = '/api'; // nginx прокси
+  const API_URL = 'https://bba1ef5ji9jvpn21c5t1.containers.yandexcloud.net';
+  let currentLogin = localStorage.getItem('karmabank_login') || '';
+  let currentPoints = 0, currentEnergy = 0;
+  let levelsCache = [];
 
-// Солнце
-const sun = document.getElementById('sun');
-const sunFace = document.getElementById('sunFace');
-sun.addEventListener('click', () => {
-    sun.classList.add('alive');
-    setTimeout(() => sun.classList.remove('alive'), 400);
-    sunFace.classList.add('visible');
-    setTimeout(() => sunFace.classList.remove('visible'), 1800);
-});
+  async function loadLevels() { try { const res = await fetch(`${API_URL}?action=getLevels`); levelsCache = await res.json(); } catch(e) {} }
 
-// Авторизация
-async function login() {
-    const userId = document.getElementById('loginInput').value.trim();
-    if (!userId) return;
-    try {
-        const res = await fetch(`${API}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId })
-        });
-        const data = await res.json();
-        if (data.status === 'ok') {
-            localStorage.setItem('karmabank_user', data.user_id);
-            showDashboard(data.user_id);
-        } else {
-            document.getElementById('loginError').textContent = 'Пользователь не найден';
+  function showLoading() {
+    const overlay = document.createElement('div'); overlay.className = 'loading-overlay';
+    overlay.innerHTML = '<div class="loading-arrows"><div class="arrow"></div><div class="arrow"></div><div class="arrow"></div></div>';
+    document.body.appendChild(overlay);
+  }
+  function hideLoading() { const o = document.querySelector('.loading-overlay'); if (o) o.remove(); }
+
+  function updateEnergyDisplay(energy) {
+    document.getElementById('energyDisplay').innerHTML = `
+      <svg class="energy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-linejoin="round"/>
+      </svg>
+      ${energy} энергии
+    `;
+  }
+
+  async function updateDashboard(energy, activeCount) {
+    document.getElementById('energyDashValue').textContent = energy;
+    if (levelsCache.length) {
+      let curLevel = levelsCache[0], nextLevel = levelsCache[1] || null;
+      for (let i = levelsCache.length - 1; i >= 0; i--) {
+        if (energy >= levelsCache[i].energy) {
+          curLevel = levelsCache[i];
+          nextLevel = levelsCache[i + 1] || null;
+          break;
         }
-    } catch(e) {
-        document.getElementById('loginError').textContent = 'Ошибка соединения';
+      }
+      if (nextLevel) {
+        const progress = Math.min(((energy - curLevel.energy) / (nextLevel.energy - curLevel.energy)) * 100, 100);
+        document.getElementById('energyDashBar').style.width = progress + '%';
+        document.getElementById('nextLevelName').textContent = nextLevel.name;
+        document.getElementById('energyRemaining').textContent = `ещё ${nextLevel.energy - energy}`;
+      } else {
+        document.getElementById('energyDashBar').style.width = '100%';
+        document.getElementById('nextLevelName').textContent = 'Макс';
+        document.getElementById('energyRemaining').textContent = '';
+      }
     }
-}
+    // Обновление рейтинга (заглушка)
+    const rating = Math.min(1000, Math.floor(energy / 10 + currentPoints / 100));
+    document.getElementById('ratingBadge').textContent = rating;
+  }
 
-function logout() {
-    localStorage.removeItem('karmabank_user');
-    document.getElementById('loginScreen').style.display = 'block';
-    document.getElementById('dashboardScreen').style.display = 'none';
-    document.getElementById('loginInput').value = '';
-}
+  async function updateTasksAnalytics() {
+    if (!currentLogin) return;
+    try {
+      const res = await fetch(`${API_URL}?action=getTasks&login=${encodeURIComponent(currentLogin)}`);
+      const tasks = await res.json();
+      const active = Array.isArray(tasks) ? tasks.filter(t => t.status !== 'Выполнено').length : 0;
+      updateDashboard(currentEnergy, active);
+    } catch(e) {}
+  }
 
-// Дашборд
-async function showDashboard(userId) {
+  function showSuccessNotification(message) {
+    const modal = document.createElement('div'); modal.className = 'modal active';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="success-animation">
+          <div class="check-circle-large">
+            <svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"></polyline></svg>
+          </div>
+          <div class="success-message">${message}</div>
+        </div>
+        <button class="modal-close-btn" onclick="this.closest('.modal').remove()">Закрыть</button>
+      </div>`;
+    document.body.appendChild(modal);
+    setTimeout(() => { if (modal && modal.parentNode) modal.remove(); }, 6000);
+  }
+
+  function login() {
+    const login = document.getElementById('loginInput').value.trim();
+    if (!login) { document.getElementById('loginError').textContent = 'Введите логин'; return; }
+    showLoading();
+    fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(login)}`)
+      .then(r => r.json())
+      .then(async user => {
+        hideLoading();
+        if (user && user.name) {
+          localStorage.setItem('karmabank_login', login);
+          currentLogin = login;
+          currentPoints = user.points || 0;
+          currentEnergy = user.energy || 0;
+          await loadLevels();
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('mainScreen').style.display = 'flex';
+          document.getElementById('userNameDisplay').textContent = user.name;
+          document.getElementById('userDept').textContent = user.department || '';
+          document.getElementById('userPoints').textContent = currentPoints;
+          updateEnergyDisplay(currentEnergy);
+          updateDashboard(currentEnergy, 0);
+          updateTasksAnalytics();
+        } else { document.getElementById('loginError').textContent = 'Пользователь не найден'; }
+      })
+      .catch(() => { hideLoading(); document.getElementById('loginError').textContent = 'Ошибка соединения'; });
+  }
+  function logout() { localStorage.removeItem('karmabank_login'); location.reload(); }
+
+  function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
+  function closeTransferModal() { document.getElementById('transferModal').classList.remove('active'); }
+
+  async function executeTransfer() {
+    const receiver = document.getElementById('receiverLogin').value.trim();
+    const amount = document.getElementById('transferAmount').value;
+    const comment = document.getElementById('transferComment').value.trim();
+    if (!receiver || !amount) { document.getElementById('transferError').textContent = 'Заполните поля'; return; }
+    showLoading();
+    try {
+      const res = await fetch(`${API_URL}?action=transferPoints&sender=${encodeURIComponent(currentLogin)}&receiver=${encodeURIComponent(receiver)}&amount=${encodeURIComponent(amount)}&comment=${encodeURIComponent(comment)}`);
+      const result = await res.json();
+      hideLoading();
+      if (result.success) {
+        closeTransferModal();
+        const userRes = await fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`);
+        const user = await userRes.json();
+        if (user) {
+          currentPoints = user.points;
+          currentEnergy = user.energy || 0;
+          document.getElementById('userPoints').textContent = currentPoints;
+          updateEnergyDisplay(currentEnergy);
+          updateDashboard(currentEnergy, parseInt(document.getElementById('activeTasksCount').textContent));
+        }
+        showSuccessNotification('Перевод выполнен успешно!');
+      } else {
+        document.getElementById('transferError').textContent = result.message;
+      }
+    } catch (e) { hideLoading(); document.getElementById('transferError').textContent = 'Ошибка соединения'; }
+  }
+
+  (function initStars() {
+    const container = document.getElementById('starsBackground');
+    const colors = ['#ffffff', '#e0f0ff', '#fbbf24', '#c084fc', '#38bdf8'];
+    for (let i = 0; i < 50; i++) {
+      const star = document.createElement('div'); star.className = 'star-dot';
+      const size = Math.random() * 2.5 + 0.8;
+      star.style.width = size + 'px'; star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+      star.style.background = colors[Math.floor(Math.random() * colors.length)];
+      star.style.animationDelay = Math.random() * 2 + 's';
+      star.style.animationDuration = (Math.random() * 2 + 1.8) + 's';
+      container.appendChild(star);
+    }
+  })();
+
+  if (currentLogin) {
     document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('dashboardScreen').style.display = 'block';
-    document.getElementById('greeting').textContent = `Привет, ${userId}!`;
-
-    // Профиль
-    try {
-        const profileRes = await fetch(`${API}/?action=getFullProfile&login=${userId}`);
-        const profile = await profileRes.json();
-        document.getElementById('karma').textContent = profile.karma_balance || 0;
-        document.getElementById('energy').textContent = profile.energy_balance || 0;
-        document.getElementById('rubles').textContent = profile.ruble_balance || 0;
-    } catch(e) { console.warn('Профиль не загружен'); }
-
-    // Задания
-    try {
-        const tasksRes = await fetch(`${API}/?action=getAllTasks`);
-        const tasksData = await tasksRes.json();
-        const tasks = tasksData.data || [];
-        const tasksHtml = tasks.length ? tasks.map(t => `
-            <div class="task">
-                <span><strong>${t.title || t.description || 'Задание'}</strong> — ${t.status || 'активно'}</span>
-                <span style="color:#FFA500;">+${t.karma_reward || 0} кармиков</span>
-            </div>
-        `).join('') : '<p>Нет активных заданий</p>';
-        document.getElementById('tasksList').innerHTML = tasksHtml;
-    } catch(e) { document.getElementById('tasksList').innerHTML = 'Ошибка загрузки заданий'; }
-}
-
-// Проверка сессии
-window.onload = () => {
-    const savedUser = localStorage.getItem('karmabank_user');
-    if (savedUser) {
-        document.getElementById('loginInput').value = savedUser;
-        showDashboard(savedUser);
-    }
-};
+    document.getElementById('mainScreen').style.display = 'flex';
+    showLoading();
+    fetch(`${API_URL}?action=getFullProfile&login=${encodeURIComponent(currentLogin)}`)
+      .then(r => r.json()).then(async user => {
+        hideLoading();
+        if (user) {
+          currentPoints = user.points || 0;
+          currentEnergy = user.energy || 0;
+          document.getElementById('userNameDisplay').textContent = user.name;
+          document.getElementById('userDept').textContent = user.department || '';
+          await loadLevels();
+          document.getElementById('userPoints').textContent = currentPoints;
+          updateEnergyDisplay(currentEnergy);
+          updateDashboard(currentEnergy, 0);
+          updateTasksAnalytics();
+        }
+      }).catch(() => hideLoading());
+  }
 </script>
 </body>
 </html>
