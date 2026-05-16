@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кармический банк — Личный кабинет</title>
+    <title>Кармический банк</title>
     <style>
-        /* ---------- Твой оригинальный стиль ---------- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', 'Comic Sans MS', sans-serif;
-            background: #fff4e6; color: #1a2634;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #fff4e6;
+            color: #1a2634;
             min-height: 100vh;
             user-select: none;
         }
-        .tropical-bg {
+        .bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(180deg, #87CEEB 0%, #FFDAB9 60%, #FFE4B5 100%);
         }
@@ -53,92 +53,76 @@
         }
         .sun-blush.left { left: 20px; } .sun-blush.right { right: 20px; }
 
-        /* ---------- Контент ---------- */
-        .container {
-            max-width: 900px; margin: 0 auto; padding: 40px 20px;
-            position: relative; z-index: 1;
-        }
-        .login-card, .dashboard-card, .tasks-card {
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(15px);
-            border-radius: 32px; padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        h1, h2 {
-            background: linear-gradient(90deg, #ffffff, #1E90FF, #FF6347);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
+        .card {
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);
+            border-radius: 32px; padding: 30px; margin-bottom: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5);
         }
         .btn {
             padding: 14px 32px; border-radius: 40px; font-weight: 700; font-size: 16px;
             cursor: pointer; border: none; transition: all 0.25s;
             background: linear-gradient(135deg, #A5D6A7, #FFB74D);
-            color: #1a2634; letter-spacing: 0.5px;
+            color: #1a2634; letter-spacing: 0.3px;
             position: relative; z-index: 1;
-            display: inline-flex; align-items: center; gap: 10px;
-            margin: 8px;
+            display: inline-flex; align-items: center; gap: 8px;
+            margin: 6px; text-decoration: none;
         }
         .btn::before {
             content: ''; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
             border-radius: 43px;
             background: linear-gradient(45deg, #FFD700, #FF8C00, #FFD700, #FF8C00);
-            background-size: 300% 300%; z-index: -1; animation: hologram 3s ease infinite; opacity: 0.4;
+            background-size: 300% 300%; z-index: -1; animation: hologram 3s ease infinite; opacity: 0.35;
         }
         @keyframes hologram {
             0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
         }
-        .btn:hover { transform: translateY(-3px); }
+        .btn:hover { transform: translateY(-2px); }
         input {
             padding: 16px 20px; border-radius: 30px; border: 2px solid #FFD700;
-            font-size: 16px; width: 100%; max-width: 300px; outline: none;
+            font-size: 16px; width: 100%; max-width: 280px; outline: none;
             background: rgba(255,255,255,0.9); color: #1a2634;
+            text-align: center;
         }
-        .balance {
-            display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;
-        }
+        .balance-grid { display: flex; gap: 15px; flex-wrap: wrap; margin: 20px 0; }
         .balance-item {
-            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.2));
-            border-radius: 20px; padding: 20px; flex: 1; min-width: 150px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.15));
+            border-radius: 20px; padding: 20px; flex: 1; min-width: 130px;
             text-align: center; font-weight: 700;
         }
         .task {
-            background: rgba(255,255,255,0.5); border-radius: 16px;
+            background: rgba(255,255,255,0.6); border-radius: 16px;
             padding: 15px; margin: 10px 0; display: flex;
             justify-content: space-between; align-items: center;
         }
-        .nav-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
-        .nav-links a { text-decoration: none; }
+        .nav-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
     </style>
 </head>
 <body>
-<div class="tropical-bg">
-    <div class="sun" id="sun">
-        <div class="sun-face" id="sunFace">
-            <div class="sun-eye left"></div><div class="sun-eye right"></div>
-            <div class="sun-mouth"></div>
-            <div class="sun-blush left"></div><div class="sun-blush right"></div>
-        </div>
+<div class="bg"></div>
+<div class="sun" id="sun">
+    <div class="sun-face" id="sunFace">
+        <div class="sun-eye left"></div><div class="sun-eye right"></div>
+        <div class="sun-mouth"></div>
+        <div class="sun-blush left"></div><div class="sun-blush right"></div>
     </div>
 </div>
 
 <div class="container">
     <!-- Экран входа -->
-    <div id="loginScreen" class="login-card">
+    <div id="loginScreen" class="card">
         <h1>🌴 Кармический банк</h1>
         <p style="margin: 20px 0;">Войдите, чтобы увидеть баланс и задания</p>
         <input type="text" id="loginInput" placeholder="Ваш логин" autofocus>
         <button class="btn" onclick="login()">Войти</button>
-        <p id="loginError" style="color: #FF4500; margin-top: 10px;"></p>
+        <p id="loginError" style="color:#FF4500; margin-top:10px;"></p>
     </div>
 
-    <!-- Экран дашборда (скрыт до входа) -->
-    <div id="dashboardScreen" style="display: none;">
-        <div class="dashboard-card">
-            <h1 id="greeting">Привет, Гость!</h1>
-            <div class="balance">
+    <!-- Экран дашборда (скрыт) -->
+    <div id="dashboardScreen" style="display:none;">
+        <div class="card">
+            <h1 id="greeting">Привет!</h1>
+            <div class="balance-grid">
                 <div class="balance-item">🪙 Кармики<br><span id="karma">0</span></div>
                 <div class="balance-item">⚡ Энергия<br><span id="energy">0</span></div>
                 <div class="balance-item">💰 Рубли<br><span id="rubles">0</span></div>
@@ -151,11 +135,10 @@
                 <a href="millionaire.html" class="btn">🎮 Миллионер</a>
                 <a href="admin.html" class="btn">⚙️ Админка</a>
             </div>
-            <button class="btn" onclick="logout()" style="background: #EF9A9A; margin-top: 15px;">Выйти</button>
+            <button class="btn" onclick="logout()" style="background:#EF9A9A; margin-top:15px;">Выйти</button>
         </div>
 
-        <!-- Активные задания -->
-        <div class="tasks-card">
+        <div class="card">
             <h2>📌 Активные задания</h2>
             <div id="tasksList">Загрузка...</div>
         </div>
@@ -163,9 +146,9 @@
 </div>
 
 <script>
-const API = '/api'; // nginx проксирует /api -> FastAPI
+const API = '/api'; // nginx прокси
 
-// ===== СОЛНЦЕ =====
+// Солнце
 const sun = document.getElementById('sun');
 const sunFace = document.getElementById('sunFace');
 sun.addEventListener('click', () => {
@@ -175,7 +158,7 @@ sun.addEventListener('click', () => {
     setTimeout(() => sunFace.classList.remove('visible'), 1800);
 });
 
-// ===== АВТОРИЗАЦИЯ =====
+// Авторизация
 async function login() {
     const userId = document.getElementById('loginInput').value.trim();
     if (!userId) return;
@@ -204,24 +187,22 @@ function logout() {
     document.getElementById('loginInput').value = '';
 }
 
-// ===== ДАШБОРД =====
+// Дашборд
 async function showDashboard(userId) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboardScreen').style.display = 'block';
     document.getElementById('greeting').textContent = `Привет, ${userId}!`;
 
-    // Загружаем профиль
+    // Профиль
     try {
         const profileRes = await fetch(`${API}/?action=getFullProfile&login=${userId}`);
         const profile = await profileRes.json();
         document.getElementById('karma').textContent = profile.karma_balance || 0;
         document.getElementById('energy').textContent = profile.energy_balance || 0;
         document.getElementById('rubles').textContent = profile.ruble_balance || 0;
-    } catch(e) {
-        console.warn('Профиль не загружен, показываем нули');
-    }
+    } catch(e) { console.warn('Профиль не загружен'); }
 
-    // Загружаем задания
+    // Задания
     try {
         const tasksRes = await fetch(`${API}/?action=getAllTasks`);
         const tasksData = await tasksRes.json();
@@ -233,12 +214,10 @@ async function showDashboard(userId) {
             </div>
         `).join('') : '<p>Нет активных заданий</p>';
         document.getElementById('tasksList').innerHTML = tasksHtml;
-    } catch(e) {
-        document.getElementById('tasksList').innerHTML = 'Ошибка загрузки заданий';
-    }
+    } catch(e) { document.getElementById('tasksList').innerHTML = 'Ошибка загрузки заданий'; }
 }
 
-// ===== ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =====
+// Проверка сессии
 window.onload = () => {
     const savedUser = localStorage.getItem('karmabank_user');
     if (savedUser) {
